@@ -211,7 +211,15 @@ const nickBadge = document.getElementById('nick-label');
 const nickModalBackdrop = document.getElementById('nick-modal-backdrop');
 const nickInput = document.getElementById('nick-input');
 
-const LOCAL_PROGRESS_KEY = 'jc_progress_cache';
+const LOCAL_PROGRESS_KEY = 'jc_personal_progress'; // האלמנטים שהמשתמש הזה עצמו גילה (בדפדפן הזה בלבד)
+
+/* אלמנטי הפתיחה קבועים וזהים לכולם - אין צורך לשלוף אותם מהשרת */
+const STARTING_ITEMS = [
+  { name: 'אש',  emoji: '🔥' },
+  { name: 'מים', emoji: '💧' },
+  { name: 'רוח', emoji: '🌬️' },
+  { name: 'אדמה', emoji: '🌍' },
+];
 
 /* ================= boot ================= */
 function boot(){
@@ -242,16 +250,25 @@ function submitNickname(){
 nickBadge.addEventListener('click', () => { nickModalBackdrop.style.display = 'flex'; nickInput.value = nickname; nickInput.focus(); });
 
 async function startGame(){
-  await loadElements();
+  loadPersonalProgress();
   updateEmptyHint();
 }
 
-/* ================= data ================= */
-async function loadElements(){
-  const { data, error } = await sb.from('elements').select('name, emoji, discovered_by').order('created_at', { ascending: true });
-  if (error) { console.error(error); return; }
-  unlockedItems = data;
+/* ================= personal progress (local to this browser only) ================= */
+function loadPersonalProgress(){
+  let personal = [];
+  try{ personal = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_KEY) || '[]'); }catch{ personal = []; }
+  // מיזוג: אלמנטי הפתיחה תמיד קיימים, בתוספת כל מה שהמשתמש הזה גילה בעצמו
+  const map = new Map();
+  STARTING_ITEMS.forEach(i => map.set(i.name, i));
+  personal.forEach(i => map.set(i.name, i));
+  unlockedItems = [...map.values()];
   renderSidebar();
+}
+
+function savePersonalProgress(){
+  const personal = unlockedItems.filter(i => !STARTING_ITEMS.some(s => s.name === i.name));
+  localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify(personal));
 }
 
 function findItem(name){ return unlockedItems.find(i => i.name === name); }
@@ -292,9 +309,13 @@ function showInfo(item, e){
 function hideInfo(){ infoPanel.classList.remove('show'); }
 
 document.getElementById('btn-reset').addEventListener('click', () => {
-  if (!confirm('לאפס את הלוח? (ההתגליות שלך יישארו שמורות באתר לכולם)')) return;
+  if (!confirm('לאפס את כל ההתקדמות האישית שלך בדפדפן הזה ולהתחיל מחדש רק עם 4 האלמנטים ההתחלתיים?')) return;
+  localStorage.removeItem(LOCAL_PROGRESS_KEY);
+  unlockedItems = [...STARTING_ITEMS];
+  recentlyDiscovered.clear();
   playArea.querySelectorAll('.board-item').forEach(n => n.remove());
   updateEmptyHint();
+  renderSidebar();
 });
 document.getElementById('btn-clear').addEventListener('click', () => {
   playArea.querySelectorAll('.board-item').forEach(n => n.remove());
@@ -404,21 +425,30 @@ async function combineItems(div1, div2){
     div1.classList.add('merged-away'); div2.classList.add('merged-away');
     setTimeout(() => { div1.remove(); div2.remove(); }, 170);
 
-    const isNew = result.isNew || !findItem(result.name);
+    // "חדש עבורי" נקבע אך ורק לפי מה שכבר יש ברשימה האישית של השחקן הזה בדפדפן שלו -
+    // לא לפי מה שקרה במשחק הגלובלי. אם שחקן אחר כבר גילה את זה, זה עדיין "חדש" עבור השחקן הנוכחי
+    // בפעם הראשונה שהוא עצמו בונה את הצירוף - אבל בלי לקרוא ל-AI, כי התוצאה כבר שמורה בשרת.
+    const isPersonallyNew = !findItem(result.name);
+    const isGloballyNew = !!result.isNew;
 
     setTimeout(() => {
       const newDiv = spawnOnBoard(result, x, y);
       newDiv.classList.add('combining');
     }, 160);
 
-    if (isNew){
-      unlockedItems.push({ name: result.name, emoji: result.emoji, discovered_by: result.discoveredBy || nickname });
+    if (isPersonallyNew){
+      unlockedItems.push({ name: result.name, emoji: result.emoji, discovered_by: result.discoveredBy || null });
+      savePersonalProgress();
       recentlyDiscovered.add(result.name);
       renderSidebar();
-      showToast(`${result.emoji} גילוי חדש: ${result.name}`, true, nickname);
+      if (isGloballyNew) {
+        showToast(`${result.emoji} גילוי חדש: ${result.name}`, true, nickname);
+      } else {
+        showToast(`${result.emoji} פתחת אלמנט חדש: ${result.name}`, true, result.discoveredBy);
+      }
       setTimeout(() => recentlyDiscovered.delete(result.name), 3400);
     } else {
-      showToast(`${result.emoji} ${name1} + ${name2} = ${result.name}`, false, result.discoveredBy);
+      showToast(`${result.emoji} ${name1} + ${name2} = ${result.name}`, false);
     }
 
     recordMyRecipe(name1, name2, result.name, result.emoji);
