@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>יצירה אינסופית</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/hFnPhkc2/Gemini-Generated-Image-b1pnfbb1pnfbb1pn.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#eeecf6; --bg-dot:#e1ddef; --sidebar-bg:#fff; --border:#e4e1f2; --text:#33313f;
+    --text-dim:#8b87a1; --item-bg:#fff; --item-border:#e7e4f4;
+    --item-shadow:0 1px 2px rgba(60,50,110,.08),0 1px 1px rgba(60,50,110,.04);
+    --accent:#8b5cf6; --accent-soft:#efe9fe; --danger:#ef4444; --toolbar-btn:#fff;
+  }
+  html.dark{
+    --bg:#1b1a22; --bg-dot:#26242f; --sidebar-bg:#211f29; --border:#34313f; --text:#eeecf6;
+    --text-dim:#8b87a1; --item-bg:#2a2833; --item-border:#3a3745; --item-shadow:0 1px 2px rgba(0,0,0,.3);
+    --accent:#a78bfa; --accent-soft:#362f4d; --toolbar-btn:#2a2833;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; height:100vh; overflow:hidden; font-family:'Rubik','Segoe UI',sans-serif;
+    background:var(--bg); color:var(--text); display:flex; user-select:none; -webkit-tap-highlight-color:transparent; }
+
+  #play-area{ flex:1; position:relative; overflow:hidden;
+    background-image:radial-gradient(var(--bg-dot) 1.5px, transparent 1.5px); background-size:22px 22px; background-color:var(--bg); }
+  #empty-hint{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--text-dim); font-size:15px;
+    text-align:center; pointer-events:none; display:flex; flex-direction:column; gap:6px; align-items:center; }
+  #empty-hint .big{ font-size:34px; }
+
+  #toolbar{ position:absolute; top:16px; left:16px; display:flex; gap:8px; z-index:20; }
+  .tool-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--toolbar-btn);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; box-shadow:var(--item-shadow); transition:transform .15s; }
+  .tool-btn:hover{ transform:scale(1.08); }
+
+  #nick-badge{ position:absolute; top:16px; right:16px; z-index:20; background:var(--toolbar-btn); border:1px solid var(--border);
+    border-radius:20px; padding:8px 16px; font-size:13px; font-weight:600; box-shadow:var(--item-shadow); cursor:pointer; }
+
+  #toast-wrap{ position:absolute; top:18px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; gap:6px; z-index:50; align-items:center; pointer-events:none; }
+  .toast{ background:var(--item-bg); border:1px solid var(--item-border); color:var(--text); padding:8px 18px; border-radius:20px;
+    box-shadow:var(--item-shadow); font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; white-space:nowrap;
+    animation:toast-in .35s ease, toast-out .35s ease 2.35s forwards; }
+  .toast.new-discovery{ border-color:var(--accent); background:var(--accent-soft); }
+  .toast .credit{ font-size:11.5px; font-weight:400; color:var(--text-dim); }
+  @keyframes toast-in{ from{opacity:0; transform:translateY(-14px) scale(.9);} to{opacity:1; transform:translateY(0) scale(1);} }
+  @keyframes toast-out{ from{opacity:1;} to{opacity:0; transform:translateY(-10px);} }
+
+  .board-item{ position:absolute; display:inline-flex; align-items:center; gap:8px; padding:9px 16px; background:var(--item-bg);
+    border:1px solid var(--item-border); border-radius:22px; box-shadow:var(--item-shadow); font-size:16px; font-weight:500;
+    cursor:grab; white-space:nowrap; touch-action:none; z-index:2; transition:box-shadow .15s; }
+  .board-item:active{ cursor:grabbing; box-shadow:0 4px 14px rgba(60,50,110,.18); }
+  .board-item.combining{ animation:pop-in .28s cubic-bezier(.34,1.56,.64,1); }
+  .board-item.merged-away{ animation:merge-fade .18s ease forwards; }
+  .board-item.shake{ animation:shake .35s ease; }
+  .board-item.loading{ opacity:.55; cursor:wait; }
+  @keyframes pop-in{ 0%{transform:scale(.4);opacity:0;} 70%{transform:scale(1.12);} 100%{transform:scale(1);opacity:1;} }
+  @keyframes merge-fade{ to{transform:scale(.3);opacity:0;} }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
+  .emoji{ font-size:19px; line-height:1; }
+
+  .spark{ position:absolute; pointer-events:none; font-size:14px; z-index:5; animation:spark-fly .6s ease-out forwards; }
+  @keyframes spark-fly{ 0%{opacity:1; transform:translate(0,0) scale(1) rotate(0deg);} 100%{opacity:0; transform:var(--fly) scale(.4) rotate(180deg);} }
+
+  #sidebar{ width:320px; background:var(--sidebar-bg); border-left:1px solid var(--border); display:flex; flex-direction:column; z-index:10; }
+  #sidebar-header{ padding:16px 16px 12px; border-bottom:1px solid var(--border); }
+  #sidebar-header h1{ margin:0 0 12px; font-size:20px; font-weight:700; text-align:center; }
+  #search-wrap{ position:relative; margin-bottom:10px; }
+  #search-input{ width:100%; padding:9px 34px 9px 12px; border-radius:16px; border:1px solid var(--border); background:var(--bg);
+    color:var(--text); font-family:inherit; font-size:14px; outline:none; }
+  #search-input:focus{ border-color:var(--accent); }
+  #search-wrap .icon{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:14px; pointer-events:none; }
+  #meta-row{ display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-dim); }
+  #meta-row button{ border:none; background:none; color:var(--danger); cursor:pointer; font-size:12px; font-weight:600; font-family:inherit; padding:0; }
+
+  #items-list{ flex:1; overflow-y:auto; padding:14px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:9px; }
+  #items-list::-webkit-scrollbar{ width:6px; }
+  #items-list::-webkit-scrollbar-thumb{ background:var(--border); border-radius:3px; }
+  .sidebar-item{ display:inline-flex; align-items:center; gap:7px; padding:8px 14px; background:var(--item-bg); border:1px solid var(--item-border);
+    border-radius:18px; box-shadow:var(--item-shadow); font-size:14.5px; font-weight:500; cursor:grab; touch-action:none; }
+  .sidebar-item:hover{ border-color:var(--accent); }
+  .sidebar-item.just-discovered{ animation:glow-pulse 1.6s ease 2; }
+  @keyframes glow-pulse{ 0%,100%{box-shadow:var(--item-shadow); border-color:var(--item-border);} 50%{box-shadow:0 0 0 3px var(--accent-soft); border-color:var(--accent);} }
+  #no-results{ color:var(--text-dim); font-size:13px; text-align:center; width:100%; margin-top:20px; }
+
+  /* discoverer info panel (like neal.fun's item info) */
+  #info-panel{ position:absolute; z-index:60; background:var(--item-bg); border:1px solid var(--item-border); border-radius:12px;
+    padding:10px 14px; font-size:12.5px; box-shadow:var(--item-shadow); display:none; color:var(--text-dim); white-space:nowrap; }
+  #info-panel.show{ display:block; }
+  #info-panel b{ color:var(--text); }
+
+  /* nickname modal */
+  #nick-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.45); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #nick-modal{ background:var(--sidebar-bg); border-radius:16px; padding:28px; width:320px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  #nick-modal .big{ font-size:36px; margin-bottom:8px; }
+  #nick-modal h2{ margin:0 0 6px; font-size:18px; }
+  #nick-modal p{ margin:0 0 16px; font-size:13px; color:var(--text-dim); }
+  #nick-modal input{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); font-family:inherit; font-size:14px; margin-bottom:12px; background:var(--bg); color:var(--text); }
+  #nick-modal button{ width:100%; padding:10px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-weight:600; font-family:inherit; font-size:14px; cursor:pointer; }
+
+  #recipe-book-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.45); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #recipe-book{ background:var(--sidebar-bg); border-radius:16px; padding:22px; width:420px; max-height:78vh; display:flex; flex-direction:column;
+    box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  #recipe-book-header{ display:flex; justify-content:space-between; align-items:center; }
+  #recipe-book-header h2{ margin:0; font-size:18px; }
+  #recipe-book-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
+  #recipe-book-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 12px; }
+  #recipe-book-search{ width:100%; padding:9px 12px; border-radius:10px; border:1px solid var(--border); background:var(--bg);
+    color:var(--text); font-family:inherit; font-size:13.5px; margin-bottom:12px; outline:none; }
+  #recipe-book-search:focus{ border-color:var(--accent); }
+  #recipe-book-list{ overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
+  .recipe-row{ display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border:1px solid var(--item-border);
+    border-radius:10px; font-size:13.5px; }
+  .recipe-row .combo{ color:var(--text-dim); }
+  .recipe-row .arrow{ color:var(--accent); margin:0 6px; }
+  #recipe-book-empty{ color:var(--text-dim); font-size:13px; text-align:center; padding:20px 0; }
+
+  @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100%; height:42%; border-left:none; border-top:1px solid var(--border); } #play-area{ height:58%; } }
+</style>
+</head>
+<body>
+
+  <div id="play-area">
+    <div id="toolbar">
+      <button class="tool-btn" id="btn-dark" title="מצב כהה">🌙</button>
+      <button class="tool-btn" id="btn-recipe-book" title="ספר המתכונים שלי">📖</button>
+      <button class="tool-btn" id="btn-donate-key" title="תרמו מפתח API כדי לעזור למשחק">🔑</button>
+      <button class="tool-btn" id="btn-clear" title="נקה לוח">🗑️</button>
+    </div>
+    <div id="nick-badge" title="לחצו להחלפת כינוי">👤 <span id="nick-label"></span></div>
+    <div id="toast-wrap"></div>
+    <div id="empty-hint"><div class="big">🧩</div><div>גררו אלמנטים מהתפריט ללוח<br>ושחררו אחד על השני כדי לשלב</div></div>
+    <div id="info-panel"></div>
+  </div>
+
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <h1>✨ יצירה אינסופית</h1>
+      <div id="search-wrap"><span class="icon">🔍</span><input id="search-input" type="text" placeholder="חיפוש אלמנט..."></div>
+      <div id="meta-row"><span id="count-label">0 אלמנטים</span><button id="btn-reset">איפוס התקדמות</button></div>
+    </div>
+    <div id="items-list"></div>
+  </div>
+
+  <div id="recipe-book-backdrop" style="display:none;">
+    <div id="recipe-book">
+      <div id="recipe-book-header">
+        <h2>📖 ספר המתכונים שלי</h2>
+        <button id="btn-close-recipe-book">✕</button>
+      </div>
+      <div id="recipe-book-sub">כל השילובים שאני גיליתי בעצמי</div>
+      <input id="recipe-book-search" type="text" placeholder="חיפוש בספר המתכונים...">
+      <div id="recipe-book-list"></div>
+    </div>
+  </div>
+
+  <div id="nick-modal-backdrop" style="display:none;">
+    <div id="nick-modal">
+      <div class="big">🧑‍🎨</div>
+      <h2>איך קוראים לך?</h2>
+      <p>הכינוי שלך יופיע לצד כל אלמנט חדש שתגלה, בדיוק כמו ב-Infinite Craft</p>
+      <input id="nick-input" type="text" maxlength="24" placeholder="לדוגמה: דני">
+      <button id="nick-submit">בואו נתחיל!</button>
+    </div>
+  </div>
+
+  <div id="donate-modal-backdrop" style="display:none;">
+    <div id="nick-modal">
+      <div class="big">🔑</div>
+      <h2>תרמו מפתח API של Gemini</h2>
+      <p>המשחק משתמש ב-AI כדי ליצור שילובים חדשים. אם יש לכם מפתח Gemini משלכם (חינמי ב-<a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent);">aistudio.google.com/apikey</a>), תרומתו תיכנס אוטומטית לרוטציה ותעזור למנוע חסימות עומס לכל השחקנים.</p>
+      <input id="donate-key-input" type="text" placeholder="AIzaSy... או AQ.Ab...">
+      <button id="donate-key-submit">תרמו מפתח</button>
+      <div id="donate-key-status" style="font-size:12.5px; margin-top:10px; display:none;"></div>
+    </div>
+  </div>
+
+<script>
+/* ================= CONFIG ================= */
+/* פרטי החיבור קבועים כאן ישירות. אפשר גם לעדכן אותם דרך admin.html
+   (נשמר ב-localStorage ומקבל עדיפות אם קיים, לנוחות בזמן פיתוח). */
+const HARDCODED_SUPABASE_URL = 'https://pixooektajgzrpifkxvg.supabase.co';
+const HARDCODED_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpeG9vZWt0YWpnenJwaWZreHZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyMjUyNzQsImV4cCI6MjA5OTgwMTI3NH0.S3ET8us1Bup9lrGP4GLOdJJgiV8nw_McuK7R3jHDnXM';
+
+const CFG = JSON.parse(localStorage.getItem('jc_config') || '{}');
+const SUPABASE_URL = CFG.supabaseUrl || HARDCODED_SUPABASE_URL;
+const SUPABASE_ANON_KEY = CFG.supabaseAnonKey || HARDCODED_SUPABASE_ANON_KEY;
+
+let sb = null;
+if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+const EDGE_FUNCTION_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/combine` : '';
+const CONTRIBUTE_KEY_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/contribute-key` : '';
+
+/* ================= STATE ================= */
+let unlockedItems = [];         // {name, emoji, discovered_by}
+let recentlyDiscovered = new Set();
+let nickname = localStorage.getItem('jc_nickname') || '';
+
+const playArea = document.getElementById('play-area');
+const itemsList = document.getElementById('items-list');
+const emptyHint = document.getElementById('empty-hint');
+const toastWrap = document.getElementById('toast-wrap');
+const searchInput = document.getElementById('search-input');
+const countLabel = document.getElementById('count-label');
+const infoPanel = document.getElementById('info-panel');
+const nickBadge = document.getElementById('nick-label');
+const nickModalBackdrop = document.getElementById('nick-modal-backdrop');
+const nickInput = document.getElementById('nick-input');
+
+const LOCAL_PROGRESS_KEY = 'jc_progress_cache';
+
+/* ================= boot ================= */
+function boot(){
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    playArea.innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--text-dim);font-size:14px;">
+      ⚠️ המשחק לא מחובר עדיין ל-Supabase.<br>היכנסו לדף הניהול (admin.html) והזינו את פרטי החיבור.</div>`;
+    return;
+  }
+  if (!nickname) {
+    nickModalBackdrop.style.display = 'flex';
+  } else {
+    nickBadge.textContent = nickname;
+    startGame();
+  }
+}
+
+document.getElementById('nick-submit').addEventListener('click', submitNickname);
+nickInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitNickname(); });
+function submitNickname(){
+  const val = nickInput.value.trim();
+  if (!val) return;
+  nickname = val;
+  localStorage.setItem('jc_nickname', nickname);
+  nickBadge.textContent = nickname;
+  nickModalBackdrop.style.display = 'none';
+  startGame();
+}
+nickBadge.addEventListener('click', () => { nickModalBackdrop.style.display = 'flex'; nickInput.value = nickname; nickInput.focus(); });
+
+async function startGame(){
+  await loadElements();
+  updateEmptyHint();
+}
+
+/* ================= data ================= */
+async function loadElements(){
+  const { data, error } = await sb.from('elements').select('name, emoji, discovered_by').order('created_at', { ascending: true });
+  if (error) { console.error(error); return; }
+  unlockedItems = data;
+  renderSidebar();
+}
+
+function findItem(name){ return unlockedItems.find(i => i.name === name); }
+
+/* ================= sidebar ================= */
+function renderSidebar(){
+  const q = searchInput.value.trim().toLowerCase();
+  itemsList.innerHTML = '';
+  countLabel.textContent = unlockedItems.length + ' אלמנטים';
+  const filtered = unlockedItems.filter(i => i.name.toLowerCase().includes(q));
+  if (filtered.length === 0){
+    const div = document.createElement('div');
+    div.id = 'no-results'; div.textContent = 'לא נמצאו אלמנטים תואמים';
+    itemsList.appendChild(div); return;
+  }
+  filtered.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'sidebar-item';
+    if (recentlyDiscovered.has(item.name)) el.classList.add('just-discovered');
+    el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
+    el.addEventListener('mouseenter', (e) => showInfo(item, e));
+    el.addEventListener('mouseleave', hideInfo);
+    makeDraggableSource(el, item);
+    itemsList.appendChild(el);
+  });
+}
+searchInput.addEventListener('input', renderSidebar);
+
+function showInfo(item, e){
+  if (!item.discovered_by) return;
+  infoPanel.innerHTML = `נמצא לראשונה על ידי <b>${item.discovered_by}</b>`;
+  const rect = e.target.getBoundingClientRect();
+  const areaRect = playArea.getBoundingClientRect();
+  infoPanel.style.left = Math.max(8, rect.left - areaRect.left - 40) + 'px';
+  infoPanel.style.top = (rect.top - areaRect.top - 34) + 'px';
+  infoPanel.classList.add('show');
+}
+function hideInfo(){ infoPanel.classList.remove('show'); }
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (!confirm('לאפס את הלוח? (ההתגליות שלך יישארו שמורות באתר לכולם)')) return;
+  playArea.querySelectorAll('.board-item').forEach(n => n.remove());
+  updateEmptyHint();
+});
+document.getElementById('btn-clear').addEventListener('click', () => {
+  playArea.querySelectorAll('.board-item').forEach(n => n.remove());
+  updateEmptyHint();
+});
+document.getElementById('btn-dark').addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+  document.getElementById('btn-dark').textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+});
+
+/* ================= dragging ================= */
+function makeDraggableSource(el, item){
+  el.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    const rect = playArea.getBoundingClientRect();
+    const startX = e.clientX - rect.left - 20;
+    const startY = e.clientY - rect.top - 16;
+    const board = spawnOnBoard(item, startX, startY);
+    startDragging(board, e);
+  });
+}
+
+let zCounter = 100;
+function spawnOnBoard(item, x, y){
+  const div = document.createElement('div');
+  div.className = 'board-item';
+  div.dataset.name = item.name; div.dataset.emoji = item.emoji;
+  div.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
+  div.style.left = x + 'px'; div.style.top = y + 'px'; div.style.zIndex = ++zCounter;
+  div.addEventListener('pointerdown', (e) => startDragging(div, e));
+  div.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    const offsetX = 18, offsetY = 18;
+    const dupX = parseFloat(div.style.left) + offsetX;
+    const dupY = parseFloat(div.style.top) + offsetY;
+    const dup = spawnOnBoard({ name: item.name, emoji: item.emoji }, dupX, dupY);
+    dup.classList.add('combining');
+  });
+  playArea.appendChild(div);
+  updateEmptyHint();
+  return div;
+}
+
+function startDragging(div, e){
+  div.setPointerCapture && div.setPointerCapture(e.pointerId);
+  const rect = playArea.getBoundingClientRect();
+  let offsetX = e.clientX - rect.left - div.offsetLeft;
+  let offsetY = e.clientY - rect.top - div.offsetTop;
+  div.style.zIndex = ++zCounter;
+  function move(ev){
+    const r = playArea.getBoundingClientRect();
+    div.style.left = (ev.clientX - r.left - offsetX) + 'px';
+    div.style.top = (ev.clientY - r.top - offsetY) + 'px';
+  }
+  function up(){
+    document.removeEventListener('pointermove', move);
+    document.removeEventListener('pointerup', up);
+    checkCollision(div);
+  }
+  document.addEventListener('pointermove', move);
+  document.addEventListener('pointerup', up);
+}
+
+function updateEmptyHint(){
+  emptyHint.style.display = playArea.querySelectorAll('.board-item').length > 0 ? 'none' : 'flex';
+}
+
+/* ================= collision + combine (AI-powered) ================= */
+function checkCollision(draggedDiv){
+  if (!draggedDiv.isConnected || draggedDiv.classList.contains('loading')) return;
+  const rect1 = draggedDiv.getBoundingClientRect();
+  const others = playArea.querySelectorAll('.board-item:not(.loading)');
+  for (const other of others){
+    if (other === draggedDiv) continue;
+    const rect2 = other.getBoundingClientRect();
+    const overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom);
+    if (overlap){ combineItems(draggedDiv, other); return; }
+  }
+}
+
+async function combineItems(div1, div2){
+  const name1 = div1.dataset.name, name2 = div2.dataset.name;
+  div1.classList.add('loading'); div2.classList.add('loading');
+
+  const x = (parseFloat(div1.style.left) + parseFloat(div2.style.left)) / 2;
+  const y = (parseFloat(div1.style.top) + parseFloat(div2.style.top)) / 2;
+
+  try{
+    const res = await fetch(EDGE_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ itemA: name1, itemB: name2, nickname })
+    });
+    if (!res.ok) throw new Error('שגיאת שרת');
+    const result = await res.json();
+    if (result.error) throw new Error(result.error);
+
+    if (result.failed) {
+      div1.classList.remove('loading'); div2.classList.remove('loading');
+      div1.classList.add('shake'); div2.classList.add('shake');
+      showToast(`🚫 אין שילוב הגיוני בין ${name1} ל-${name2}`, false);
+      setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
+      return;
+    }
+
+    spawnSparks(x, y);
+    div1.classList.add('merged-away'); div2.classList.add('merged-away');
+    setTimeout(() => { div1.remove(); div2.remove(); }, 170);
+
+    const isNew = result.isNew || !findItem(result.name);
+
+    setTimeout(() => {
+      const newDiv = spawnOnBoard(result, x, y);
+      newDiv.classList.add('combining');
+    }, 160);
+
+    if (isNew){
+      unlockedItems.push({ name: result.name, emoji: result.emoji, discovered_by: result.discoveredBy || nickname });
+      recentlyDiscovered.add(result.name);
+      renderSidebar();
+      showToast(`${result.emoji} גילוי חדש: ${result.name}`, true, nickname);
+      setTimeout(() => recentlyDiscovered.delete(result.name), 3400);
+    } else {
+      showToast(`${result.emoji} ${name1} + ${name2} = ${result.name}`, false, result.discoveredBy);
+    }
+
+    recordMyRecipe(name1, name2, result.name, result.emoji);
+  } catch(err){
+    console.error(err);
+    div1.classList.remove('loading'); div2.classList.remove('loading');
+    div1.classList.add('shake'); div2.classList.add('shake');
+    showToast('⚠️ לא הצלחנו ליצור שילוב כרגע, נסו שוב', false);
+    setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
+  }
+}
+
+function spawnSparks(x, y){
+  const emojis = ['✨','⭐','💫'];
+  for (let i=0;i<6;i++){
+    const s = document.createElement('div');
+    s.className = 'spark'; s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left = x + 'px'; s.style.top = y + 'px';
+    const angle = (Math.PI*2*i)/6, dist = 40 + Math.random()*20;
+    s.style.setProperty('--fly', `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`);
+    playArea.appendChild(s);
+    setTimeout(() => s.remove(), 650);
+  }
+}
+
+function showToast(text, isNew, credit){
+  const t = document.createElement('div');
+  t.className = 'toast' + (isNew ? ' new-discovery' : '');
+  t.innerHTML = `<span>${text}</span>` + (credit ? `<span class="credit">· ${credit}</span>` : '');
+  toastWrap.appendChild(t);
+  setTimeout(() => t.remove(), 2700);
+}
+
+boot();
+
+/* ================= ספר המתכונים שלי ================= */
+const MY_RECIPES_KEY = 'jc_my_recipes';
+const recipeBookBackdrop = document.getElementById('recipe-book-backdrop');
+const recipeBookList = document.getElementById('recipe-book-list');
+const recipeBookSearch = document.getElementById('recipe-book-search');
+
+function getMyRecipes(){
+  try{ return JSON.parse(localStorage.getItem(MY_RECIPES_KEY) || '[]'); }
+  catch{ return []; }
+}
+
+function recordMyRecipe(nameA, nameB, resultName, resultEmoji){
+  const mine = getMyRecipes();
+  const key = [nameA, nameB].sort().join(',');
+  if (mine.some(r => r.key === key)) return; // כבר רשום אצלי
+  mine.push({ key, itemA: nameA, itemB: nameB, resultName, resultEmoji, at: Date.now() });
+  localStorage.setItem(MY_RECIPES_KEY, JSON.stringify(mine));
+}
+
+function renderRecipeBook(){
+  const q = recipeBookSearch.value.trim().toLowerCase();
+  const mine = getMyRecipes().slice().sort((a,b) => b.at - a.at);
+  const filtered = mine.filter(r =>
+    r.resultName.toLowerCase().includes(q) || r.itemA.toLowerCase().includes(q) || r.itemB.toLowerCase().includes(q));
+
+  recipeBookList.innerHTML = '';
+  if (filtered.length === 0){
+    recipeBookList.innerHTML = `<div id="recipe-book-empty">${mine.length === 0 ? 'עדיין לא גיליתם שילובים - התחילו לגרור אלמנטים!' : 'לא נמצאו תוצאות'}</div>`;
+    return;
+  }
+  filtered.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'recipe-row';
+    row.innerHTML = `<span class="combo">${r.itemA} + ${r.itemB}</span><span><span class="arrow">←</span>${r.resultEmoji} ${r.resultName}</span>`;
+    recipeBookList.appendChild(row);
+  });
+}
+
+document.getElementById('btn-recipe-book').addEventListener('click', () => {
+  recipeBookBackdrop.style.display = 'flex';
+  renderRecipeBook();
+});
+document.getElementById('btn-close-recipe-book').addEventListener('click', () => { recipeBookBackdrop.style.display = 'none'; });
+recipeBookBackdrop.addEventListener('click', (e) => { if (e.target === recipeBookBackdrop) recipeBookBackdrop.style.display = 'none'; });
+recipeBookSearch.addEventListener('input', renderRecipeBook);
+
+/* ================= donate a Gemini key ================= */
+const donateModalBackdrop = document.getElementById('donate-modal-backdrop');
+const donateKeyInput = document.getElementById('donate-key-input');
+const donateKeyStatus = document.getElementById('donate-key-status');
+
+document.getElementById('btn-donate-key').addEventListener('click', () => {
+  donateKeyInput.value = '';
+  donateKeyStatus.style.display = 'none';
+  donateModalBackdrop.style.display = 'flex';
+  donateKeyInput.focus();
+});
+donateModalBackdrop.addEventListener('click', (e) => { if (e.target === donateModalBackdrop) donateModalBackdrop.style.display = 'none'; });
+
+document.getElementById('donate-key-submit').addEventListener('click', async () => {
+  const key = donateKeyInput.value.trim();
+  if (!key) return;
+  const btn = document.getElementById('donate-key-submit');
+  btn.disabled = true; btn.textContent = 'בודק ושומר...';
+  donateKeyStatus.style.display = 'none';
+
+  try {
+    const res = await fetch(CONTRIBUTE_KEY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ apiKey: key, nickname })
+    });
+    const result = await res.json();
+    if (res.ok && result.success) {
+      donateKeyStatus.style.color = 'var(--accent)';
+      donateKeyStatus.textContent = '🎉 תודה רבה! המפתח נכנס לרוטציה ויעזור לכל השחקנים.';
+      donateKeyInput.value = '';
+    } else {
+      donateKeyStatus.style.color = '#e53e3e';
+      donateKeyStatus.textContent = result.error || 'משהו השתבש, נסו שוב.';
+    }
+  } catch (err) {
+    donateKeyStatus.style.color = '#e53e3e';
+    donateKeyStatus.textContent = 'שגיאת רשת, נסו שוב.';
+  } finally {
+    donateKeyStatus.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'תרמו מפתח';
+  }
+});
+
+</script>
+</body>
+</html>
