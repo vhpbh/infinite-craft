@@ -68,7 +68,10 @@
   .spark{ position:absolute; pointer-events:none; font-size:14px; z-index:5; animation:spark-fly .6s ease-out forwards; }
   @keyframes spark-fly{ 0%{opacity:1; transform:translate(0,0) scale(1) rotate(0deg);} 100%{opacity:0; transform:var(--fly) scale(.4) rotate(180deg);} }
 
-  #sidebar{ width:320px; background:var(--sidebar-bg); border-left:1px solid var(--border); display:flex; flex-direction:column; z-index:10; }
+  #sidebar{ width:320px; flex:0 0 auto; min-width:220px; background:var(--sidebar-bg); border-left:1px solid var(--border); display:flex; flex-direction:column; z-index:10; }
+  #sidebar-resizer{ flex:0 0 auto; width:6px; margin-inline:-3px; position:relative; z-index:16; cursor:col-resize; background:transparent; touch-action:none; }
+  #sidebar-resizer::after{ content:''; position:absolute; top:0; bottom:0; left:50%; width:2px; transform:translateX(-50%); background:transparent; transition:background .15s; }
+  #sidebar-resizer:hover::after, #sidebar-resizer.dragging::after{ background:var(--accent); }
   #sidebar-header{ padding:16px 16px 12px; border-bottom:1px solid var(--border); }
   #sidebar-header h1{ margin:0 0 12px; font-size:20px; font-weight:700; text-align:center; }
   #search-wrap{ position:relative; margin-bottom:10px; }
@@ -158,7 +161,7 @@
     background:#fff; color:#33313f; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.3); }
   #ad-overlay-close:hover{ filter:brightness(.95); }
 
-  @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100%; height:42%; border-left:none; border-top:1px solid var(--border); } #play-area{ height:58%; }
+  @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100% !important; height:42%; border-left:none; border-top:1px solid var(--border); } #sidebar-resizer{ display:none; } #play-area{ height:58%; }
     #quota-gauge{ width:96px; padding:8px 10px 6px; } #quota-gauge svg{ width:80px; height:48px; } #discovered-banner{ font-size:12px; padding:8px 12px; } }
 </style>
 </head>
@@ -194,6 +197,7 @@
     </div>
   </div>
 
+  <div id="sidebar-resizer" title="גררו כדי לשנות את רוחב הסרגל"></div>
   <div id="sidebar">
     <div id="sidebar-header">
       <h1>✨ יצירה אינסופית</h1>
@@ -219,9 +223,10 @@
     <div id="nick-modal">
       <div class="big">🧑‍🎨</div>
       <h2>איך קוראים לך?</h2>
-      <p>הכינוי שלך יופיע לצד כל אלמנט חדש שתגלה, בדיוק כמו ב-Infinite Craft</p>
+      <p>הכינוי שלך יופיע לצד כל אלמנט חדש שתגלה, בדיוק כמו ב-Infinite Craft. שימו לב: לא ניתן להחליף כינוי אחרי שמתחילים, ואם השם כבר תפוס תקבלו גרסה ייחודית שלו.</p>
       <input id="nick-input" type="text" maxlength="24" placeholder="לדוגמה: דני">
       <button id="nick-submit">בואו נתחיל!</button>
+      <div id="nick-status" style="font-size:12.5px; margin-top:10px; display:none; color:#e53e3e;"></div>
     </div>
   </div>
 
@@ -272,11 +277,22 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
 const EDGE_FUNCTION_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/combine` : '';
 const CONTRIBUTE_KEY_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/contribute-key` : '';
+const CLAIM_NICKNAME_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/claim-nickname` : '';
 
 /* ================= STATE ================= */
 let unlockedItems = [];         // {name, emoji, discovered_by}
 let recentlyDiscovered = new Set();
 let nickname = localStorage.getItem('jc_nickname') || '';
+
+// מזהה קבוע לדפדפן הזה - נוצר פעם אחת בלבד ולא משתנה לעולם, כדי לקשור את הכינוי
+// לזהות אחת ויציבה (בסיס למניעת החלפת כינוי ולמניעת התנגשות עם כינוי שכבר תפוס - ראו claimNickname).
+const CLIENT_ID_KEY = 'jc_client_id';
+let clientId = localStorage.getItem(CLIENT_ID_KEY);
+if (!clientId) {
+  clientId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+    : 'c-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+  localStorage.setItem(CLIENT_ID_KEY, clientId);
+}
 
 const playArea = document.getElementById('play-area');
 const itemsList = document.getElementById('items-list');
@@ -314,18 +330,51 @@ function boot(){
   }
 }
 
+const nickSubmitBtn = document.getElementById('nick-submit');
+const nickStatus = document.getElementById('nick-status');
 document.getElementById('nick-submit').addEventListener('click', submitNickname);
 nickInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitNickname(); });
-function submitNickname(){
+
+// קובע/מאמת כינוי מול השרת: אם ל-client_id הזה כבר יש כינוי - חוזר איתו (אין החלפה באמצע המשחק).
+// אם הכינוי המבוקש כבר תפוס ע"י client_id אחר - השרת מחזיר כינוי אחר (עם סיומת מספרית),
+// כדי שהמשתמש הזה ייחשב תמיד שחקן נפרד ולעולם לא "יירש" את הגילויים של מישהו אחר.
+async function claimNickname(desired){
+  const res = await fetch(CLAIM_NICKNAME_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ clientId, desiredNickname: desired })
+  });
+  const result = await res.json();
+  if (!res.ok || result.error) throw new Error(result.error || 'שגיאת שרת');
+  return result; // { nickname, wasTaken }
+}
+
+async function submitNickname(){
   const val = nickInput.value.trim();
   if (!val) return;
-  nickname = val;
-  localStorage.setItem('jc_nickname', nickname);
-  nickBadge.textContent = nickname;
-  nickModalBackdrop.style.display = 'none';
-  startGame();
+  nickSubmitBtn.disabled = true; nickSubmitBtn.textContent = 'בודק זמינות...';
+  if (nickStatus) nickStatus.style.display = 'none';
+  try{
+    const { nickname: finalNickname, wasTaken } = await claimNickname(val);
+    nickname = finalNickname;
+    localStorage.setItem('jc_nickname', nickname);
+    nickBadge.textContent = nickname;
+    nickModalBackdrop.style.display = 'none';
+    if (wasTaken) {
+      showToast(`הכינוי "${val}" כבר תפוס, לכן קיבלת את הכינוי "${finalNickname}"`, false);
+    }
+    startGame();
+  }catch(err){
+    if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'לא הצלחנו לקבוע כינוי, נסו שוב.'; }
+  }finally{
+    nickSubmitBtn.disabled = false; nickSubmitBtn.textContent = 'בואו נתחיל!';
+  }
 }
-nickBadge.addEventListener('click', () => { nickModalBackdrop.style.display = 'flex'; nickInput.value = nickname; nickInput.focus(); });
+
+// לא ניתן להחליף כינוי באמצע המשחק - לחיצה על התג רק מציגה את הכינוי הנוכחי בטוסט.
+nickBadge.addEventListener('click', () => {
+  showToast(`אתם משחקים בתור "${nickname}" - לא ניתן להחליף כינוי באמצע המשחק`, false);
+});
 
 async function startGame(){
   loadPersonalProgress();
@@ -404,6 +453,61 @@ document.getElementById('btn-dark').addEventListener('click', () => {
   document.documentElement.classList.toggle('dark');
   document.getElementById('btn-dark').textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
 });
+
+/* ================= שינוי רוחב הסרגל הצדדי (גרירת הגבול) ================= */
+const SIDEBAR_WIDTH_KEY = 'jc_sidebar_width';
+const SIDEBAR_MIN_WIDTH = 220;
+const MOBILE_BREAKPOINT = 720; // תואם למדיה קוורי שהופך את הלייאאוט לעמודה במסכים צרים
+const sidebarEl = document.getElementById('sidebar');
+const sidebarResizer = document.getElementById('sidebar-resizer');
+
+function sidebarMaxWidth(){ return Math.min(640, Math.round(window.innerWidth * 0.7)); }
+
+function applySavedSidebarWidth(){
+  if (window.innerWidth <= MOBILE_BREAKPOINT) return; // במובייל הרוחב נקבע לגמרי ע"י ה-CSS (100%)
+  const saved = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
+  if (!saved) return;
+  const clamped = Math.min(Math.max(saved, SIDEBAR_MIN_WIDTH), sidebarMaxWidth());
+  sidebarEl.style.width = clamped + 'px';
+}
+applySavedSidebarWidth();
+window.addEventListener('resize', () => {
+  // אם המסך גדל/הצטמצם אחרי גרירה, נוודא שהרוחב השמור עדיין הגיוני (או שנחזור למובייל)
+  if (window.innerWidth <= MOBILE_BREAKPOINT) return;
+  const current = parseFloat(sidebarEl.style.width);
+  if (current) sidebarEl.style.width = Math.min(current, sidebarMaxWidth()) + 'px';
+});
+
+let sidebarResizing = false, sidebarStartX = 0, sidebarStartWidth = 0, sidebarIsLeftOfResizer = false;
+sidebarResizer.addEventListener('pointerdown', (e) => {
+  if (window.innerWidth <= MOBILE_BREAKPOINT) return;
+  e.preventDefault();
+  sidebarResizing = true;
+  sidebarStartX = e.clientX;
+  sidebarStartWidth = sidebarEl.getBoundingClientRect().width;
+  // בודקים דינמית אם הסרגל נמצא משמאל או מימין לגבול הנגרר (תלוי בכיוון RTL/LTR של הדף),
+  // כדי שגרירה תרחיב את הסרגל לכיוון הנכון בלוח הגדול תמיד.
+  sidebarIsLeftOfResizer = sidebarEl.getBoundingClientRect().left < sidebarResizer.getBoundingClientRect().left;
+  sidebarResizer.classList.add('dragging');
+  sidebarResizer.setPointerCapture(e.pointerId);
+  document.body.style.cursor = 'col-resize';
+});
+sidebarResizer.addEventListener('pointermove', (e) => {
+  if (!sidebarResizing) return;
+  const delta = e.clientX - sidebarStartX;
+  let newWidth = sidebarIsLeftOfResizer ? sidebarStartWidth + delta : sidebarStartWidth - delta;
+  newWidth = Math.min(Math.max(newWidth, SIDEBAR_MIN_WIDTH), sidebarMaxWidth());
+  sidebarEl.style.width = newWidth + 'px';
+});
+function endSidebarResize(){
+  if (!sidebarResizing) return;
+  sidebarResizing = false;
+  sidebarResizer.classList.remove('dragging');
+  document.body.style.cursor = '';
+  localStorage.setItem(SIDEBAR_WIDTH_KEY, String(Math.round(parseFloat(sidebarEl.style.width))));
+}
+sidebarResizer.addEventListener('pointerup', endSidebarResize);
+sidebarResizer.addEventListener('pointercancel', endSidebarResize);
 
 /* ================= dragging ================= */
 function makeDraggableSource(el, item){

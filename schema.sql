@@ -41,6 +41,23 @@ create policy "elements_public_read" on public.elements
 create policy "recipes_public_read" on public.recipes
   for select using (true);
 
+-- ================= שחקנים (מניעת החלפת כינוי / התחזות לכינוי קיים) =================
+-- כל דפדפן מקבל client_id קבוע (נוצר פעם אחת ב-localStorage, לא ניתן לשינוי).
+-- הכינוי נקשר ל-client_id ונשמר כאן כדי לאכוף ייחודיות אמיתית:
+-- שני client_id שונים לעולם לא יקבלו את אותו כינוי (בהתעלם מרישיות/רווחים),
+-- כך ש-discovered_by תמיד מזהה שחקן אחד ויחיד ולא "מתנגש" בין שני אנשים שהקלידו שם דומה.
+create table if not exists public.players (
+  id bigint generated always as identity primary key,
+  client_id text not null unique,
+  nickname text not null,
+  nickname_key text generated always as (lower(trim(nickname))) stored,
+  created_at timestamptz not null default now()
+);
+create unique index if not exists idx_players_nickname_key on public.players(nickname_key);
+alter table public.players enable row level security;
+-- אין policy לקריאה/כתיבה עבור anon/authenticated - גישה רק דרך ה-Edge Function claim-nickname עם service_role,
+-- כדי שלקוח לא יוכל "לתפוס" כינוי בעצמו בלי מעבר דרך לוגיקת בדיקת הזמינות.
+
 create table if not exists public.api_key_rotation (
   id int primary key default 1,
   current_index int not null default 0,
