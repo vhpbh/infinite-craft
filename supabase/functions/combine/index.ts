@@ -306,9 +306,21 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), {
+    return new Response(JSON.stringify({ error: extractErrorMessage(err) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
+
+// Postgrest/Supabase errors הם אובייקטים רגילים (message/details/hint/code) בלי toString שימושי,
+// ולכן String(err) עליהם מחזיר "[object Object]". הפונקציה הזו שולפת הודעה קריאה בפועל.
+function extractErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object") {
+    const anyErr = err as Record<string, unknown>;
+    if (typeof anyErr.message === "string" && anyErr.message) return anyErr.message;
+    try { return JSON.stringify(err); } catch { /* fall through */ }
+  }
+  return String(err);
+}
