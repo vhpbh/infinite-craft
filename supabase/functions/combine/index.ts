@@ -7,12 +7,22 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// מפתחות "זרע" קבועים, מופרדים בפסיק, ב-secret בשם GEMINI_API_KEYS (אופציונלי).
-// לדוגמה: supabase secrets set GEMINI_API_KEYS="key1,key2,key3"
+// מפתחות "זרע" קבועים, מופרדים בפסיק, בסודות בשם GEMINI_API_KEYS ו-GROQ_API_KEYS (אופציונלי).
+// לדוגמה: supabase secrets set GEMINI_API_KEYS="key1,key2"
+//          supabase secrets set GROQ_API_KEYS="gsk_key1,gsk_key2"
 const SEED_GEMINI_API_KEYS = (Deno.env.get("GEMINI_API_KEYS") ?? Deno.env.get("GEMINI_API_KEY") ?? "")
   .split(",")
   .map((k) => k.trim())
   .filter(Boolean);
+const SEED_GROQ_API_KEYS = (Deno.env.get("GROQ_API_KEYS") ?? Deno.env.get("GROQ_API_KEY") ?? "")
+  .split(",")
+  .map((k) => k.trim())
+  .filter(Boolean);
+
+const GROQ_MODEL = Deno.env.get("GROQ_MODEL") ?? "llama-3.3-70b-versatile";
+
+type Provider = "gemini" | "groq";
+type KeyEntry = { key: string; provider: Provider };
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,6 +31,49 @@ const corsHeaders = {
 
 function sortKey(a: string, b: string) {
   return [a, b].sort().join(",");
+}
+
+// קורא ל-AI אצל הספק המתאים (Gemini או Groq) ומחזיר את טקסט ה-JSON הגולמי שהוא ייצר.
+async function callProvider(entry: KeyEntry, prompt: string): Promise<{ ok: true; text: string } | { ok: false; errText: string }> {
+  try {
+    if (entry.provider === "groq") {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${entry.key}`,
+        },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
+        }),
+      });
+      if (!res.ok) return { ok: false, errText: await res.text() };
+      const json = await res.json();
+      return { ok: true, text: json.choices?.[0]?.message?.content ?? "{}" };
+    } else {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": entry.key,
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json" },
+          }),
+        }
+      );
+      if (!res.ok) return { ok: false, errText: await res.text() };
+      const json = await res.json();
+      return { ok: true, text: json.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}" };
+    }
+  } catch (e) {
+    return { ok: false, errText: String(e) };
+  }
 }
 
 Deno.serve(async (req) => {
@@ -107,16 +160,28 @@ Deno.serve(async (req) => {
     //     כ"נוכחי", ואם הוא נכשל (מכסה/שגיאה) עוברים לבא בתור עד שמישהו מצליח.
     const { data: contributedKeysData } = await supabase
       .from("gemini_keys")
-      .select("api_key")
+      .select("api_key, provider")
       .eq("active", true)
       .order("created_at", { ascending: true });
 
-    const contributedKeys = (contributedKeysData ?? []).map((r) => r.api_key);
-    const GEMINI_API_KEYS = [...new Set([...SEED_GEMINI_API_KEYS, ...contributedKeys])];
+    const contributedKeys: KeyEntry[] = (contributedKeysData ?? []).map((r) => ({
+      key: r.api_key,
+      provider: (r.provider === "groq" ? "groq" : "gemini") as Provider,
+    }));
+    const seedKeys: KeyEntry[] = [
+      ...SEED_GEMINI_API_KEYS.map((k) => ({ key: k, provider: "gemini" as Provider })),
+      ...SEED_GROQ_API_KEYS.map((k) => ({ key: k, provider: "groq" as Provider })),
+    ];
+    const seenKeys = new Set<string>();
+    const API_KEYS: KeyEntry[] = [...seedKeys, ...contributedKeys].filter((entry) => {
+      if (seenKeys.has(entry.key)) return false;
+      seenKeys.add(entry.key);
+      return true;
+    });
 
-    if (GEMINI_API_KEYS.length === 0) {
+    if (API_KEYS.length === 0) {
       await supabase.from("activity_log").insert({ nickname, event_type: "quota_fail" });
-      return new Response(JSON.stringify({ error: "לא הוגדר אף מפתח Gemini (GEMINI_API_KEYS)", quotaExceeded: true }), {
+      return new Response(JSON.stringify({ error: "לא הוגדר אף מפתח AI (GEMINI_API_KEYS / GROQ_API_KEYS)", quotaExceeded: true }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -128,56 +193,38 @@ Deno.serve(async (req) => {
       .eq("id", 1)
       .maybeSingle();
 
-    let startIndex = (rotation?.current_index ?? 0) % GEMINI_API_KEYS.length;
-    let geminiJson: any = null;
+    let startIndex = (rotation?.current_index ?? 0) % API_KEYS.length;
+    let responseText: string | null = null;
     let lastErrText = "";
     let successIndex = -1;
 
-    for (let attempt = 0; attempt < GEMINI_API_KEYS.length; attempt++) {
-      const tryIndex = (startIndex + attempt) % GEMINI_API_KEYS.length;
-      const key = GEMINI_API_KEYS[tryIndex];
-      try {
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-goog-api-key": key,
-            },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { responseMimeType: "application/json" },
-            }),
-          }
-        );
-        if (geminiRes.ok) {
-          geminiJson = await geminiRes.json();
-          successIndex = tryIndex;
-          break;
-        } else {
-          lastErrText = await geminiRes.text();
-        }
-      } catch (e) {
-        lastErrText = String(e);
+    for (let attempt = 0; attempt < API_KEYS.length; attempt++) {
+      const tryIndex = (startIndex + attempt) % API_KEYS.length;
+      const entry = API_KEYS[tryIndex];
+      const result = await callProvider(entry, prompt);
+      if (result.ok) {
+        responseText = result.text;
+        successIndex = tryIndex;
+        break;
+      } else {
+        lastErrText = result.errText;
       }
     }
 
-    if (!geminiJson) {
+    if (responseText === null) {
       await supabase.from("activity_log").insert({ nickname, event_type: "quota_fail" });
-      return new Response(JSON.stringify({ error: "כל מפתחות Gemini נכשלו", detail: lastErrText, quotaExceeded: true }), {
+      return new Response(JSON.stringify({ error: "כל מפתחות ה-AI נכשלו", detail: lastErrText, quotaExceeded: true }), {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     // שמור את המפתח הבא בתור לפעם הבאה (רוטציה, כולל חזרה למפתח הראשון בסוף)
-    const nextIndex = (successIndex + 1) % GEMINI_API_KEYS.length;
+    const nextIndex = (successIndex + 1) % API_KEYS.length;
     await supabase.from("api_key_rotation").update({ current_index: nextIndex }).eq("id", 1);
-    const text = geminiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
     let parsed: { success?: boolean; name?: string; emoji?: string };
     try {
-      parsed = JSON.parse(text);
+      parsed = JSON.parse(responseText);
     } catch {
       parsed = { success: false };
     }

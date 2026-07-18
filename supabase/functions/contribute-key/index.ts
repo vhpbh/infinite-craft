@@ -1,6 +1,6 @@
 // Supabase Edge Function: contribute-key
-// מקבל מפתח Gemini מהמשתמש, מוודא שהוא באמת תקין (בלי לבזבז קריאת יצירה),
-// ואם כן - מוסיף אותו לרשימת המפתחות שברוטציה של combine.
+// מקבל מפתח API (Gemini או Groq) מהמשתמש, מזהה אוטומטית לאיזה ספק הוא שייך,
+// מוודא שהוא באמת תקין (בלי לבזבז קריאת יצירה), ואם כן - מוסיף אותו לרשימת המפתחות שברוטציה של combine.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -11,6 +11,11 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// מפתחות Groq תמיד מתחילים ב-"gsk_" - כל דבר אחר נבדק כמפתח Gemini
+function detectProvider(key: string): "groq" | "gemini" {
+  return key.startsWith("gsk_") ? "groq" : "gemini";
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -28,10 +33,16 @@ Deno.serve(async (req) => {
       });
     }
 
+    const provider = detectProvider(key);
+
     // אימות המפתח: קריאה זולה ל-list models, לא יצירת תוכן - לא צורכת מכסה משמעותית
-    const testRes = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
-      headers: { "x-goog-api-key": key },
-    });
+    const testRes = provider === "groq"
+      ? await fetch("https://api.groq.com/openai/v1/models", {
+          headers: { "Authorization": `Bearer ${key}` },
+        })
+      : await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+          headers: { "x-goog-api-key": key },
+        });
 
     if (!testRes.ok) {
       return new Response(JSON.stringify({ error: "המפתח לא תקין או לא פעיל. ודאו שהעתקתם אותו נכון." }), {
@@ -43,7 +54,7 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
     const { error: insertError } = await supabase
       .from("gemini_keys")
-      .insert({ api_key: key, contributed_by: nickname || null });
+      .insert({ api_key: key, provider, contributed_by: nickname || null });
 
     if (insertError) {
       if (insertError.code === "23505") {
@@ -56,7 +67,7 @@ Deno.serve(async (req) => {
       throw insertError;
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, provider }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {

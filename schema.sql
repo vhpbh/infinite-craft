@@ -53,13 +53,17 @@ alter table public.api_key_rotation enable row level security;
 create table if not exists public.gemini_keys (
   id bigint generated always as identity primary key,
   api_key text not null unique,
+  provider text not null default 'gemini',   -- 'gemini' או 'groq' - איזה ספק ה-AI המפתח הזה שייך אליו
   contributed_by text,
   active boolean not null default true,
   created_at timestamptz not null default now()
 );
+-- תאימות לאחור: אם הטבלה כבר קיימת מהתקנה קודמת (לפני תמיכה ב-Groq), נוסיף את העמודה בלי לשבור כלום.
+alter table public.gemini_keys add column if not exists provider text not null default 'gemini';
 alter table public.gemini_keys enable row level security;
 -- אין policy לקריאה/כתיבה עבור anon/authenticated - נגיש רק דרך Edge Functions עם service_role.
--- הוספת מפתח מתבצעת אך ורק דרך ה-Edge Function contribute-key, שמאמת את המפתח לפני השמירה.
+-- הוספת מפתח מתבצעת אך ורק דרך ה-Edge Function contribute-key, שמאמת את המפתח לפני השמירה
+-- (הספק מזוהה אוטומטית לפי צורת המפתח - מפתחות Groq מתחילים ב-"gsk_").
 
 -- ================= לוג פעילות =================
 -- כל בקשת שילוב נרשמת כאן: מי ומתי (למסך "מי היה פעיל" בניהול),
