@@ -61,3 +61,36 @@ alter table public.gemini_keys enable row level security;
 -- אין policy לקריאה/כתיבה עבור anon/authenticated - נגיש רק דרך Edge Functions עם service_role.
 -- הוספת מפתח מתבצעת אך ורק דרך ה-Edge Function contribute-key, שמאמת את המפתח לפני השמירה.
 
+-- ================= לוג פעילות =================
+-- כל בקשת שילוב נרשמת כאן: מי ומתי (למסך "מי היה פעיל" בניהול),
+-- וכן בקשות שנכשלו כי כל מפתחות ה-Gemini נגמרו (למד ה"מהירות" בצד השחקנים).
+create table if not exists public.activity_log (
+  id bigint generated always as identity primary key,
+  nickname text,
+  event_type text not null check (event_type in ('combine_attempt','quota_fail')),
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_activity_log_created_at on public.activity_log(created_at);
+create index if not exists idx_activity_log_event_type on public.activity_log(event_type, created_at);
+alter table public.activity_log enable row level security;
+create policy "activity_log_public_read" on public.activity_log
+  for select using (true);
+-- כתיבה מתבצעת רק דרך ה-Edge Function combine עם service_role (עוקף RLS).
+
+-- ================= באנר/פרסומת גלובלית =================
+-- שורה יחידה שהאדמין שולט בה מדף הניהול (עם מפתח service_role) כדי "להקפיץ" פופאפ PNG
+-- לכל השחקנים, עם קישור יעד ואפשרות כיבוי/הפעלה.
+create table if not exists public.broadcast_ad (
+  id int primary key default 1,
+  image_url text,
+  link_url text,
+  active boolean not null default false,
+  updated_at timestamptz not null default now(),
+  constraint single_row_ad check (id = 1)
+);
+insert into public.broadcast_ad (id, active) values (1, false) on conflict (id) do nothing;
+alter table public.broadcast_ad enable row level security;
+create policy "broadcast_ad_public_read" on public.broadcast_ad
+  for select using (true);
+-- עדכון (הפעלה/שינוי תמונה/קישור) מתבצע רק מדף הניהול עם מפתח service_role.
+

@@ -40,6 +40,9 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
     const comboKey = sortKey(itemA, itemB);
 
+    // רישום פעילות: מי ומתי ניסה שילוב (למסך הפעילות בדף הניהול). לא חוסם את הבקשה.
+    supabase.from("activity_log").insert({ nickname, event_type: "combine_attempt" }).then(() => {});
+
     // 1. אם השילוב כבר נוסה בעבר (הצליח או נכשל) - החזר את התוצאה השמורה מיד, בלי לפנות ל-Gemini
     const { data: existing } = await supabase
       .from("recipes")
@@ -112,7 +115,8 @@ Deno.serve(async (req) => {
     const GEMINI_API_KEYS = [...new Set([...SEED_GEMINI_API_KEYS, ...contributedKeys])];
 
     if (GEMINI_API_KEYS.length === 0) {
-      return new Response(JSON.stringify({ error: "לא הוגדר אף מפתח Gemini (GEMINI_API_KEYS)" }), {
+      await supabase.from("activity_log").insert({ nickname, event_type: "quota_fail" });
+      return new Response(JSON.stringify({ error: "לא הוגדר אף מפתח Gemini (GEMINI_API_KEYS)", quotaExceeded: true }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -160,7 +164,8 @@ Deno.serve(async (req) => {
     }
 
     if (!geminiJson) {
-      return new Response(JSON.stringify({ error: "כל מפתחות Gemini נכשלו", detail: lastErrText }), {
+      await supabase.from("activity_log").insert({ nickname, event_type: "quota_fail" });
+      return new Response(JSON.stringify({ error: "כל מפתחות Gemini נכשלו", detail: lastErrText, quotaExceeded: true }), {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

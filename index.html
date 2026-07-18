@@ -41,9 +41,14 @@
   #toast-wrap{ position:absolute; top:18px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; gap:6px; z-index:50; align-items:center; pointer-events:none; }
   .toast{ background:var(--item-bg); border:1px solid var(--item-border); color:var(--text); padding:8px 18px; border-radius:20px;
     box-shadow:var(--item-shadow); font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; white-space:nowrap;
-    animation:toast-in .35s ease, toast-out .35s ease 2.35s forwards; }
+    animation:toast-in .35s ease, toast-out .35s ease 2.35s forwards; pointer-events:auto; }
   .toast.new-discovery{ border-color:var(--accent); background:var(--accent-soft); }
   .toast .credit{ font-size:11.5px; font-weight:400; color:var(--text-dim); }
+  .toast-action-btn{ background:var(--accent); color:#fff; border:none; padding:5px 12px; border-radius:14px;
+    font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap; }
+  .toast-action-btn:hover{ filter:brightness(1.1); }
+  .toast-close-btn{ background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:13px; padding:2px 4px; line-height:1; }
+  .toast-close-btn:hover{ color:var(--text); }
   @keyframes toast-in{ from{opacity:0; transform:translateY(-14px) scale(.9);} to{opacity:1; transform:translateY(0) scale(1);} }
   @keyframes toast-out{ from{opacity:1;} to{opacity:0; transform:translateY(-10px);} }
 
@@ -116,7 +121,45 @@
   .recipe-row .arrow{ color:var(--accent); margin:0 6px; }
   #recipe-book-empty{ color:var(--text-dim); font-size:13px; text-align:center; padding:20px 0; }
 
-  @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100%; height:42%; border-left:none; border-top:1px solid var(--border); } #play-area{ height:58%; } }
+  /* ================= quota gauge (bottom-right speedometer) ================= */
+  #quota-gauge{ position:absolute; bottom:16px; right:16px; z-index:25; background:var(--item-bg); border:1px solid var(--item-border);
+    border-radius:16px; padding:10px 12px 8px; box-shadow:var(--item-shadow); display:flex; flex-direction:column; align-items:center;
+    width:118px; cursor:pointer; }
+  #quota-gauge svg{ width:100px; height:58px; }
+  #quota-gauge .gauge-label{ font-size:10.5px; color:var(--text-dim); text-align:center; margin-top:2px; line-height:1.3; }
+  #quota-gauge .gauge-num{ font-size:15px; font-weight:700; color:var(--text); }
+  #quota-gauge .gauge-btn{ margin-top:6px; background:var(--accent); color:#fff; border:none; border-radius:10px; padding:5px 10px;
+    font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; width:100%; }
+  #quota-gauge .gauge-btn:hover{ filter:brightness(1.08); }
+
+  /* ================= discovered-by-me banner (bottom-left) ================= */
+  #discovered-banner{ position:absolute; bottom:16px; left:16px; z-index:25; background:var(--item-bg); border:1px solid var(--item-border);
+    border-radius:20px; padding:9px 16px; box-shadow:var(--item-shadow); display:flex; align-items:center; gap:8px; cursor:pointer;
+    font-size:13px; font-weight:600; }
+  #discovered-banner:hover{ border-color:var(--accent); }
+  #discovered-banner .count{ background:var(--accent-soft); color:var(--accent); border-radius:10px; padding:2px 8px; font-size:12px; font-weight:700; }
+
+  #discovered-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.45); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #discovered-modal{ background:var(--sidebar-bg); border-radius:16px; padding:22px; width:380px; max-height:78vh; display:flex; flex-direction:column;
+    box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  #discovered-modal-header{ display:flex; justify-content:space-between; align-items:center; }
+  #discovered-modal-header h2{ margin:0; font-size:18px; }
+  #discovered-modal-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
+  #discovered-modal-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 12px; }
+  #discovered-modal-list{ overflow-y:auto; display:flex; flex-wrap:wrap; gap:8px; }
+  #discovered-modal-list .sidebar-item{ cursor:default; }
+  #discovered-modal-empty{ color:var(--text-dim); font-size:13px; text-align:center; padding:20px 0; width:100%; }
+
+  /* ================= admin-pushed ad popup ================= */
+  #ad-overlay-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.55); z-index:400; display:none; align-items:center; justify-content:center; }
+  #ad-overlay{ position:relative; max-width:min(92vw,420px); }
+  #ad-overlay img{ display:block; width:100%; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,.35); cursor:pointer; }
+  #ad-overlay-close{ position:absolute; top:-14px; right:-14px; width:32px; height:32px; border-radius:50%; border:none;
+    background:#fff; color:#33313f; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.3); }
+  #ad-overlay-close:hover{ filter:brightness(.95); }
+
+  @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100%; height:42%; border-left:none; border-top:1px solid var(--border); } #play-area{ height:58%; }
+    #quota-gauge{ width:96px; padding:8px 10px 6px; } #quota-gauge svg{ width:80px; height:48px; } #discovered-banner{ font-size:12px; padding:8px 12px; } }
 </style>
 </head>
 <body>
@@ -132,6 +175,23 @@
     <div id="toast-wrap"></div>
     <div id="empty-hint"><div class="big">🧩</div><div>גררו אלמנטים מהתפריט ללוח<br>ושחררו אחד על השני כדי לשלב</div></div>
     <div id="info-panel"></div>
+
+    <div id="quota-gauge" title="בקשות שנכשלו כרגע בגלל חוסר במפתחות API">
+      <svg viewBox="0 0 100 58" id="gauge-svg">
+        <path d="M8,54 A42,42 0 0 1 92,54" fill="none" stroke="var(--border)" stroke-width="9" stroke-linecap="round"/>
+        <path id="gauge-arc" d="M8,54 A42,42 0 0 1 92,54" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round"
+          stroke-dasharray="132" stroke-dashoffset="132"/>
+        <line id="gauge-needle" x1="50" y1="54" x2="50" y2="18" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="50" cy="54" r="4" fill="var(--text)"/>
+      </svg>
+      <div class="gauge-num" id="gauge-num">0</div>
+      <div class="gauge-label">בקשות ללא מענה<br>(חסרים מפתחות)</div>
+      <button class="gauge-btn" id="gauge-donate-btn">תרמו מפתח 🔑</button>
+    </div>
+
+    <div id="discovered-banner" title="האלמנטים שאני גיליתי לראשונה בעולם">
+      🏆 <span>האלמנטים שגיליתי</span> <span class="count" id="discovered-count">0</span>
+    </div>
   </div>
 
   <div id="sidebar">
@@ -162,6 +222,24 @@
       <p>הכינוי שלך יופיע לצד כל אלמנט חדש שתגלה, בדיוק כמו ב-Infinite Craft</p>
       <input id="nick-input" type="text" maxlength="24" placeholder="לדוגמה: דני">
       <button id="nick-submit">בואו נתחיל!</button>
+    </div>
+  </div>
+
+  <div id="discovered-modal-backdrop" style="display:none;">
+    <div id="discovered-modal">
+      <div id="discovered-modal-header">
+        <h2>🏆 האלמנטים שגיליתי</h2>
+        <button id="btn-close-discovered-modal">✕</button>
+      </div>
+      <div id="discovered-modal-sub">אלמנטים שאני הייתי הראשון/ה בעולם לגלות</div>
+      <div id="discovered-modal-list"></div>
+    </div>
+  </div>
+
+  <div id="ad-overlay-backdrop">
+    <div id="ad-overlay">
+      <button id="ad-overlay-close" title="סגירה">✕</button>
+      <img id="ad-overlay-img" src="" alt="פרסומת">
     </div>
   </div>
 
@@ -252,6 +330,7 @@ nickBadge.addEventListener('click', () => { nickModalBackdrop.style.display = 'f
 async function startGame(){
   loadPersonalProgress();
   updateEmptyHint();
+  refreshDiscoveredByMe();
 }
 
 /* ================= personal progress (local to this browser only) ================= */
@@ -409,9 +488,13 @@ async function combineItems(div1, div2){
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({ itemA: name1, itemB: name2, nickname })
     });
-    if (!res.ok) throw new Error('שגיאת שרת');
-    const result = await res.json();
-    if (result.error) throw new Error(result.error);
+    let result;
+    try { result = await res.json(); } catch { result = {}; }
+    if (!res.ok || result.error) {
+      const err = new Error(result.error || 'שגיאת שרת');
+      err.quotaExceeded = !!result.quotaExceeded;
+      throw err;
+    }
 
     if (result.failed) {
       div1.classList.remove('loading'); div2.classList.remove('loading');
@@ -443,6 +526,7 @@ async function combineItems(div1, div2){
       renderSidebar();
       if (isGloballyNew) {
         showToast(`${result.emoji} גילוי חדש: ${result.name}`, true, nickname);
+        setTimeout(refreshDiscoveredByMe, 600);
       } else {
         showToast(`${result.emoji} פתחת אלמנט חדש: ${result.name}`, true, result.discoveredBy);
       }
@@ -456,8 +540,19 @@ async function combineItems(div1, div2){
     console.error(err);
     div1.classList.remove('loading'); div2.classList.remove('loading');
     div1.classList.add('shake'); div2.classList.add('shake');
-    showToast('⚠️ לא הצלחנו ליצור שילוב כרגע, נסו שוב', false);
+    const msg = String(err.message || err);
+    const isQuotaIssue = err.quotaExceeded || /מפתח|key|quota|429|502/i.test(msg);
+    if (isQuotaIssue) {
+      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה, אנא עזרו לכולנו ותרמו מפתח API בחינם', false, null, 'תרמו עכשיו 🔑', () => {
+        document.getElementById('btn-donate-key').click();
+      });
+    } else {
+      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה, אנא עזרו לכולנו ותרמו מפתח API בחינם', false, null, 'תרמו עכשיו 🔑', () => {
+        document.getElementById('btn-donate-key').click();
+      });
+    }
     setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
+    refreshQuotaGauge();
   }
 }
 
@@ -474,13 +569,119 @@ function spawnSparks(x, y){
   }
 }
 
-function showToast(text, isNew, credit){
+function showToast(text, isNew, credit, actionLabel, actionFn){
   const t = document.createElement('div');
   t.className = 'toast' + (isNew ? ' new-discovery' : '');
   t.innerHTML = `<span>${text}</span>` + (credit ? `<span class="credit">· ${credit}</span>` : '');
+  if (actionLabel){
+    const btn = document.createElement('button');
+    btn.textContent = actionLabel;
+    btn.className = 'toast-action-btn';
+    btn.onclick = actionFn;
+    t.appendChild(btn);
+    t.style.animation = 'toast-in .35s ease'; // ביטול ה-auto-fade כשיש כפתור לחיץ
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.className = 'toast-close-btn';
+    closeBtn.onclick = () => t.remove();
+    t.appendChild(closeBtn);
+    toastWrap.appendChild(t);
+    setTimeout(() => t.remove(), 9000);
+    return;
+  }
   toastWrap.appendChild(t);
   setTimeout(() => t.remove(), 2700);
 }
+
+/* ================= מד "בקשות ללא מענה" (בקשות שנכשלו כי חסרים מפתחות) ================= */
+const gaugeNeedle = document.getElementById('gauge-needle');
+const gaugeArc = document.getElementById('gauge-arc');
+const gaugeNum = document.getElementById('gauge-num');
+const GAUGE_ARC_LENGTH = 132; // אורך המסלול של gauge-arc, תואם ל-stroke-dasharray שהוגדר ב-HTML
+const GAUGE_WINDOW_MS = 3 * 60 * 1000; // חלון "כרגע" - 3 הדקות האחרונות
+
+function setGaugeValue(count){
+  const capped = Math.min(count, 10);
+  const ratio = capped / 10;
+  const angleDeg = -90 + ratio * 180;
+  gaugeNeedle.setAttribute('transform', `rotate(${angleDeg} 50 54)`);
+  gaugeArc.setAttribute('stroke-dashoffset', String(GAUGE_ARC_LENGTH - GAUGE_ARC_LENGTH * ratio));
+  gaugeNum.textContent = String(count);
+}
+
+async function refreshQuotaGauge(){
+  if (!sb) return;
+  try{
+    const since = new Date(Date.now() - GAUGE_WINDOW_MS).toISOString();
+    const { count } = await sb.from('activity_log').select('*', { count: 'exact', head: true })
+      .eq('event_type', 'quota_fail').gte('created_at', since);
+    setGaugeValue(count ?? 0);
+  }catch{ /* לא קריטי אם זה נכשל */ }
+}
+document.getElementById('gauge-donate-btn').addEventListener('click', () => document.getElementById('btn-donate-key').click());
+document.getElementById('quota-gauge').addEventListener('click', (e) => {
+  if (e.target.id !== 'gauge-donate-btn') document.getElementById('btn-donate-key').click();
+});
+refreshQuotaGauge();
+setInterval(refreshQuotaGauge, 8000);
+
+/* ================= האלמנטים שגיליתי (לפי המשחק המקורי - גילוי גלובלי ראשון) ================= */
+const discoveredCountEl = document.getElementById('discovered-count');
+const discoveredBanner = document.getElementById('discovered-banner');
+const discoveredModalBackdrop = document.getElementById('discovered-modal-backdrop');
+const discoveredModalList = document.getElementById('discovered-modal-list');
+
+async function refreshDiscoveredByMe(){
+  if (!sb || !nickname) return [];
+  try{
+    const { data } = await sb.from('elements').select('name, emoji, created_at')
+      .eq('discovered_by', nickname).order('created_at', { ascending: false });
+    discoveredCountEl.textContent = String((data || []).length);
+    return data || [];
+  }catch{ return []; }
+}
+
+discoveredBanner.addEventListener('click', async () => {
+  const mine = await refreshDiscoveredByMe();
+  discoveredModalList.innerHTML = '';
+  if (mine.length === 0){
+    discoveredModalList.innerHTML = `<div id="discovered-modal-empty">עדיין לא גיליתם אלמנט חדש בעולם - המשיכו לשלב!</div>`;
+  } else {
+    mine.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'sidebar-item';
+      el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
+      discoveredModalList.appendChild(el);
+    });
+  }
+  discoveredModalBackdrop.style.display = 'flex';
+});
+document.getElementById('btn-close-discovered-modal').addEventListener('click', () => { discoveredModalBackdrop.style.display = 'none'; });
+discoveredModalBackdrop.addEventListener('click', (e) => { if (e.target === discoveredModalBackdrop) discoveredModalBackdrop.style.display = 'none'; });
+
+/* ================= פרסומת שהאדמין הקפיץ (broadcast_ad) ================= */
+const adOverlayBackdrop = document.getElementById('ad-overlay-backdrop');
+const adOverlayImg = document.getElementById('ad-overlay-img');
+
+async function checkBroadcastAd(){
+  if (!sb) return;
+  try{
+    const { data: ad } = await sb.from('broadcast_ad').select('*').eq('id', 1).maybeSingle();
+    if (!ad || !ad.active || !ad.image_url) { adOverlayBackdrop.style.display = 'none'; return; }
+    const dismissedAt = sessionStorage.getItem('jc_ad_dismissed_at');
+    if (dismissedAt && dismissedAt === ad.updated_at) return; // כבר נסגר על ידי המשתמש בסשן הזה
+    adOverlayImg.src = ad.image_url;
+    adOverlayImg.onclick = () => { if (ad.link_url) window.open(ad.link_url, '_blank'); };
+    adOverlayBackdrop.style.display = 'flex';
+    adOverlayBackdrop.dataset.updatedAt = ad.updated_at;
+  }catch{ /* לא קריטי אם זה נכשל */ }
+}
+document.getElementById('ad-overlay-close').addEventListener('click', () => {
+  sessionStorage.setItem('jc_ad_dismissed_at', adOverlayBackdrop.dataset.updatedAt || '1');
+  adOverlayBackdrop.style.display = 'none';
+});
+checkBroadcastAd();
+setInterval(checkBroadcastAd, 15000);
 
 boot();
 
