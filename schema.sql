@@ -98,6 +98,22 @@ create policy "activity_log_public_read" on public.activity_log
   for select using (true);
 -- כתיבה מתבצעת רק דרך ה-Edge Function combine עם service_role (עוקף RLS).
 
+-- ================= מצב תחזוקה =================
+-- שורה יחידה שהאדמין שולט בה מדף הניהול (עם מפתח service_role) כדי להעביר את האתר
+-- למצב תחזוקה זמני עבור כל השחקנים, עם הודעה מותאמת אישית אופציונלית.
+create table if not exists public.site_status (
+  id int primary key default 1,
+  maintenance boolean not null default false,
+  message text,
+  updated_at timestamptz not null default now(),
+  constraint single_row_status check (id = 1)
+);
+insert into public.site_status (id, maintenance) values (1, false) on conflict (id) do nothing;
+alter table public.site_status enable row level security;
+create policy "site_status_public_read" on public.site_status
+  for select using (true);
+-- עדכון (הפעלה/כיבוי/שינוי הודעה) מתבצע רק מדף הניהול עם מפתח service_role.
+
 -- ================= באנר/פרסומת גלובלית =================
 -- שורה יחידה שהאדמין שולט בה מדף הניהול (עם מפתח service_role) כדי "להקפיץ" פופאפ PNG
 -- לכל השחקנים, עם קישור יעד ואפשרות כיבוי/הפעלה.

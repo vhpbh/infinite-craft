@@ -161,6 +161,13 @@
     background:#fff; color:#33313f; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.3); }
   #ad-overlay-close:hover{ filter:brightness(.95); }
 
+  /* ================= מסך מצב תחזוקה (חוסם, בלי אפשרות סגירה) ================= */
+  #maintenance-backdrop{ position:fixed; inset:0; background:var(--bg); z-index:500; display:none; align-items:center; justify-content:center;
+    text-align:center; padding:24px; }
+  #maintenance-box .big{ font-size:48px; margin-bottom:10px; }
+  #maintenance-box h2{ margin:0 0 8px; font-size:20px; }
+  #maintenance-box p{ margin:0; color:var(--text-dim); font-size:14px; max-width:360px; }
+
   @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100% !important; height:42%; border-left:none; border-top:1px solid var(--border); } #sidebar-resizer{ display:none; } #play-area{ height:58%; }
     #quota-gauge{ width:96px; padding:8px 10px 6px; } #quota-gauge svg{ width:80px; height:48px; } #discovered-banner{ font-size:12px; padding:8px 12px; } }
 </style>
@@ -245,6 +252,14 @@
     <div id="ad-overlay">
       <button id="ad-overlay-close" title="סגירה">✕</button>
       <img id="ad-overlay-img" src="" alt="פרסומת">
+    </div>
+  </div>
+
+  <div id="maintenance-backdrop">
+    <div id="maintenance-box">
+      <div class="big">🛠️</div>
+      <h2>האתר בתחזוקה</h2>
+      <p id="maintenance-message">חוזרים בקרוב, תודה על הסבלנות!</p>
     </div>
   </div>
 
@@ -566,7 +581,31 @@ function updateEmptyHint(){
   emptyHint.style.display = playArea.querySelectorAll('.board-item').length > 0 ? 'none' : 'flex';
 }
 
-/* ================= collision + combine (AI-powered) ================= */
+/* ================= מאגר ידע סטטי (db/data-N.json) - שכבה ראשונה לפני מסד הנתונים =================
+   קבצים אופציונליים שהאדמין מייצא בזה אחר זה מדף הניהול (data-1.json, data-2.json, ...) ושם
+   בתיקיית db/ ליד index.html (למשל ב-GitHub). כל ייצוא ממחק את הנתונים המקבילים מה-DB, אז ההיסטוריה
+   המלאה חיה רק כאן, בקבצים המצטברים. טוענים אותם אחד-אחד לפי המספור, ועוצרים ברגע שקובץ לא נמצא (404).
+   שילוב שכבר מופיע באחד הקבצים נפתר מיד בצד הלקוח בלי שום קריאת רשת - ורק אם השילוב לא מופיע
+   באף קובץ, פונים ל-Edge Function שבודקת קודם את מסד הנתונים, ורק אם גם שם אין תשובה - ל-AI. */
+let staticGameData = { elements: {}, recipes: {} };
+const staticGameDataReady = (async () => {
+  const MAX_FILES = 500; // רשת ביטחון בלבד - עוצרים ממילא מיד כשקובץ לא נמצא
+  for (let fileIndex = 1; fileIndex <= MAX_FILES; fileIndex++) {
+    try{
+      const res = await fetch(`./db/data-${fileIndex}.json`, { cache: 'no-store' });
+      if (!res.ok) break; // אין עוד קבצים ממוספרים - הגענו לסוף ההיסטוריה
+      const data = await res.json();
+      Object.assign(staticGameData.elements, data.elements || {});
+      Object.assign(staticGameData.recipes, data.recipes || {});
+    }catch{
+      break; // שגיאת רשת / קובץ לא קיים - עוצרים, זה תקין, פשוט נמשיך ישר למסד הנתונים
+    }
+  }
+})();
+
+function comboKeyOf(a, b){ return [a, b].sort().join(','); }
+
+/* ================= collision + combine (קובץ סטטי -> מסד נתונים -> AI) ================= */
 function checkCollision(draggedDiv){
   if (!draggedDiv.isConnected || draggedDiv.classList.contains('loading')) return;
   const rect1 = draggedDiv.getBoundingClientRect();
@@ -586,6 +625,27 @@ async function combineItems(div1, div2){
   const x = (parseFloat(div1.style.left) + parseFloat(div2.style.left)) / 2;
   const y = (parseFloat(div1.style.top) + parseFloat(div2.style.top)) / 2;
 
+  // שכבה 1: קובץ סטטי מקומי - אם השילוב הזה כבר מוכר משם, פותרים אותו מיד בלי שום קריאת רשת.
+  await staticGameDataReady;
+  const staticHit = staticGameData.recipes[comboKeyOf(name1, name2)];
+  if (staticHit) {
+    div1.classList.remove('loading'); div2.classList.remove('loading');
+    if (staticHit.failed || !staticHit.result) {
+      handleCombineFailed(div1, div2, name1, name2);
+      return;
+    }
+    const staticElement = staticGameData.elements[staticHit.result];
+    const result = {
+      name: staticHit.result,
+      emoji: (staticElement && staticElement.emoji) || '❔',
+      discoveredBy: staticHit.discoveredBy || (staticElement && staticElement.discoveredBy) || null,
+      isNew: false, // אם זה מופיע בקובץ הסטטי, מעצם ההגדרה זה כבר לא גילוי חדש בעולם
+    };
+    handleCombineSuccess(result, div1, div2, name1, name2, x, y);
+    return;
+  }
+
+  // שכבה 2+3: אין תשובה בקובץ - פונים ל-Edge Function, שבודקת קודם את מסד הנתונים ואז את ה-AI.
   try{
     const res = await fetch(EDGE_FUNCTION_URL, {
       method: 'POST',
@@ -602,44 +662,11 @@ async function combineItems(div1, div2){
 
     if (result.failed) {
       div1.classList.remove('loading'); div2.classList.remove('loading');
-      div1.classList.add('shake'); div2.classList.add('shake');
-      showToast(`🚫 אין שילוב הגיוני בין ${name1} ל-${name2}`, false);
-      setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
+      handleCombineFailed(div1, div2, name1, name2);
       return;
     }
 
-    spawnSparks(x, y);
-    div1.classList.add('merged-away'); div2.classList.add('merged-away');
-    setTimeout(() => { div1.remove(); div2.remove(); }, 170);
-
-    // "חדש עבורי" נקבע אך ורק לפי מה שכבר יש ברשימה האישית של השחקן הזה בדפדפן שלו -
-    // לא לפי מה שקרה במשחק הגלובלי. אם שחקן אחר כבר גילה את זה, זה עדיין "חדש" עבור השחקן הנוכחי
-    // בפעם הראשונה שהוא עצמו בונה את הצירוף - אבל בלי לקרוא ל-AI, כי התוצאה כבר שמורה בשרת.
-    const isPersonallyNew = !findItem(result.name);
-    const isGloballyNew = !!result.isNew;
-
-    setTimeout(() => {
-      const newDiv = spawnOnBoard(result, x, y);
-      newDiv.classList.add('combining');
-    }, 160);
-
-    if (isPersonallyNew){
-      unlockedItems.push({ name: result.name, emoji: result.emoji, discovered_by: result.discoveredBy || null });
-      savePersonalProgress();
-      recentlyDiscovered.add(result.name);
-      renderSidebar();
-      if (isGloballyNew) {
-        showToast(`${result.emoji} גילוי חדש: ${result.name}`, true, nickname);
-        setTimeout(refreshDiscoveredByMe, 600);
-      } else {
-        showToast(`${result.emoji} פתחת אלמנט חדש: ${result.name}`, true, result.discoveredBy);
-      }
-      setTimeout(() => recentlyDiscovered.delete(result.name), 3400);
-    } else {
-      showToast(`${result.emoji} ${name1} + ${name2} = ${result.name}`, false);
-    }
-
-    recordMyRecipe(name1, name2, result.name, result.emoji);
+    handleCombineSuccess(result, div1, div2, name1, name2, x, y);
   } catch(err){
     console.error(err);
     div1.classList.remove('loading'); div2.classList.remove('loading');
@@ -658,6 +685,47 @@ async function combineItems(div1, div2){
     setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
     refreshQuotaGauge();
   }
+}
+
+function handleCombineFailed(div1, div2, name1, name2){
+  div1.classList.add('shake'); div2.classList.add('shake');
+  showToast(`🚫 אין שילוב הגיוני בין ${name1} ל-${name2}`, false);
+  setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
+}
+
+function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
+  spawnSparks(x, y);
+  div1.classList.add('merged-away'); div2.classList.add('merged-away');
+  setTimeout(() => { div1.remove(); div2.remove(); }, 170);
+
+  // "חדש עבורי" נקבע אך ורק לפי מה שכבר יש ברשימה האישית של השחקן הזה בדפדפן שלו -
+  // לא לפי מה שקרה במשחק הגלובלי. אם שחקן אחר כבר גילה את זה (או שזה הגיע מהקובץ הסטטי),
+  // זה עדיין "חדש" עבור השחקן הנוכחי בפעם הראשונה שהוא עצמו בונה את הצירוף.
+  const isPersonallyNew = !findItem(result.name);
+  const isGloballyNew = !!result.isNew;
+
+  setTimeout(() => {
+    const newDiv = spawnOnBoard(result, x, y);
+    newDiv.classList.add('combining');
+  }, 160);
+
+  if (isPersonallyNew){
+    unlockedItems.push({ name: result.name, emoji: result.emoji, discovered_by: result.discoveredBy || null });
+    savePersonalProgress();
+    recentlyDiscovered.add(result.name);
+    renderSidebar();
+    if (isGloballyNew) {
+      showToast(`${result.emoji} גילוי חדש: ${result.name}`, true, nickname);
+      setTimeout(refreshDiscoveredByMe, 600);
+    } else {
+      showToast(`${result.emoji} פתחת אלמנט חדש: ${result.name}`, true, result.discoveredBy);
+    }
+    setTimeout(() => recentlyDiscovered.delete(result.name), 3400);
+  } else {
+    showToast(`${result.emoji} ${name1} + ${name2} = ${result.name}`, false);
+  }
+
+  recordMyRecipe(name1, name2, result.name, result.emoji);
 }
 
 function spawnSparks(x, y){
@@ -786,6 +854,25 @@ document.getElementById('ad-overlay-close').addEventListener('click', () => {
 });
 checkBroadcastAd();
 setInterval(checkBroadcastAd, 15000);
+
+/* ================= מצב תחזוקה (חוסם את כל המשחק כשהאדמין מפעיל) ================= */
+const maintenanceBackdrop = document.getElementById('maintenance-backdrop');
+const maintenanceMessageEl = document.getElementById('maintenance-message');
+
+async function checkMaintenance(){
+  if (!sb) return;
+  try{
+    const { data: status } = await sb.from('site_status').select('maintenance, message').eq('id', 1).maybeSingle();
+    if (status && status.maintenance){
+      maintenanceMessageEl.textContent = status.message || 'חוזרים בקרוב, תודה על הסבלנות!';
+      maintenanceBackdrop.style.display = 'flex';
+    } else {
+      maintenanceBackdrop.style.display = 'none';
+    }
+  }catch{ /* לא קריטי אם זה נכשל - עדיף שהמשחק ימשיך לעבוד */ }
+}
+checkMaintenance();
+setInterval(checkMaintenance, 15000);
 
 boot();
 
