@@ -7,7 +7,6 @@
 <link rel="icon" type="image/png" href="https://i.ibb.co/hFnPhkc2/Gemini-Generated-Image-b1pnfbb1pnfbb1pn.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#eeecf6; --bg-dot:#e1ddef; --sidebar-bg:#fff; --border:#e4e1f2; --text:#33313f;
@@ -291,23 +290,21 @@
 
 <script>
 /* ================= CONFIG ================= */
-/* פרטי החיבור קבועים כאן ישירות. אפשר גם לעדכן אותם דרך admin.html
-   (נשמר ב-localStorage ומקבל עדיפות אם קיים, לנוחות בזמן פיתוח). */
-const HARDCODED_SUPABASE_URL = 'https://pixooektajgzrpifkxvg.supabase.co';
-const HARDCODED_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpeG9vZWt0YWpnenJwaWZreHZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyMjUyNzQsImV4cCI6MjA5OTgwMTI3NH0.S3ET8us1Bup9lrGP4GLOdJJgiV8nw_McuK7R3jHDnXM';
+/* עברנו מ-Supabase ל-Cloudflare Worker + D1. צריך רק כתובת אחת - ה-URL של ה-Worker
+   שקיבלתם אחרי הפריסה (למשל https://yetzira-yehudit.YOUR-SUBDOMAIN.workers.dev).
+   אפשר גם לעדכן דרך admin.html (נשמר ב-localStorage ומקבל עדיפות, לנוחות בזמן פיתוח). */
+const HARDCODED_WORKER_URL = 'https://yetzira-yehudit.arieldavid613.workers.dev';
 
 const CFG = JSON.parse(localStorage.getItem('jc_config') || '{}');
-const SUPABASE_URL = CFG.supabaseUrl || HARDCODED_SUPABASE_URL;
-const SUPABASE_ANON_KEY = CFG.supabaseAnonKey || HARDCODED_SUPABASE_ANON_KEY;
+const WORKER_URL = (CFG.workerUrl || HARDCODED_WORKER_URL).replace(/\/$/, '');
 
-let sb = null;
-if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
-
-const EDGE_FUNCTION_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/combine` : '';
-const CONTRIBUTE_KEY_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/contribute-key` : '';
-const CLAIM_NICKNAME_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/claim-nickname` : '';
+const EDGE_FUNCTION_URL = WORKER_URL ? `${WORKER_URL}/combine` : '';
+const CONTRIBUTE_KEY_URL = WORKER_URL ? `${WORKER_URL}/contribute-key` : '';
+const CLAIM_NICKNAME_URL = WORKER_URL ? `${WORKER_URL}/claim-nickname` : '';
+const MY_ELEMENTS_URL = WORKER_URL ? `${WORKER_URL}/my-elements` : '';
+const QUOTA_GAUGE_URL = WORKER_URL ? `${WORKER_URL}/quota-gauge` : '';
+const BROADCAST_AD_URL = WORKER_URL ? `${WORKER_URL}/broadcast-ad` : '';
+const SITE_STATUS_URL = WORKER_URL ? `${WORKER_URL}/site-status` : '';
 
 /* ================= STATE ================= */
 let unlockedItems = [];         // {name, emoji, discovered_by}
@@ -347,9 +344,9 @@ const STARTING_ITEMS = [
 
 /* ================= boot ================= */
 function boot(){
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  if (!WORKER_URL) {
     playArea.innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--text-dim);font-size:14px;">
-      ⚠️ המשחק לא מחובר עדיין ל-Supabase.<br>היכנסו לדף הניהול (admin.html) והזינו את פרטי החיבור.</div>`;
+      ⚠️ המשחק לא מחובר עדיין ל-Worker.<br>היכנסו לדף הניהול (admin.html) והזינו את כתובת ה-Worker.</div>`;
     return;
   }
   if (!nickname) {
@@ -371,7 +368,7 @@ nickInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitNickna
 async function claimNickname(desired){
   const res = await fetch(CLAIM_NICKNAME_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ clientId, desiredNickname: desired })
   });
   const result = await res.json();
@@ -638,7 +635,7 @@ async function fetchCombineResult(itemA, itemB){
   const personalProvider = localStorage.getItem('jc_personal_api_provider') || '';
   const res = await fetch(EDGE_FUNCTION_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       itemA, itemB, nickname,
       personalKey: personalKey || undefined,
@@ -822,11 +819,11 @@ function setGaugeValue(count){
 }
 
 async function refreshQuotaGauge(){
-  if (!sb) return;
+  if (!WORKER_URL) return;
   try{
     const since = new Date(Date.now() - GAUGE_WINDOW_MS).toISOString();
-    const { count } = await sb.from('activity_log').select('*', { count: 'exact', head: true })
-      .eq('event_type', 'quota_fail').gte('created_at', since);
+    const res = await fetch(`${QUOTA_GAUGE_URL}?since=${encodeURIComponent(since)}`);
+    const { count } = await res.json();
     setGaugeValue(count ?? 0);
   }catch{ /* לא קריטי אם זה נכשל */ }
 }
@@ -844,10 +841,10 @@ const discoveredModalBackdrop = document.getElementById('discovered-modal-backdr
 const discoveredModalList = document.getElementById('discovered-modal-list');
 
 async function refreshDiscoveredByMe(){
-  if (!sb || !nickname) return [];
+  if (!WORKER_URL || !nickname) return [];
   try{
-    const { data } = await sb.from('elements').select('name, emoji, created_at')
-      .eq('discovered_by', nickname).order('created_at', { ascending: false });
+    const res = await fetch(`${MY_ELEMENTS_URL}?nickname=${encodeURIComponent(nickname)}`);
+    const { data } = await res.json();
     discoveredCountEl.textContent = String((data || []).length);
     return data || [];
   }catch{ return []; }
@@ -876,9 +873,10 @@ const adOverlayBackdrop = document.getElementById('ad-overlay-backdrop');
 const adOverlayImg = document.getElementById('ad-overlay-img');
 
 async function checkBroadcastAd(){
-  if (!sb) return;
+  if (!WORKER_URL) return;
   try{
-    const { data: ad } = await sb.from('broadcast_ad').select('*').eq('id', 1).maybeSingle();
+    const res = await fetch(BROADCAST_AD_URL);
+    const { data: ad } = await res.json();
     if (!ad || !ad.active || !ad.image_url) { adOverlayBackdrop.style.display = 'none'; return; }
     const dismissedAt = sessionStorage.getItem('jc_ad_dismissed_at');
     if (dismissedAt && dismissedAt === ad.updated_at) return; // כבר נסגר על ידי המשתמש בסשן הזה
@@ -900,9 +898,10 @@ const maintenanceBackdrop = document.getElementById('maintenance-backdrop');
 const maintenanceMessageEl = document.getElementById('maintenance-message');
 
 async function checkMaintenance(){
-  if (!sb) return;
+  if (!WORKER_URL) return;
   try{
-    const { data: status } = await sb.from('site_status').select('maintenance, message').eq('id', 1).maybeSingle();
+    const res = await fetch(SITE_STATUS_URL);
+    const { data: status } = await res.json();
     if (status && status.maintenance){
       maintenanceMessageEl.textContent = status.message || 'חוזרים בקרוב, תודה על הסבלנות!';
       maintenanceBackdrop.style.display = 'flex';
@@ -985,7 +984,7 @@ document.getElementById('donate-key-submit').addEventListener('click', async () 
   try {
     const res = await fetch(CONTRIBUTE_KEY_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ apiKey: key, nickname })
     });
     const result = await res.json();
