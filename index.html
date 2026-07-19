@@ -154,8 +154,8 @@
 
   /* ================= admin-pushed ad popup ================= */
   #ad-overlay-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.55); z-index:400; display:none; align-items:center; justify-content:center; }
-  #ad-overlay{ position:relative; max-width:min(92vw,420px); }
-  #ad-overlay img{ display:block; width:100%; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,.35); cursor:pointer; }
+  #ad-overlay{ position:relative; max-width:min(92vw,420px); min-width:200px; min-height:120px; }
+  #ad-overlay img{ display:block; width:100%; min-height:120px; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,.35); cursor:pointer; background:rgba(255,255,255,.06); }
   #ad-overlay-close{ position:absolute; top:-14px; right:-14px; width:32px; height:32px; border-radius:50%; border:none;
     background:#fff; color:#33313f; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.3); }
   #ad-overlay-close:hover{ filter:brightness(.95); }
@@ -880,6 +880,10 @@ async function checkBroadcastAd(){
     if (!ad || !ad.active || !ad.image_url) { adOverlayBackdrop.style.display = 'none'; return; }
     const dismissedAt = sessionStorage.getItem('jc_ad_dismissed_at');
     if (dismissedAt && dismissedAt === ad.updated_at) return; // כבר נסגר על ידי המשתמש בסשן הזה
+    adOverlayImg.onerror = () => {
+      // התמונה לא נטענה (קישור שבור/לא ישיר) - עדיף לא להציג כלום מאשר להשאיר מסך אפור תקוע.
+      adOverlayBackdrop.style.display = 'none';
+    };
     adOverlayImg.src = ad.image_url;
     adOverlayImg.onclick = () => { if (ad.link_url) window.open(ad.link_url, '_blank'); };
     adOverlayBackdrop.style.display = 'flex';
@@ -889,6 +893,18 @@ async function checkBroadcastAd(){
 document.getElementById('ad-overlay-close').addEventListener('click', () => {
   sessionStorage.setItem('jc_ad_dismissed_at', adOverlayBackdrop.dataset.updatedAt || '1');
   adOverlayBackdrop.style.display = 'none';
+});
+adOverlayBackdrop.addEventListener('click', (e) => {
+  if (e.target === adOverlayBackdrop){
+    sessionStorage.setItem('jc_ad_dismissed_at', adOverlayBackdrop.dataset.updatedAt || '1');
+    adOverlayBackdrop.style.display = 'none';
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && adOverlayBackdrop.style.display === 'flex'){
+    sessionStorage.setItem('jc_ad_dismissed_at', adOverlayBackdrop.dataset.updatedAt || '1');
+    adOverlayBackdrop.style.display = 'none';
+  }
 });
 checkBroadcastAd();
 setInterval(checkBroadcastAd, 15000);
