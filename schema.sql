@@ -67,6 +67,37 @@ insert into public.api_key_rotation (id, current_index) values (1, 0) on conflic
 alter table public.api_key_rotation enable row level security;
 -- אין policy לקריאה/כתיבה עבור anon/authenticated - נגיש רק דרך ה-Edge Function עם service_role.
 
+-- קריאה+עדכון אטומיים של אינדקס הרוטציה במשפט/עסקה יחידה בצד ה-DB (עם FOR UPDATE שנועל את השורה),
+-- כדי ששני שחקנים ששולחים בקשת שילוב באותו רגע ממש לא "יקראו" את אותו אינדקס במקביל
+-- ויתחילו שניהם מאותו מפתח (מה שהיה קורה עם read-then-write נפרד מתוך ה-Edge Function).
+create or replace function public.claim_next_key_index(p_key_count int)
+returns int
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_index int;
+begin
+  if p_key_count <= 0 then
+    return 0;
+  end if;
+
+  select current_index into v_index
+  from public.api_key_rotation
+  where id = 1
+  for update;
+
+  update public.api_key_rotation
+  set current_index = (v_index + 1) % p_key_count
+  where id = 1;
+
+  return v_index % p_key_count;
+end;
+$$;
+-- הרשאת הרצה נשארת רק ל-service_role (ברירת המחדל) - לא נחשפת ל-anon/authenticated.
+revoke all on function public.claim_next_key_index(int) from public, anon, authenticated;
+
 create table if not exists public.gemini_keys (
   id bigint generated always as identity primary key,
   api_key text not null unique,
@@ -77,6 +108,12 @@ create table if not exists public.gemini_keys (
 );
 -- תאימות לאחור: אם הטבלה כבר קיימת מהתקנה קודמת (לפני תמיכה ב-Groq), נוסיף את העמודה בלי לשבור כלום.
 alter table public.gemini_keys add column if not exists provider text not null default 'gemini';
+
+-- מעקב כשלים: מתי לדלג זמנית על מפתח שחרג ממכסה (429 - יתאפס), וכמה כשלים רצופים
+-- ספג (בלי קשר לסוג) כדי לדעת מתי לחשוד שהמפתח מת ולכבות אותו אוטומטית.
+alter table public.gemini_keys add column if not exists cooldown_until timestamptz;
+alter table public.gemini_keys add column if not exists consecutive_failures int not null default 0;
+
 alter table public.gemini_keys enable row level security;
 -- אין policy לקריאה/כתיבה עבור anon/authenticated - נגיש רק דרך Edge Functions עם service_role.
 -- הוספת מפתח מתבצעת אך ורק דרך ה-Edge Function contribute-key, שמאמת את המפתח לפני השמירה

@@ -33,12 +33,25 @@ function sortKey(a: string, b: string) {
   return [a, b].sort().join(",");
 }
 
-// קורא ל-AI אצל הספק המתאים (Gemini או Groq) ומחזיר את טקסט ה-JSON הגולמי שהוא ייצר.
-async function callProvider(entry: KeyEntry, prompt: string): Promise<{ ok: true; text: string } | { ok: false; errText: string }> {
+// כמה זמן לתת לכל ניסיון בודד לפני שמוותרים עליו ועוברים למפתח הבא -
+// בלי timeout, מפתח "תקוע"/איטי היה יכול לתקוע את כל הרוטציה ולגרום לבקשה להיתלות.
+const PROVIDER_TIMEOUT_MS = 15000;
+
+type ProviderResult =
+  | { ok: true; text: string }
+  | { ok: false; status: number; errText: string; retryAfterMs: number | null };
+
+// קורא ל-AI אצל הספק המתאים (Gemini או Groq) ומחזיר את טקסט ה-JSON הגולמי שהוא ייצר,
+// יחד עם קוד הסטטוס - כדי שמי שקורא לפונקציה יוכל להבחין בין כשל זמני (429, יתאפס)
+// לכשל קבוע (401/403, מפתח לא תקין/בוטל) ולהגיב בהתאם.
+async function callProvider(entry: KeyEntry, prompt: string): Promise<ProviderResult> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), PROVIDER_TIMEOUT_MS);
   try {
     if (entry.provider === "groq") {
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
+        signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${entry.key}`,
@@ -49,7 +62,9 @@ async function callProvider(entry: KeyEntry, prompt: string): Promise<{ ok: true
           response_format: { type: "json_object" },
         }),
       });
-      if (!res.ok) return { ok: false, errText: await res.text() };
+      if (!res.ok) {
+        return { ok: false, status: res.status, errText: await res.text(), retryAfterMs: parseRetryAfter(res) };
+      }
       const json = await res.json();
       return { ok: true, text: json.choices?.[0]?.message?.content ?? "{}" };
     } else {
@@ -57,6 +72,7 @@ async function callProvider(entry: KeyEntry, prompt: string): Promise<{ ok: true
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent`,
         {
           method: "POST",
+          signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
             "x-goog-api-key": entry.key,
@@ -67,14 +83,41 @@ async function callProvider(entry: KeyEntry, prompt: string): Promise<{ ok: true
           }),
         }
       );
-      if (!res.ok) return { ok: false, errText: await res.text() };
+      if (!res.ok) {
+        return { ok: false, status: res.status, errText: await res.text(), retryAfterMs: parseRetryAfter(res) };
+      }
       const json = await res.json();
       return { ok: true, text: json.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}" };
     }
   } catch (e) {
-    return { ok: false, errText: String(e) };
+    // כולל timeout/abort - מטופל כשגיאת רשת זמנית (status 0), לא כמפתח לא תקין.
+    return { ok: false, status: 0, errText: String(e), retryAfterMs: null };
+  } finally {
+    clearTimeout(timeout);
   }
 }
+
+// מנסה לקרוא Retry-After (שניות או תאריך HTTP) מהתשובה, אם הספק סיפק אחד.
+function parseRetryAfter(res: Response): number | null {
+  const header = res.headers.get("retry-after");
+  if (!header) return null;
+  const asSeconds = Number(header);
+  if (!Number.isNaN(asSeconds)) return asSeconds * 1000;
+  const asDate = Date.parse(header);
+  if (!Number.isNaN(asDate)) return Math.max(0, asDate - Date.now());
+  return null;
+}
+
+// כשל קבוע (מפתח לא תקין/בוטל/אין הרשאה) - אין טעם לנסות שוב, עדיף לכבות אוטומטית
+// כדי שכל בקשה עתידית לא תבזבז קריאת HTTP על מפתח שממילא לא יעבוד.
+function isPermanentFailure(status: number): boolean {
+  return status === 401 || status === 403;
+}
+// כשל זמני של מכסה - המפתח כנראה יעבוד שוב בעוד זמן מה, רק לשים בקירור זמני.
+function isQuotaFailure(status: number): boolean {
+  return status === 429;
+}
+const DEFAULT_COOLDOWN_MS = 60_000;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -82,7 +125,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { itemA, itemB, nickname } = await req.json();
+    const { itemA, itemB, nickname, personalKey, personalProvider } = await req.json();
     if (!itemA || !itemB || !nickname) {
       return new Response(JSON.stringify({ error: "חסרים פרמטרים" }), {
         status: 400,
@@ -155,59 +198,108 @@ Deno.serve(async (req) => {
 אם יש תוצאה הגיונית: {"success": true, "name": "שם התוצאה בעברית (מילה או צירוף קצר)", "emoji": "אימוג'י בודד המתאים ביותר"}
 אם אין שום שילוב הגיוני: {"success": false}`;
 
-    // 2.5 קרא ל-Gemini עם רוטציה בין כל המפתחות הזמינים: מפתחות "זרע" קבועים
-    //     ועוד כל מפתח שתרמו שחקנים ונשמר פעיל ב-DB. מתחילים מהמפתח שנשמר
-    //     כ"נוכחי", ואם הוא נכשל (מכסה/שגיאה) עוברים לבא בתור עד שמישהו מצליח.
-    const { data: contributedKeysData } = await supabase
-      .from("gemini_keys")
-      .select("api_key, provider")
-      .eq("active", true)
-      .order("created_at", { ascending: true });
-
-    const contributedKeys: KeyEntry[] = (contributedKeysData ?? []).map((r) => ({
-      key: r.api_key,
-      provider: (r.provider === "groq" ? "groq" : "gemini") as Provider,
-    }));
-    const seedKeys: KeyEntry[] = [
-      ...SEED_GEMINI_API_KEYS.map((k) => ({ key: k, provider: "gemini" as Provider })),
-      ...SEED_GROQ_API_KEYS.map((k) => ({ key: k, provider: "groq" as Provider })),
-    ];
-    const seenKeys = new Set<string>();
-    const API_KEYS: KeyEntry[] = [...seedKeys, ...contributedKeys].filter((entry) => {
-      if (seenKeys.has(entry.key)) return false;
-      seenKeys.add(entry.key);
-      return true;
-    });
-
-    if (API_KEYS.length === 0) {
-      await supabase.from("activity_log").insert({ nickname, event_type: "quota_fail" });
-      return new Response(JSON.stringify({ error: "לא הוגדר אף מפתח AI (GEMINI_API_KEYS / GROQ_API_KEYS)", quotaExceeded: true }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const { data: rotation } = await supabase
-      .from("api_key_rotation")
-      .select("current_index")
-      .eq("id", 1)
-      .maybeSingle();
-
-    let startIndex = (rotation?.current_index ?? 0) % API_KEYS.length;
     let responseText: string | null = null;
     let lastErrText = "";
-    let successIndex = -1;
 
-    for (let attempt = 0; attempt < API_KEYS.length; attempt++) {
-      const tryIndex = (startIndex + attempt) % API_KEYS.length;
-      const entry = API_KEYS[tryIndex];
-      const result = await callProvider(entry, prompt);
-      if (result.ok) {
-        responseText = result.text;
-        successIndex = tryIndex;
-        break;
+    // 2.4 מפתח אישי (אם השחקן הגדיר אחד דרך Alt+C+O): מנסים אותו ראשון ובלעדית -
+    //     הוא לא חלק מהמאגר המשותף, לא נוגע ברוטציה/אינדקס המשותף, ולא נכשל -> ממשיכים
+    //     למאגר המשותף הרגיל בדיוק כאילו לא היה מפתח אישי בכלל.
+    const trimmedPersonalKey = typeof personalKey === "string" ? personalKey.trim() : "";
+    if (trimmedPersonalKey) {
+      const provider: Provider = personalProvider === "groq" ? "groq" : "gemini";
+      const personalResult = await callProvider({ key: trimmedPersonalKey, provider }, prompt);
+      if (personalResult.ok) {
+        responseText = personalResult.text;
       } else {
+        lastErrText = personalResult.errText;
+        // לא מכבים/משנים כלום במאגר המשותף בגלל כשל של מפתח אישי - הוא לא שייך לו.
+      }
+    }
+
+    // 2.5 מאגר משותף: מפתחות "זרע" קבועים + מפתחות שתרמו שחקנים ופעילים כרגע
+    //     (לא בקירור אחרי 429 ולא כובו לצמיתות אחרי 401/403).
+    if (responseText === null) {
+      const { data: contributedKeysData } = await supabase
+        .from("gemini_keys")
+        .select("id, api_key, provider, consecutive_failures")
+        .eq("active", true)
+        .or("cooldown_until.is.null,cooldown_until.lt." + new Date().toISOString())
+        .order("created_at", { ascending: true });
+
+      type ContribEntry = KeyEntry & { id?: number };
+      const contributedKeys: ContribEntry[] = (contributedKeysData ?? []).map((r) => ({
+        id: r.id,
+        key: r.api_key,
+        provider: (r.provider === "groq" ? "groq" : "gemini") as Provider,
+      }));
+      const seedKeys: KeyEntry[] = [
+        ...SEED_GEMINI_API_KEYS.map((k) => ({ key: k, provider: "gemini" as Provider })),
+        ...SEED_GROQ_API_KEYS.map((k) => ({ key: k, provider: "groq" as Provider })),
+      ];
+      const seenKeys = new Set<string>();
+      const API_KEYS: ContribEntry[] = [...seedKeys, ...contributedKeys].filter((entry) => {
+        if (seenKeys.has(entry.key)) return false;
+        seenKeys.add(entry.key);
+        return true;
+      });
+
+      if (API_KEYS.length === 0) {
+        await supabase.from("activity_log").insert({ nickname, event_type: "quota_fail" });
+        return new Response(JSON.stringify({ error: "לא הוגדר אף מפתח AI (GEMINI_API_KEYS / GROQ_API_KEYS)", quotaExceeded: true }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // קריאה+עדכון אטומיים של אינדקס ההתחלה דרך פונקציית DB (נעולה בעסקה אחת),
+      // כדי שתי בקשות שילוב במקביל לא "יתחילו" מאותו מפתח בדיוק.
+      const { data: startIndexData, error: rpcError } = await supabase.rpc("claim_next_key_index", {
+        p_key_count: API_KEYS.length,
+      });
+      const startIndex = rpcError || typeof startIndexData !== "number" ? 0 : startIndexData;
+
+      for (let attempt = 0; attempt < API_KEYS.length; attempt++) {
+        const tryIndex = (startIndex + attempt) % API_KEYS.length;
+        const entry = API_KEYS[tryIndex];
+        const result = await callProvider(entry, prompt);
+        if (result.ok) {
+          responseText = result.text;
+          if (entry.id != null) {
+            // הצלחה - איפוס מונה הכשלים כדי שכשל ישן ולא-קשור לא יצטבר לעבר כיבוי שגוי בעתיד.
+            await supabase.from("gemini_keys").update({ consecutive_failures: 0, cooldown_until: null }).eq("id", entry.id);
+          }
+          break;
+        }
+
         lastErrText = result.errText;
+
+        // רק מפתחות שתרמו שחקנים (יש להם id בטבלה) ניתנים לעדכון סטטוס ב-DB -
+        // מפתחות "זרע" מגיעים מ-secrets ואי אפשר/אין טעם לכבות אותם אוטומטית.
+        if (entry.id != null) {
+          if (isPermanentFailure(result.status)) {
+            // מפתח לא תקין/בוטל - כיבוי מיידי כדי שאף בקשה עתידית לא תבזבז עליו קריאה.
+            await supabase.from("gemini_keys").update({ active: false }).eq("id", entry.id);
+          } else if (isQuotaFailure(result.status)) {
+            // חריגה ממכסה - קירור זמני (מכבד Retry-After אם סופק, אחרת ברירת מחדל).
+            const cooldownMs = result.retryAfterMs ?? DEFAULT_COOLDOWN_MS;
+            await supabase
+              .from("gemini_keys")
+              .update({ cooldown_until: new Date(Date.now() + cooldownMs).toISOString() })
+              .eq("id", entry.id);
+          } else {
+            // שגיאה חולפת אחרת (500/timeout/רשת) - סופרים, ומכבים רק אחרי כמה כשלים רצופים,
+            // כדי לא לכבות מפתח תקין בגלל תקלה זמנית חד-פעמית אצל הספק.
+            const { data: updated } = await supabase
+              .from("gemini_keys")
+              .update({ consecutive_failures: (contributedKeysData?.find((r) => r.id === entry.id)?.consecutive_failures ?? 0) + 1 })
+              .eq("id", entry.id)
+              .select("consecutive_failures")
+              .maybeSingle();
+            if ((updated?.consecutive_failures ?? 0) >= 5) {
+              await supabase.from("gemini_keys").update({ active: false }).eq("id", entry.id);
+            }
+          }
+        }
       }
     }
 
@@ -219,9 +311,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // שמור את המפתח הבא בתור לפעם הבאה (רוטציה, כולל חזרה למפתח הראשון בסוף)
-    const nextIndex = (successIndex + 1) % API_KEYS.length;
-    await supabase.from("api_key_rotation").update({ current_index: nextIndex }).eq("id", 1);
     let parsed: { success?: boolean; name?: string; emoji?: string };
     try {
       parsed = JSON.parse(responseText);

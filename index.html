@@ -274,6 +274,21 @@
     </div>
   </div>
 
+  <div id="personal-key-modal-backdrop" style="display:none;">
+    <div id="nick-modal">
+      <div class="big">🗝️</div>
+      <h2>מפתח API אישי</h2>
+      <p>מפתח שרק אתם מזינים כאן משמש <b>רק את הבקשות שלכם</b> - הוא נשמר רק בדפדפן הזה, לא נשלח לאף מקום
+      חוץ מלצד השילובים שאתם עצמכם מבקשים, ולא נכנס לרוטציה המשותפת שכל שאר השחקנים חולקים.
+      כך אתם לא תלויים בעומס של אחרים. אפשר Groq חינמי (מ-<a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a>,
+      מפתח שמתחיל ב-"gsk_") או Gemini (מ-aistudio.google.com/apikey).</p>
+      <input id="personal-key-input" type="text" placeholder="gsk_... או AIzaSy...">
+      <button id="personal-key-submit">שמרו מפתח אישי</button>
+      <button id="personal-key-clear" style="margin-top:8px; background:transparent; border:1px solid var(--border); color:var(--text-dim);">הסירו מפתח אישי קיים</button>
+      <div id="personal-key-status" style="font-size:12.5px; margin-top:10px; display:none;"></div>
+    </div>
+  </div>
+
 <script>
 /* ================= CONFIG ================= */
 /* פרטי החיבור קבועים כאן ישירות. אפשר גם לעדכן אותם דרך admin.html
@@ -603,29 +618,32 @@ const staticGameDataReady = (async () => {
   }
 })();
 
-/* ================= מצב "אל תוותר" נסתר (Alt+C+O) =================
-   קיצור מקלדת נסתר, מקומי לדפדפן הזה בלבד (לא נשמר, לא משפיע על אף אחד אחר):
-   ברגע שמפעילים אותו, כל שילוב שנכשל כי ה-AI עמוס/חסר מכסה לא מוותר עליו - הוא ממשיך לנסות
-   ברקע ברקע עם השהיה גוברת (1 שנ' -> 2 -> 4 ... עד תקרה של 15 שנ') עד שמתקבלת תשובה בפועל,
-   בלי צורך לגרור את האלמנטים שוב. חוזר למצב רגיל אוטומטית ברענון הדף. */
-let persistentRetryMode = false;
+/* ================= מפתח אישי (קיצור מקלדת נסתר: Alt+C+O) =================
+   קיצור מקלדת נסתר, מקומי לדפדפן הזה בלבד: פותח אפשרות להזין מפתח API אישי שמשמש
+   רק אתכם (נשמר רק בדפדפן שלכם, נשלח רק לצד הבקשות שלכם עצמכם ולא נכנס לרוטציה
+   המשותפת של כל השחקנים) - כדי שלא תהיו תלויים בעומס על המאגר המשותף. */
 const pressedKeysForCheat = new Set();
 window.addEventListener('keydown', (e) => {
   pressedKeysForCheat.add(e.key.toLowerCase());
-  if (e.altKey && pressedKeysForCheat.has('c') && pressedKeysForCheat.has('o') && !persistentRetryMode) {
-    persistentRetryMode = true;
-    showToast('🚀 מצב "אל תוותר" הופעל עד לרענון הדף', true);
+  if (e.altKey && pressedKeysForCheat.has('c') && pressedKeysForCheat.has('o')) {
+    openPersonalKeyModal();
   }
 });
 window.addEventListener('keyup', (e) => pressedKeysForCheat.delete(e.key.toLowerCase()));
 
 function comboKeyOf(a, b){ return [a, b].sort().join(','); }
 
-async function fetchCombineResult(itemA, itemB, isRetry = false){
+async function fetchCombineResult(itemA, itemB){
+  const personalKey = localStorage.getItem('jc_personal_api_key') || '';
+  const personalProvider = localStorage.getItem('jc_personal_api_provider') || '';
   const res = await fetch(EDGE_FUNCTION_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
-    body: JSON.stringify({ itemA, itemB, nickname, isRetry })
+    body: JSON.stringify({
+      itemA, itemB, nickname,
+      personalKey: personalKey || undefined,
+      personalProvider: personalProvider || undefined,
+    })
   });
   let result;
   try { result = await res.json(); } catch { result = {}; }
@@ -635,29 +653,6 @@ async function fetchCombineResult(itemA, itemB, isRetry = false){
     throw err;
   }
   return result;
-}
-
-// רץ במצב "אל תוותר": ממשיך לנסות את אותו שילוב עם השהיה גוברת עד שמתקבלת תשובה בפועל,
-// כל עוד האלמנטים עדיין על הלוח (לא בוטלו/שולבו אחרת בינתיים).
-async function retryCombineUntilSuccess(div1, div2, name1, name2, x, y){
-  let delay = 1000;
-  const maxDelay = 15000;
-  while (true) {
-    await new Promise(r => setTimeout(r, delay));
-    if (!div1.isConnected || !div2.isConnected) return;
-    try {
-      const result = await fetchCombineResult(name1, name2, true);
-      if (result.failed) {
-        div1.classList.remove('loading'); div2.classList.remove('loading');
-        handleCombineFailed(div1, div2, name1, name2);
-        return;
-      }
-      handleCombineSuccess(result, div1, div2, name1, name2, x, y);
-      return;
-    } catch {
-      delay = Math.min(delay * 2, maxDelay);
-    }
-  }
 }
 
 /* ================= collision + combine (קובץ סטטי -> מסד נתונים -> AI) ================= */
@@ -714,12 +709,6 @@ async function combineItems(div1, div2){
   } catch(err){
     const msg = String(err.message || err);
     const isQuotaIssue = err.quotaExceeded || /מפתח|key|quota|429|502/i.test(msg);
-
-    if (persistentRetryMode) {
-      // במצב "אל תוותר" - לא מוותרים על השילוב, ממשיכים לנסות ברקע עד שמתקבלת תשובה בפועל.
-      retryCombineUntilSuccess(div1, div2, name1, name2, x, y);
-      return;
-    }
 
     console.error(err);
     div1.classList.remove('loading'); div2.classList.remove('loading');
@@ -1015,6 +1004,39 @@ document.getElementById('donate-key-submit').addEventListener('click', async () 
     donateKeyStatus.style.display = 'block';
     btn.disabled = false; btn.textContent = 'תרמו מפתח';
   }
+});
+
+/* ================= מפתח API אישי (משמש רק אתכם, לא נכנס לרוטציה המשותפת) ================= */
+const personalKeyModalBackdrop = document.getElementById('personal-key-modal-backdrop');
+const personalKeyInput = document.getElementById('personal-key-input');
+const personalKeyStatus = document.getElementById('personal-key-status');
+
+function openPersonalKeyModal(){
+  personalKeyInput.value = localStorage.getItem('jc_personal_api_key') || '';
+  personalKeyStatus.style.display = 'none';
+  personalKeyModalBackdrop.style.display = 'flex';
+  personalKeyInput.focus();
+}
+personalKeyModalBackdrop.addEventListener('click', (e) => { if (e.target === personalKeyModalBackdrop) personalKeyModalBackdrop.style.display = 'none'; });
+
+document.getElementById('personal-key-submit').addEventListener('click', () => {
+  const key = personalKeyInput.value.trim();
+  if (!key){ personalKeyStatus.style.display = 'block'; personalKeyStatus.style.color = '#e53e3e'; personalKeyStatus.textContent = 'הזינו מפתח תחילה.'; return; }
+  const provider = key.startsWith('gsk_') ? 'groq' : 'gemini';
+  localStorage.setItem('jc_personal_api_key', key);
+  localStorage.setItem('jc_personal_api_provider', provider);
+  personalKeyStatus.style.display = 'block';
+  personalKeyStatus.style.color = 'var(--accent)';
+  personalKeyStatus.textContent = `✅ נשמר! מעתה הבקשות שלכם ינסו קודם עם המפתח האישי הזה (${provider}).`;
+});
+
+document.getElementById('personal-key-clear').addEventListener('click', () => {
+  localStorage.removeItem('jc_personal_api_key');
+  localStorage.removeItem('jc_personal_api_provider');
+  personalKeyInput.value = '';
+  personalKeyStatus.style.display = 'block';
+  personalKeyStatus.style.color = 'var(--text-dim)';
+  personalKeyStatus.textContent = 'המפתח האישי הוסר. חוזרים למאגר המשותף.';
 });
 
 </script>
