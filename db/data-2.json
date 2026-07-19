@@ -1,0 +1,4968 @@
+{
+  "part": 2,
+  "generatedAt": "2026-07-19T02:08:40.231Z",
+  "elements": {
+    "אוכל משומר": {
+      "emoji": "🍲",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "גלישת פעלולים": {
+      "emoji": "🏄",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "סופת הוריקן": {
+      "emoji": "🌪️",
+      "isStarting": false,
+      "discoveredBy": "שיר"
+    },
+    "מרק": {
+      "emoji": "🍲",
+      "isStarting": false,
+      "discoveredBy": "הדסה"
+    },
+    "מושבת חלל": {
+      "emoji": "🛸",
+      "isStarting": false,
+      "discoveredBy": "פיני"
+    },
+    "גלישת רוח": {
+      "emoji": "🏄",
+      "isStarting": false,
+      "discoveredBy": "מוישה זוכמיר"
+    },
+    "עשן": {
+      "emoji": "💨",
+      "isStarting": false,
+      "discoveredBy": "האלוף מבית שמש"
+    },
+    "ביצה": {
+      "emoji": "🌿",
+      "isStarting": false,
+      "discoveredBy": "TATATAT"
+    },
+    "פילוסופיה": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": "חני מגלת העולם"
+    },
+    "תנור": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "חנינה"
+    },
+    "מזרקה": {
+      "emoji": "⛲",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "קריאת השכמה": {
+      "emoji": "⏰",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "חשמל": {
+      "emoji": "⚡️",
+      "isStarting": false,
+      "discoveredBy": "שמחה"
+    },
+    "גל רוח": {
+      "emoji": "💨",
+      "isStarting": false,
+      "discoveredBy": "מלי"
+    },
+    "לחם משורף": {
+      "emoji": "🍞️",
+      "isStarting": false,
+      "discoveredBy": "שרה"
+    },
+    "שיר": {
+      "emoji": "🎶",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "הר געש": {
+      "emoji": "🌋",
+      "isStarting": false,
+      "discoveredBy": "עדי"
+    },
+    "בית חם": {
+      "emoji": "🏠",
+      "isStarting": false,
+      "discoveredBy": "TATATAT"
+    },
+    "סופת ברקים": {
+      "emoji": "⛈️",
+      "isStarting": false,
+      "discoveredBy": "משה2"
+    },
+    "כוכב לכת ימי": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "כדור פורח": {
+      "emoji": "🎈",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "מפעל": {
+      "emoji": "🏭",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "גחלים": {
+      "emoji": "🪵",
+      "isStarting": false,
+      "discoveredBy": "דני6"
+    },
+    "מסיבה": {
+      "emoji": "🎉",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "שפירית": {
+      "emoji": "🦋",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "חוות חוף": {
+      "emoji": "🏠",
+      "isStarting": false,
+      "discoveredBy": "מרים"
+    },
+    "מלח": {
+      "emoji": "💸",
+      "isStarting": false,
+      "discoveredBy": "כחכח"
+    },
+    "חפירות לילה": {
+      "emoji": "🌃",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "פיצוץ": {
+      "emoji": "💥",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "זיקוקים": {
+      "emoji": "🎇",
+      "isStarting": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "רוח ים": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "מלאך": {
+      "emoji": "👼",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "כוכב נופל": {
+      "emoji": "⭐",
+      "isStarting": false,
+      "discoveredBy": "בננית"
+    },
+    "אוקיינוס חם": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "תרח"
+    },
+    "חוף בוצי": {
+      "emoji": "🏖️",
+      "isStarting": false,
+      "discoveredBy": "יהודית"
+    },
+    "דיונות": {
+      "emoji": "🏜️",
+      "isStarting": false,
+      "discoveredBy": "חוי"
+    },
+    "נר": {
+      "emoji": "🕯️",
+      "isStarting": false,
+      "discoveredBy": "תרח"
+    },
+    "פח אשפה": {
+      "emoji": "🗑️",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "מציל": {
+      "emoji": "🚣",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "פרפר": {
+      "emoji": "🦋",
+      "isStarting": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "בועות סבון": {
+      "emoji": "🧖",
+      "isStarting": false,
+      "discoveredBy": "יהודית"
+    },
+    "איטליה": {
+      "emoji": "🏯",
+      "isStarting": false,
+      "discoveredBy": "ללי"
+    },
+    "מזהם": {
+      "emoji": "🚽",
+      "isStarting": false,
+      "discoveredBy": "מיע"
+    },
+    "ארמון מעיין": {
+      "emoji": "🏰",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "אורות פסטיבל": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "ברק": {
+      "emoji": "⚡️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "שמש": {
+      "emoji": "☀️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "דיונת שלג": {
+      "emoji": "☃️",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "צונאמי": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "כחכח"
+    },
+    "אנרגיה ימית": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "גייזר": {
+      "emoji": "⛰️",
+      "isStarting": false,
+      "discoveredBy": "שרי"
+    },
+    "סופת גשם": {
+      "emoji": "⛈️",
+      "isStarting": false,
+      "discoveredBy": "יעכ"
+    },
+    "גלריה": {
+      "emoji": "🏛️",
+      "isStarting": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "קיטור": {
+      "emoji": "💧",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "להבה": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "רכבת מים": {
+      "emoji": "🚂",
+      "isStarting": false,
+      "discoveredBy": "גיל"
+    },
+    "אינסוף לבה": {
+      "emoji": "⚫️",
+      "isStarting": false,
+      "discoveredBy": "שרה"
+    },
+    "צוללת חשמלית": {
+      "emoji": "⚡️",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "פאתוס": {
+      "emoji": "🐳",
+      "isStarting": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "טיל בוער": {
+      "emoji": "🚀",
+      "isStarting": false,
+      "discoveredBy": "עדי"
+    },
+    "נהר": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "תינוק": {
+      "emoji": "👶",
+      "isStarting": false,
+      "discoveredBy": "שיר"
+    },
+    "מערכת השמש": {
+      "emoji": "🪐",
+      "isStarting": false,
+      "discoveredBy": "אתי"
+    },
+    "רעב": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "MIRI"
+    },
+    "תיאבון": {
+      "emoji": "🥚",
+      "isStarting": false,
+      "discoveredBy": "MIRI"
+    },
+    "ארכאולוגיה": {
+      "emoji": "🏯",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "צוללת": {
+      "emoji": "🚣",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "יקום": {
+      "emoji": "🌌",
+      "isStarting": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "גלקסיית ים": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "בוץ חם": {
+      "emoji": "🌿",
+      "isStarting": false,
+      "discoveredBy": "יחי"
+    },
+    "מילוט בסירה": {
+      "emoji": "🚣",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "סופת חום": {
+      "emoji": "🌡️",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "גולש גלים": {
+      "emoji": "🏄",
+      "isStarting": false,
+      "discoveredBy": "היי"
+    },
+    "טיל רקטי": {
+      "emoji": "🚀",
+      "isStarting": false,
+      "discoveredBy": "חנינה"
+    },
+    "ארמדה בוערת": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "אני זה אני"
+    },
+    "אדמה חרוכה": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "אני זה אני"
+    },
+    "ממלכה": {
+      "emoji": "🏰",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "מנהרת רוח": {
+      "emoji": "🌀",
+      "isStarting": false,
+      "discoveredBy": "האלוף מבית שמש"
+    },
+    "מנוע פירה": {
+      "emoji": "🚀",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "אוצר": {
+      "emoji": "🏹",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "אמנות לחימה": {
+      "emoji": "🥋",
+      "isStarting": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "מחשב": {
+      "emoji": "🖥️",
+      "isStarting": false,
+      "discoveredBy": "הדסה"
+    },
+    "משימה לאפריקה": {
+      "emoji": "🚀",
+      "isStarting": false,
+      "discoveredBy": "גדי"
+    },
+    "שעון": {
+      "emoji": "🕰️",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "ארמון חוף": {
+      "emoji": "🏰",
+      "isStarting": false,
+      "discoveredBy": "כחכח"
+    },
+    "אור": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": "תססן"
+    },
+    "צללית": {
+      "emoji": "🌫️",
+      "isStarting": false,
+      "discoveredBy": "אפרת"
+    },
+    "ממטרה": {
+      "emoji": "💦",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "הרמוניה": {
+      "emoji": "☯️",
+      "isStarting": false,
+      "discoveredBy": "גדי"
+    },
+    "נר מעיין": {
+      "emoji": "🕯️",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "נווד": {
+      "emoji": "🏃",
+      "isStarting": false,
+      "discoveredBy": "שרה"
+    },
+    "דייג": {
+      "emoji": "🎣",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "בית אדם": {
+      "emoji": "🏠",
+      "isStarting": false,
+      "discoveredBy": "Y"
+    },
+    "זרקור": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": "אפרת"
+    },
+    "מרק נוף": {
+      "emoji": "🍲",
+      "isStarting": false,
+      "discoveredBy": "חוי"
+    },
+    "אבן נשורת": {
+      "emoji": "🌀",
+      "isStarting": false,
+      "discoveredBy": "אתי"
+    },
+    "מערבולת": {
+      "emoji": "🌀",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "סאונה": {
+      "emoji": "🛀",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "גגות נחל": {
+      "emoji": "🏠",
+      "isStarting": false,
+      "discoveredBy": "חיילי"
+    },
+    "נמל": {
+      "emoji": "🚣",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "אמבטיה": {
+      "emoji": "🧖",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "יום": {
+      "emoji": "☀️",
+      "isStarting": false,
+      "discoveredBy": "תססן"
+    },
+    "לפיד": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": "היי"
+    },
+    "הדuf": {
+      "emoji": "💧",
+      "isStarting": false,
+      "discoveredBy": "דגדגגכ"
+    },
+    "ספינת קיטור": {
+      "emoji": "🚢",
+      "isStarting": false,
+      "discoveredBy": "גיל"
+    },
+    "זכוכית מותכת": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "הינדי"
+    },
+    "מפל מים": {
+      "emoji": "💧",
+      "isStarting": false,
+      "discoveredBy": "יוס"
+    },
+    "זהב": {
+      "emoji": "💎",
+      "isStarting": false,
+      "discoveredBy": "חוי"
+    },
+    "מיפוי אווירי": {
+      "emoji": "🗺️",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "חוקר": {
+      "emoji": "🕵️",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "זכוכית": {
+      "emoji": "🔍",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "פסטיבל": {
+      "emoji": "🎉",
+      "isStarting": false,
+      "discoveredBy": "אאא"
+    },
+    "פסל": {
+      "emoji": "🏛️",
+      "isStarting": false,
+      "discoveredBy": "האלוף מבית שמש"
+    },
+    "חוף": {
+      "emoji": "🏖️",
+      "isStarting": false,
+      "discoveredBy": "אתי"
+    },
+    "אתר ארכאולוגי": {
+      "emoji": "🏯",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "קרנבל מלכותי": {
+      "emoji": "🎉",
+      "isStarting": false,
+      "discoveredBy": "חיילי"
+    },
+    "מרק שמש": {
+      "emoji": "🍲",
+      "isStarting": false,
+      "discoveredBy": "תססן"
+    },
+    "פסטיבל חורבות": {
+      "emoji": "🏞️",
+      "isStarting": false,
+      "discoveredBy": "Y"
+    },
+    "סופת שלג": {
+      "emoji": "☃️",
+      "isStarting": false,
+      "discoveredBy": "כחכח"
+    },
+    "ענן בועות": {
+      "emoji": "☁️",
+      "isStarting": false,
+      "discoveredBy": "כרמלה"
+    },
+    "שמפניה": {
+      "emoji": "🍾",
+      "isStarting": false,
+      "discoveredBy": "חוי"
+    },
+    "ערפיח": {
+      "emoji": "🌫️",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "פיסת פחם": {
+      "emoji": "⚒️",
+      "isStarting": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "אוקיינוס": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "פיני"
+    },
+    "ירקות שרופים": {
+      "emoji": "🥔",
+      "isStarting": false,
+      "discoveredBy": "הדסה"
+    },
+    "באר רוח": {
+      "emoji": "💨",
+      "isStarting": false,
+      "discoveredBy": "ציפי"
+    },
+    "אקולוגיה": {
+      "emoji": "🌳",
+      "isStarting": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "בית אבן": {
+      "emoji": "🏠",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "נebula": {
+      "emoji": "⭐️",
+      "isStarting": false,
+      "discoveredBy": "Y"
+    },
+    "לילה": {
+      "emoji": "🌃",
+      "isStarting": false,
+      "discoveredBy": "ללי"
+    },
+    "זבל": {
+      "emoji": "🚮",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "רעידת אדמה": {
+      "emoji": "🌎",
+      "isStarting": false,
+      "discoveredBy": "כחכח"
+    },
+    "מוזיאון ארוחות": {
+      "emoji": "🍴",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "הר לגו": {
+      "emoji": "🏔️",
+      "isStarting": false,
+      "discoveredBy": "חנינה"
+    },
+    "מנוע חיפוש": {
+      "emoji": "🔍",
+      "isStarting": false,
+      "discoveredBy": "דני"
+    },
+    "קהילת חוף": {
+      "emoji": "🏖️",
+      "isStarting": false,
+      "discoveredBy": "ציפי"
+    },
+    "גולם קיטור": {
+      "emoji": "🤖",
+      "isStarting": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "הרס": {
+      "emoji": "⛈️",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "אמנות מדברית": {
+      "emoji": "🏜️",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "חילוץ במערבולת": {
+      "emoji": "🌪️",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "מפעל תהליכים": {
+      "emoji": "🏭",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "להבות אדם": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "אאא"
+    },
+    "להבות": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "גזוז": {
+      "emoji": "🥤",
+      "isStarting": false,
+      "discoveredBy": "חני מגלת העולם"
+    },
+    "שיטפון": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "נתנאל המלך"
+    },
+    "מדבריות שלג": {
+      "emoji": "☃️",
+      "isStarting": false,
+      "discoveredBy": "חני מגלת העולם"
+    },
+    "גלישת סקי": {
+      "emoji": "⛷️",
+      "isStarting": false,
+      "discoveredBy": "חוי"
+    },
+    "זיהום": {
+      "emoji": "🚮",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "עיר הבירה": {
+      "emoji": "🏛️",
+      "isStarting": false,
+      "discoveredBy": "ישראל"
+    },
+    "תערוכת הצלה": {
+      "emoji": "🏛️",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "שבט בדואי": {
+      "emoji": "🐫",
+      "isStarting": false,
+      "discoveredBy": "תססן"
+    },
+    "תכשיט": {
+      "emoji": "💍",
+      "isStarting": false,
+      "discoveredBy": "מיכל"
+    },
+    "צל": {
+      "emoji": "⛅️",
+      "isStarting": false,
+      "discoveredBy": "אפרת"
+    },
+    "סופת אבק": {
+      "emoji": "⛈️",
+      "isStarting": false,
+      "discoveredBy": "ציפי"
+    },
+    "הר גבוה": {
+      "emoji": "🏔️",
+      "isStarting": false,
+      "discoveredBy": "חוי"
+    },
+    "טלסקופ": {
+      "emoji": "🔍",
+      "isStarting": false,
+      "discoveredBy": "ציפי"
+    },
+    "כיבוי": {
+      "emoji": "🚒",
+      "isStarting": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "מטר מטאורים": {
+      "emoji": "☄️",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "גל": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "מטבח": {
+      "emoji": "🍳",
+      "isStarting": false,
+      "discoveredBy": "מלי"
+    },
+    "גשם": {
+      "emoji": "☁️",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "רשת זהב": {
+      "emoji": "🕸️",
+      "isStarting": false,
+      "discoveredBy": "דני"
+    },
+    "כפר הרים": {
+      "emoji": "🏔️",
+      "isStarting": false,
+      "discoveredBy": "איךה"
+    },
+    "שעון חול": {
+      "emoji": "⏳️",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "ספארי": {
+      "emoji": "🚀",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "צלופח חשמלי": {
+      "emoji": "⚡️",
+      "isStarting": false,
+      "discoveredBy": "יוסף חיים"
+    },
+    "אי הלוהט": {
+      "emoji": "🌋",
+      "isStarting": false,
+      "discoveredBy": "הינדי"
+    },
+    "חילוץ במעיין חם": {
+      "emoji": "🏊‍♂️",
+      "isStarting": false,
+      "discoveredBy": "כבי"
+    },
+    "משקפי זכוכית": {
+      "emoji": "🔍",
+      "isStarting": false,
+      "discoveredBy": "יחי"
+    },
+    "תעשייה": {
+      "emoji": "🏭",
+      "isStarting": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "ספר מים": {
+      "emoji": "📖",
+      "isStarting": false,
+      "discoveredBy": "נפתלי"
+    },
+    "שעון מים": {
+      "emoji": "🕰️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "ענן": {
+      "emoji": "☁️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "משקפיים נגד רוח": {
+      "emoji": "🕶️",
+      "isStarting": false,
+      "discoveredBy": "ב"
+    },
+    "אירוע חם": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "שלום עולמי": {
+      "emoji": "🌎",
+      "isStarting": false,
+      "discoveredBy": "דני"
+    },
+    "לוויין": {
+      "emoji": "🛰️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "זכוכית למראה": {
+      "emoji": "🪞",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "הר": {
+      "emoji": "🏔️",
+      "isStarting": false,
+      "discoveredBy": "חנינה"
+    },
+    "שלווה עולמית": {
+      "emoji": "🌎",
+      "isStarting": false,
+      "discoveredBy": "דני"
+    },
+    "מעיין": {
+      "emoji": "⛲️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "ספינת מים": {
+      "emoji": "🛥️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "אואזיס": {
+      "emoji": "🏜️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "לבה": {
+      "emoji": "🌋",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "מקדש": {
+      "emoji": "🕊️",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "גולש": {
+      "emoji": "🏄",
+      "isStarting": false,
+      "discoveredBy": "מיע"
+    },
+    "חוף מסיבות": {
+      "emoji": "🏖️",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "ציפור נודדת": {
+      "emoji": "🐦",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "בדואי": {
+      "emoji": "🏜️",
+      "isStarting": false,
+      "discoveredBy": "Y"
+    },
+    "מעיין חם": {
+      "emoji": "☕️",
+      "isStarting": false,
+      "discoveredBy": "אילה"
+    },
+    "נמל אווירי": {
+      "emoji": "🛫️",
+      "isStarting": false,
+      "discoveredBy": "מלי"
+    },
+    "תה בוצי": {
+      "emoji": "🍵",
+      "isStarting": false,
+      "discoveredBy": "אילה"
+    },
+    "עיר רפאים": {
+      "emoji": "🏚️",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "לחם": {
+      "emoji": "🍞",
+      "isStarting": false,
+      "discoveredBy": "שרה"
+    },
+    "גלישת גלים": {
+      "emoji": "🏄",
+      "isStarting": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "שיטפון בוצי": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "מדבר": {
+      "emoji": "🏜️",
+      "isStarting": false,
+      "discoveredBy": "שייני"
+    },
+    "אופק הארה": {
+      "emoji": "🌅",
+      "isStarting": false,
+      "discoveredBy": "תססן"
+    },
+    "ארבה עש": {
+      "emoji": "🦋",
+      "isStarting": false,
+      "discoveredBy": "ללי"
+    },
+    "סבון ליד הכיור": {
+      "emoji": "🚿",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "פצלת שמן": {
+      "emoji": "⛽️",
+      "isStarting": false,
+      "discoveredBy": "כע"
+    },
+    "הרי הריסות": {
+      "emoji": "🏔️",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "מגדלור": {
+      "emoji": "⛡️",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "שלווה": {
+      "emoji": "🕯️",
+      "isStarting": false,
+      "discoveredBy": "MIRI"
+    },
+    "מראה": {
+      "emoji": "🪞",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "גולם חשמל": {
+      "emoji": "⚡️",
+      "isStarting": false,
+      "discoveredBy": "יוסף חיים"
+    },
+    "גנרטור רוח ים": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "ארובת בניין": {
+      "emoji": "🏢",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "ארובה": {
+      "emoji": "🏠",
+      "isStarting": false,
+      "discoveredBy": "שייני"
+    },
+    "בייקון מעושן": {
+      "emoji": "🥓",
+      "isStarting": false,
+      "discoveredBy": "כחכח"
+    },
+    "סופת חול": {
+      "emoji": "⛈️",
+      "isStarting": false,
+      "discoveredBy": "אפרת"
+    },
+    "אגם הוואי": {
+      "emoji": "🏖️",
+      "isStarting": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "עושר": {
+      "emoji": "💎",
+      "isStarting": false,
+      "discoveredBy": "זהבי"
+    },
+    "אש": {
+      "emoji": "🔥",
+      "isStarting": true,
+      "discoveredBy": null
+    },
+    "מים": {
+      "emoji": "💧",
+      "isStarting": true,
+      "discoveredBy": null
+    },
+    "רוח": {
+      "emoji": "🌬️",
+      "isStarting": true,
+      "discoveredBy": null
+    },
+    "אדמה": {
+      "emoji": "🌍",
+      "isStarting": true,
+      "discoveredBy": null
+    },
+    "אבק שריוני": {
+      "emoji": "🌀",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "בריכה": {
+      "emoji": "🐸",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "אי": {
+      "emoji": "🏝️",
+      "isStarting": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "קטורת": {
+      "emoji": "🪔",
+      "isStarting": false,
+      "discoveredBy": "הדסה"
+    },
+    "אוצר חוף": {
+      "emoji": "🏴‍☠️",
+      "isStarting": false,
+      "discoveredBy": "מרים"
+    },
+    "תבלין": {
+      "emoji": "🍃",
+      "isStarting": false,
+      "discoveredBy": "הדסה"
+    },
+    "רכבת אווירית": {
+      "emoji": "🚂",
+      "isStarting": false,
+      "discoveredBy": "mem"
+    },
+    "הזיה": {
+      "emoji": "💧",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "קנים": {
+      "emoji": "🌿",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "הרי נוף": {
+      "emoji": "🏔️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "היסטוריה": {
+      "emoji": "🕰️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "תבונה": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "מזרקת להבות": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "טובי"
+    },
+    "פירה": {
+      "emoji": "🥔",
+      "isStarting": false,
+      "discoveredBy": "ציפי"
+    },
+    "ים המלח": {
+      "emoji": "🌊",
+      "isStarting": false,
+      "discoveredBy": "מיע"
+    },
+    "חללית חייזרית": {
+      "emoji": "🛸",
+      "isStarting": false,
+      "discoveredBy": "פילפלת"
+    },
+    "שיר אינטרנטי": {
+      "emoji": "🎵",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "נצח": {
+      "emoji": "⏳️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "בית": {
+      "emoji": "🏠",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "ערפל": {
+      "emoji": "🌫️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "בוץ מואר": {
+      "emoji": "💡",
+      "isStarting": false,
+      "discoveredBy": "כרמלה"
+    },
+    "שומר השער": {
+      "emoji": "🗿",
+      "isStarting": false,
+      "discoveredBy": "וואב"
+    },
+    "משתה": {
+      "emoji": "🍷",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "חלום": {
+      "emoji": "💭",
+      "isStarting": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "מסכה נגד זיהום": {
+      "emoji": "🚭",
+      "isStarting": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "משקפי צלילה": {
+      "emoji": "🤿",
+      "isStarting": false,
+      "discoveredBy": "גיל"
+    },
+    "הוואי": {
+      "emoji": "🏖️",
+      "isStarting": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "אדם אוכל לחם": {
+      "emoji": "🍞",
+      "isStarting": false,
+      "discoveredBy": "שרה"
+    },
+    "אסטרונאוט": {
+      "emoji": "🚀",
+      "isStarting": false,
+      "discoveredBy": "חני"
+    },
+    "שירים ברשת": {
+      "emoji": "🎶",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "בוץ": {
+      "emoji": "🌿",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "דבוריות": {
+      "emoji": "🐝",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "תחנת חלל נצחית": {
+      "emoji": "🛰️",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "בריכת בוץ": {
+      "emoji": "🌿",
+      "isStarting": false,
+      "discoveredBy": "יחי"
+    },
+    "אד": {
+      "emoji": "💨",
+      "isStarting": false,
+      "discoveredBy": "שו"
+    },
+    "אח": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": "שייני"
+    },
+    "ניצול": {
+      "emoji": "🏕️",
+      "isStarting": false,
+      "discoveredBy": "שרה"
+    },
+    "משקפי שמש": {
+      "emoji": "🕶️",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "ונציה": {
+      "emoji": "🏙️",
+      "isStarting": false,
+      "discoveredBy": "חני"
+    },
+    "פארק הרים": {
+      "emoji": "🏔️",
+      "isStarting": false,
+      "discoveredBy": "האלנד"
+    },
+    "מסיכת גז": {
+      "emoji": "🎭",
+      "isStarting": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "ארוחה": {
+      "emoji": "🍴",
+      "isStarting": false,
+      "discoveredBy": "דסי"
+    },
+    "ערפל האוקיינוס": {
+      "emoji": "🌫️",
+      "isStarting": false,
+      "discoveredBy": "אני"
+    },
+    "מלח קפה": {
+      "emoji": "☕️",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "מדורת לילה": {
+      "emoji": "🔥",
+      "isStarting": false,
+      "discoveredBy": null
+    },
+    "מצפה כוכבים": {
+      "emoji": "🏙️",
+      "isStarting": false,
+      "discoveredBy": null
+    }
+  },
+  "recipes": {
+    "פלדה,רוגע": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גולם סלע,גולם סלע": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חדר,שכונה": {
+      "result": "בית",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אש,להבה": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "גייזר,סופר הר געש": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "עדי"
+    },
+    "להבה,צל": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "גשם חומצי,סיר לחץ": {
+      "result": "אוכל משומר",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מטוס,מטוס": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אטלנטיס,הר": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "כוכב,נצח": {
+      "result": "כוכב נופל",
+      "failed": false,
+      "discoveredBy": "בננית"
+    },
+    "החומה הסינית,שכונה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "כישוף,פילוסוף": {
+      "result": "תבונה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מנהרת רוח,שובר גלים": {
+      "result": "רוח ים",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אש,מים": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "בוץ,פאי רועים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אוצר,עתיקות": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,כוכב לכת": {
+      "result": "שמש",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "הוריקן,צונאמי": {
+      "result": "סופת הוריקן",
+      "failed": false,
+      "discoveredBy": "שיר"
+    },
+    "חוף אבן,מפולת בוץ": {
+      "result": "חוף בוצי",
+      "failed": false,
+      "discoveredBy": "יהודית"
+    },
+    "אמנות,חרב ברזל": {
+      "result": "אמנות לחימה",
+      "failed": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "שיר,שיר אינטרנטי": {
+      "result": "שיר",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "חול,טיל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אד,כד לתנור": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "עוף החול,ענן": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מכונת עשן,תנין": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "צפרדע,קרפדה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אוקיינוס,מעיין חם": {
+      "result": "אוקיינוס חם",
+      "failed": false,
+      "discoveredBy": "תרח"
+    },
+    "אדם,ביצה": {
+      "result": "תינוק",
+      "failed": false,
+      "discoveredBy": "שיר"
+    },
+    "הארה,ענן": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": "שולמית"
+    },
+    "אדם,צונאמי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מים,פיצוץ": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "נצנצים,סופה": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "הריסות,חוכמה": {
+      "result": "ארכאולוגיה",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "שגיאה,שיר": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אדם,בניין": {
+      "result": "בית",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אש,קצף": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "זמן,פסטיבל": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מים,רכס הרים": {
+      "result": "נהר",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אדם,שמיים": {
+      "result": "מלאך",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "דייג,דייג": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "שימור,תכשיט": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "טיל,רחפת": {
+      "result": "טיל רקטי",
+      "failed": false,
+      "discoveredBy": "חנינה"
+    },
+    "אדמה,חימר": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "תרח"
+    },
+    "אנרגיה,בית": {
+      "result": "בית חם",
+      "failed": false,
+      "discoveredBy": "TATATAT"
+    },
+    "אור,פסטיבל": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "נצח,רכבת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "נורה,סלמנדרה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "איש צפרדע,קיר בזלת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מאגר מים,פאטה מורגנה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "דיונה,סופת שלגים": {
+      "result": "דיונת שלג",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "זמן,חול": {
+      "result": "דיונות",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "גלישה,פעלול": {
+      "result": "גלישת פעלולים",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מפולת,סבון": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חביתה שרופה,סלע": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מגדל,מגדל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אמבטיית קצף,ארוחת ביצים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "טלסקופ,ספורט אתגרי": {
+      "result": "מצפה כוכבים",
+      "failed": false,
+      "discoveredBy": "שמחה"
+    },
+    "אנרגיה,ערפיח": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": "TATATAT"
+    },
+    "מים,תחנת רכבת": {
+      "result": "רכבת מים",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "גוגל,סהרה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בוץ,קומזיץ": {
+      "result": "חוף בוצי",
+      "failed": false,
+      "discoveredBy": "נננננננננננננמ"
+    },
+    "מרק,קלוריות": {
+      "result": "מרק",
+      "failed": false,
+      "discoveredBy": "הדסה"
+    },
+    "בוץ,מוטאנט": {
+      "result": "חוף בוצי",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "לבה,צל": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "רוח רפאים,רוח רפאים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "טיל,להבה": {
+      "result": "טיל רקטי",
+      "failed": false,
+      "discoveredBy": "שיר"
+    },
+    "אבק,גז חממה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אפריקה,מעבורת חלל": {
+      "result": "משימה לאפריקה",
+      "failed": false,
+      "discoveredBy": "גדי"
+    },
+    "אדם,חוכמה": {
+      "result": "פילוסופיה",
+      "failed": false,
+      "discoveredBy": "חני מגלת העולם"
+    },
+    "הר אררט,קרנבל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אפוקליפסה,להבה": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "כפר,ספינת אם": {
+      "result": "מושבת חלל",
+      "failed": false,
+      "discoveredBy": "פיני"
+    },
+    "עושר,שעון שמש": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אדמה,אדמה חרוכה": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "אני זה אני"
+    },
+    "יקום,כוכב לכת ימי": {
+      "result": "יקום",
+      "failed": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "קרפדה,שכונה": {
+      "result": "ביצה",
+      "failed": false,
+      "discoveredBy": "TATATAT"
+    },
+    "זכוכית,זמן": {
+      "result": "שעון",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "טבעת האש,סופת קיטור": {
+      "result": "סופת ברקים",
+      "failed": false,
+      "discoveredBy": "משה2"
+    },
+    "חומה,נר": {
+      "result": "נר",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "בקתה,בקתה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "סירת הצלה,שבט": {
+      "result": "מציל",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "סבלנות,סבלנות": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אבן,תנור": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חשמל סטטי,צוללת": {
+      "result": "צוללת חשמלית",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "בריכה,רעידת אדמה": {
+      "result": "צונאמי",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "זיהום אוויר,קיטור": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": "יאפצ'ק"
+    },
+    "לבנה,נורה": {
+      "result": "נר",
+      "failed": false,
+      "discoveredBy": "תרח"
+    },
+    "חשמל,חשמל": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "אטלנטיס,הר געש": {
+      "result": "צונאמי",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "אפוקליפסה,צוללת": {
+      "result": "צוללת",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "עוף החול,צפרדע": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "לבנה,פרפר בוץ": {
+      "result": "פרפר",
+      "failed": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "כדור הארץ,שמש": {
+      "result": "מערכת השמש",
+      "failed": false,
+      "discoveredBy": "אתי"
+    },
+    "ביצת זהב,טפטוף": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "כוכב לכת ימי,פאטה מורגנה": {
+      "result": "פאתוס",
+      "failed": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "גולם סלע,חללית": {
+      "result": "טיל רקטי",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "אבן,הר געש": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "מוישה זוכמיר"
+    },
+    "אדמה,קפה": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "התחממות גלובלית,ספינת אוויר": {
+      "result": "כדור פורח",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "בועות,חוף בוצי": {
+      "result": "בועות סבון",
+      "failed": false,
+      "discoveredBy": "יהודית"
+    },
+    "אדם,נוף": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חשמל,ים המלח": {
+      "result": "אנרגיה ימית",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "אינסוף,לבה": {
+      "result": "אינסוף לבה",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "חזיון תעתועים,נצנצים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "צללית,צללית": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גולם לבה,חוף בוצי": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "אסון טבע,קמין": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "בית,פסולת": {
+      "result": "פח אשפה",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "אש,מגדלור": {
+      "result": "אור",
+      "failed": false,
+      "discoveredBy": "תססן"
+    },
+    "ביצה,הר": {
+      "result": "הרי נוף",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "גלישה,גלישת רוח": {
+      "result": "גלישת רוח",
+      "failed": false,
+      "discoveredBy": "מוישה זוכמיר"
+    },
+    "כוכב,לג בעומר": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,ערפל": {
+      "result": "עשן",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "זהב,תעשייה": {
+      "result": "מפעל",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "השקיה,זיקוקים": {
+      "result": "ממטרה",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "לבנה,פיצוץ": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "לבנה,מנהרת רוח": {
+      "result": "מנהרת רוח",
+      "failed": false,
+      "discoveredBy": "האלוף מבית שמש"
+    },
+    "חשמל,צ'יפס חריף": {
+      "result": "מחשב",
+      "failed": false,
+      "discoveredBy": "הדסה"
+    },
+    "ארמדה,אש": {
+      "result": "ארמדה בוערת",
+      "failed": false,
+      "discoveredBy": "אני זה אני"
+    },
+    "חול טובעני,סכר": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "כוכב לכת,מאגר מים": {
+      "result": "כוכב לכת ימי",
+      "failed": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "התפרצות געשית,מדורה": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "אסון טבע,סאונה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בייקון,זיהום אוויר": {
+      "result": "עשן",
+      "failed": false,
+      "discoveredBy": "האלוף מבית שמש"
+    },
+    "הר געש,צל": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "אמבט בוץ,מעיין חם": {
+      "result": "בוץ חם",
+      "failed": false,
+      "discoveredBy": "יחי"
+    },
+    "אדם,יקום": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אדמה,ארמדה בוערת": {
+      "result": "אדמה חרוכה",
+      "failed": false,
+      "discoveredBy": "אני זה אני"
+    },
+    "אשליה,שקיעה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מים,צל": {
+      "result": "צללית",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "קיטור,תאונת חשמל": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "מכשף הרפתקה,מלך": {
+      "result": "ממלכה",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "יקום,שלווה": {
+      "result": "הרמוניה",
+      "failed": false,
+      "discoveredBy": "גדי"
+    },
+    "פסטיבל,שלולית": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "נילוס,שחייה": {
+      "result": "נהר",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "גלקסיה,ים": {
+      "result": "גלקסיית ים",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "גולם אש,סופה": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "יוסף חיים"
+    },
+    "אש,גולם אש": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "הדסה"
+    },
+    "אוקיינוס,קהילה": {
+      "result": "קהילת חוף",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "אדווה,גולם": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "זיהום אוויר,ערפיח": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "גלקסיית ים,גשם": {
+      "result": "מטר מטאורים",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "סופת אש,תפוח אדמה": {
+      "result": "ירקות שרופים",
+      "failed": false,
+      "discoveredBy": "הדסה"
+    },
+    "אבק,חוף בוצי": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "נננננננננננננמ"
+    },
+    "זכוכית בועות,עושר": {
+      "result": "שמפניה",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "אש,זכוכית": {
+      "result": "זכוכית מותכת",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "ערפיח געשי,פומפיי": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "מפת אוצר,ראשן": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "זהב,מים": {
+      "result": "זהב",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "מרק,נוף": {
+      "result": "מרק נוף",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "מזרקה,קרמיקה": {
+      "result": "פסל",
+      "failed": false,
+      "discoveredBy": "האלוף מבית שמש"
+    },
+    "בועות,ענן": {
+      "result": "ענן בועות",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "אש,פנס": {
+      "result": "נר",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "חול טובעני,ציפור": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "הדף,מים": {
+      "result": "הדuf",
+      "failed": false,
+      "discoveredBy": "דגדגגכ"
+    },
+    "מערבולת,מפולת שלגים": {
+      "result": "סופת שלג",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "מזבלה,נוף": {
+      "result": "זבל",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "זיהום אוויר,קצף": {
+      "result": "ערפיח",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "אדמה,צללית": {
+      "result": "צל",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "צללית,רוח": {
+      "result": "צל",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "גולם מים,קמין": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "אדמה,צל": {
+      "result": "צל",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "חוף,צלופח חשמלי": {
+      "result": "צלופח חשמלי",
+      "failed": false,
+      "discoveredBy": "יוסף חיים"
+    },
+    "מסוק,מפת אוצר": {
+      "result": "מיפוי אווירי",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "נילוס,רכס הרים": {
+      "result": "נהר",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "ברק,מים": {
+      "result": "סופת ברקים",
+      "failed": false,
+      "discoveredBy": "כע"
+    },
+    "כוס,סודה": {
+      "result": "גזוז",
+      "failed": false,
+      "discoveredBy": "חני מגלת העולם"
+    },
+    "אבק,גולם אפר": {
+      "result": "פיסת פחם",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "אדם,פסל": {
+      "result": "פסל",
+      "failed": false,
+      "discoveredBy": "פיני"
+    },
+    "החומה הסינית,פארק": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חביתה,טורנדו": {
+      "result": "סופת ברקים",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "מנוע,ענק מים": {
+      "result": "ספינת קיטור",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "הר געש,ים": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "חנינה"
+    },
+    "אטום,פיצוץ": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חור שחור,ספא": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חימר,לכלוך": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "גייזר,עוף החול": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "ברכי"
+    },
+    "גולם,קיטור": {
+      "result": "גולם קיטור",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "אדם,גשם בוץ": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "שיר"
+    },
+    "גלישה על הטירה,הוואי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חיות בר,טיטניק": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אדמה,קיטור": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "שבי"
+    },
+    "בועות,רוח": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "הר געש,פסל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גולם בוץ,קיימות": {
+      "result": "אדמה",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "אוקיינריום,פסל": {
+      "result": "אוקיינוס",
+      "failed": false,
+      "discoveredBy": "פיני"
+    },
+    "פיצוץ,שלווה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "טפטוף,קשת": {
+      "result": "מפל מים",
+      "failed": false,
+      "discoveredBy": "יוס"
+    },
+    "גולם קיטור,מים": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "אדמה,אסון טבע": {
+      "result": "רעידת אדמה",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "פילוסופיה,פיצוץ": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אפוקליפסה,שתייה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "כדור הארץ,נשורת": {
+      "result": "אבן נשורת",
+      "failed": false,
+      "discoveredBy": "ריקי"
+    },
+    "מגילות ים המלח,רובוט": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גולם סלע,הוואי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בועות,מים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אבן חן,נשף": {
+      "result": "תכשיט",
+      "failed": false,
+      "discoveredBy": "מיכל"
+    },
+    "מדבר,מפולת בוץ": {
+      "result": "שיטפון",
+      "failed": false,
+      "discoveredBy": "נתנאל המלך"
+    },
+    "אדם,חימר": {
+      "result": "פסל",
+      "failed": false,
+      "discoveredBy": "פיני"
+    },
+    "חוף אבן,חוף אבן": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "אתי"
+    },
+    "אש,זיהום": {
+      "result": "עשן",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "אבן,נשורת": {
+      "result": "אבן נשורת",
+      "failed": false,
+      "discoveredBy": "אתי"
+    },
+    "גולם,גרוטאה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גייזר,גשם חומצי": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "נעמי"
+    },
+    "מפת אוצר,עתיקות": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "סופת אבק,ספינת קיטור": {
+      "result": "סופת אבק",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "צל,רוח": {
+      "result": "צל",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "פסל,צלופח חשמלי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "באר,רוח": {
+      "result": "באר רוח",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "אש,זכוכית מותכת": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "אי,אש": {
+      "result": "אי הלוהט",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "ערפל,קיטור": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "זיהום אור,קמין": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גולם,תודעה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,צללית": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "להבה,להבה": {
+      "result": "אש",
+      "failed": false,
+      "discoveredBy": "יונתן"
+    },
+    "הארה,תאורה": {
+      "result": "אור",
+      "failed": false,
+      "discoveredBy": "יוס"
+    },
+    "הר,רוח": {
+      "result": "הר גבוה",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "גלקסיה,מעבורת חלל": {
+      "result": "מושבת חלל",
+      "failed": false,
+      "discoveredBy": "תססן"
+    },
+    "ים,קו חוף": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "TATATAT"
+    },
+    "גג,נחל": {
+      "result": "גגות נחל",
+      "failed": false,
+      "discoveredBy": "חיילי"
+    },
+    "אור,סוף העולם": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אינסוף,תכשיט": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "הצפה,קיטור": {
+      "result": "שיטפון",
+      "failed": false,
+      "discoveredBy": "נעמי"
+    },
+    "לבה,שמש": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "TATATAT"
+    },
+    "יבשת,פיח": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מתכת,שמש": {
+      "result": "זהב",
+      "failed": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "זיהום,מטוס סילון": {
+      "result": "ערפיח",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "ארוחת בוקר,מוזיאון": {
+      "result": "מוזיאון ארוחות",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "גולש,שמש": {
+      "result": "גלישת רוח",
+      "failed": false,
+      "discoveredBy": "יוס"
+    },
+    "זכוכית מגדלת,משקפיים": {
+      "result": "משקפי זכוכית",
+      "failed": false,
+      "discoveredBy": "יחי"
+    },
+    "הר געש,קרפדה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "לוויין,מעיין": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,גשם": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "מים,משולש ברמודה": {
+      "result": "מערבולת",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "סופת קיטור,קמין": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "טוט"
+    },
+    "לבה,קמין": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "זהב,זכוכית": {
+      "result": "תכשיט",
+      "failed": false,
+      "discoveredBy": "הרב אברם"
+    },
+    "אור,אטלנטיס": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": "שרי"
+    },
+    "מזרקה,ענן": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": "יפהפיה"
+    },
+    "גל,עיר רפאים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חול,קומזיץ": {
+      "result": "דיונות",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "אמנות,גלישה": {
+      "result": "גל",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "ברק,חול": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "יוסף חיים"
+    },
+    "חילוץ,מעיין חם": {
+      "result": "חילוץ במעיין חם",
+      "failed": false,
+      "discoveredBy": "כבי"
+    },
+    "איש צפרדע,קנים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מפולת שלגים,נווה מדבר": {
+      "result": "מדבריות שלג",
+      "failed": false,
+      "discoveredBy": "חני מגלת העולם"
+    },
+    "לבה,מערבולת": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "נננננננננננננמ"
+    },
+    "מוזיאון,מטוס קרב": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "קיימות,שובר גלים": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "פיצוץ,רכס הרים": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "נננננננננננננמ"
+    },
+    "אורות פסטיבל,צפרדע": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אסון טבע,כוכב": {
+      "result": "סופת הוריקן",
+      "failed": false,
+      "discoveredBy": "נננננננננננננמ"
+    },
+    "אש,אש": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "תהילה"
+    },
+    "ג'קוזי,סופת קיטור": {
+      "result": "סאונה",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "אש,הוריקן": {
+      "result": "סופת ברקים",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "אינטרנט,מחשב": {
+      "result": "מחשב",
+      "failed": false,
+      "discoveredBy": "הדסה"
+    },
+    "אש,זרקור": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "דיו,הצפה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "דרקון,תגובת שרשרת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "הוריקן,סאונה": {
+      "result": "סופת הוריקן",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "פיצוץ,שעון חול": {
+      "result": "שעון",
+      "failed": false,
+      "discoveredBy": "יחי"
+    },
+    "אדווה,מפלצת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אדמה,מדבר": {
+      "result": "דיונות",
+      "failed": false,
+      "discoveredBy": "מיכל"
+    },
+    "אוורסט,הר": {
+      "result": "הר גבוה",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "הפלגה,שמיים": {
+      "result": "רוח ים",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "שעון,שעון": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גז ביצות,גשם": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "אילה"
+    },
+    "חוכמת האש,ספינת אוויר": {
+      "result": "ספינת קיטור",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "יבשת,סופה": {
+      "result": "סופת ברקים",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "חילוץ,מערבולת": {
+      "result": "חילוץ במערבולת",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "בוץ,כפר": {
+      "result": "חוף בוצי",
+      "failed": false,
+      "discoveredBy": "מרים"
+    },
+    "צל,צל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "להבה,מים": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "התחממות גלובלית,פח אשפה": {
+      "result": "זיהום",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "חורבה,מגדל": {
+      "result": "אתר ארכאולוגי",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "אמנות,מדבר": {
+      "result": "אמנות מדברית",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "הוריקן,עיר": {
+      "result": "הרס",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "אש,קיטור": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "מחסה,מחסה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "סופת חול,שיטפון": {
+      "result": "סופת אבק",
+      "failed": false,
+      "discoveredBy": "נתנאל המלך"
+    },
+    "ארמון,פיח": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,כבשן": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "מלך,מלך": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אמנות מדברית,שממה": {
+      "result": "אמנות מדברית",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "הר געש של בוץ,סהרה": {
+      "result": "דיונות",
+      "failed": false,
+      "discoveredBy": "נתנאל המלך"
+    },
+    "אדמה,נהר": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "גלישת פעלולים,הר גבוה": {
+      "result": "גלישת סקי",
+      "failed": false,
+      "discoveredBy": "חוי"
+    },
+    "אבק פיות,ברק": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "זומבי,פילוסופיה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "טיטניק,צונאמי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חוקר,משקפי שמש": {
+      "result": "חוקר",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "טלסקופ,משקפי שמש": {
+      "result": "טלסקופ",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "אדמה,גולם לבה": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "מיכל"
+    },
+    "גייזר,צ'יפס": {
+      "result": "בוץ חם",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "אתר ארכאולוגי,טירה": {
+      "result": "אתר ארכאולוגי",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "גולם בוץ,צפרדע": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "יוסף חיים"
+    },
+    "אנרכיה,פסיפס": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "קומנדו ימי,קומנדו ימי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מפרץ,צוללת": {
+      "result": "נמל",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "אור,שמש": {
+      "result": "אור",
+      "failed": false,
+      "discoveredBy": "כע"
+    },
+    "אדווה,קומזיץ": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "רוגע,רוגע": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "צפה,צפה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "טירה,קרפדה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "הר,צונאמי": {
+      "result": "שיטפון",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "מדינה,עיר": {
+      "result": "עיר הבירה",
+      "failed": false,
+      "discoveredBy": "ישראל"
+    },
+    "איש צפרדע,טינופת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מוזיאון,צוות חילוץ": {
+      "result": "תערוכת הצלה",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "מזבלה,ערפל": {
+      "result": "זיהום",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "ממטרה,מפעל": {
+      "result": "מפעל תהליכים",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "אגם,אש": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "אסטרונאוט,מעיין חם": {
+      "result": "חילוץ במעיין חם",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "הר,לגו": {
+      "result": "הר לגו",
+      "failed": false,
+      "discoveredBy": "חנינה"
+    },
+    "אש,תרבות": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "צלופח חשמלי,תנין": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בית,תנור": {
+      "result": "מטבח",
+      "failed": false,
+      "discoveredBy": "מלי"
+    },
+    "אש,פסיפס": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "יער,פילוסופיה": {
+      "result": "אקולוגיה",
+      "failed": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "גשם,רכבת": {
+      "result": "גשם",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "ארוחה,שקט תעשייתי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אינסוף לבה,קסם": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "לבה,מים": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "אבי"
+    },
+    "מלך חכם,קרנבל": {
+      "result": "קרנבל מלכותי",
+      "failed": false,
+      "discoveredBy": "חיילי"
+    },
+    "מדבר,מרחצאות רומיים": {
+      "result": "אמבטיה",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "מפעל,תל אביב": {
+      "result": "תעשייה",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "הוריקן,משקפיים": {
+      "result": "משקפיים נגד רוח",
+      "failed": false,
+      "discoveredBy": "ב"
+    },
+    "ספא,ענן בועות": {
+      "result": "סאונה",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "אבק שריפה,חומה": {
+      "result": "הרס",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "אדמה,הוואי": {
+      "result": "אי",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "סאונה,פסטיבל": {
+      "result": "אירוע חם",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "לבה,פחם": {
+      "result": "פצלת שמן",
+      "failed": false,
+      "discoveredBy": "כע"
+    },
+    "גשם,קרפדה": {
+      "result": "בריכה",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "ביצה,סופת שמש": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גולם בוץ,הארה": {
+      "result": "בוץ מואר",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "הוואי,רוח": {
+      "result": "רוח ים",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "גולם סלע,פורטל": {
+      "result": "שומר השער",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "מלך,שתייה": {
+      "result": "משתה",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "יבשת,סלע": {
+      "result": "הר",
+      "failed": false,
+      "discoveredBy": "חנינה"
+    },
+    "חומה,לבה": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "האלוף מבית שמש"
+    },
+    "הרי נוף,הרי נוף": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בוץ,חלל": {
+      "result": "חוף בוצי",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "מפלצת,סוף העולם": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "טורנדו אש,מים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אפריקה,התפרצות געשית": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "הר,טבע": {
+      "result": "הרי נוף",
+      "failed": false,
+      "discoveredBy": "שמעון"
+    },
+    "אש,הריסות": {
+      "result": "הרי הריסות",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "חול,לבה": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "אבי"
+    },
+    "אפר,קומזיץ": {
+      "result": "גחלים",
+      "failed": false,
+      "discoveredBy": "דני6"
+    },
+    "ערפל,רוגע": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "אדמה,גייזר": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "חביתה שרופה,מעיין": {
+      "result": "מעיין חם",
+      "failed": false,
+      "discoveredBy": "אילה"
+    },
+    "זכוכית שבורה,פצצת עשן": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "אש,שריקה": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "קטורת,שומר עיר": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מים,רוח": {
+      "result": "גל",
+      "failed": false,
+      "discoveredBy": "זלמןית"
+    },
+    "חור שחור,מסתורין": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,לבה": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "פיח,רוח": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": "אבי"
+    },
+    "בניין,הארה": {
+      "result": "מקדש",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "מגדלור,שעון חול": {
+      "result": "שעון מים",
+      "failed": false,
+      "discoveredBy": "מיכלוש"
+    },
+    "אשליה,מזרקת עיר": {
+      "result": "מזרקת להבות",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "מפולת,רכס הרים": {
+      "result": "שיטפון",
+      "failed": false,
+      "discoveredBy": "דני"
+    },
+    "גורד שחקים,מגדלור": {
+      "result": "מגדלור",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "אבק,מים": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "אבי"
+    },
+    "גולש,שלווה": {
+      "result": "שלווה",
+      "failed": false,
+      "discoveredBy": "ישראל"
+    },
+    "הריסות,חזיון תעתועים": {
+      "result": "עיר רפאים",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "אדמה,עשר המכות": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בועות,גשם": {
+      "result": "ענן בועות",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "זיקוקים,עושר": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": "יעקב"
+    },
+    "מדורה,שלווה": {
+      "result": "שלווה",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "בוץ,בוץ": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "אדמה,רוח": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "הינדי"
+    },
+    "חומה,תנור": {
+      "result": "תנור",
+      "failed": false,
+      "discoveredBy": "חנינה"
+    },
+    "הוואי,מים": {
+      "result": "אי",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "אש,בוץ": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "טוט"
+    },
+    "ביצה קשה,הריסות": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "ספינת אוויר,שלווה": {
+      "result": "נמל אווירי",
+      "failed": false,
+      "discoveredBy": "מלי"
+    },
+    "אבק,רעיון": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "נצח,תחנת חלל": {
+      "result": "תחנת חלל נצחית",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "נהר,סהרה": {
+      "result": "אואזיס",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "גל,מים": {
+      "result": "גל",
+      "failed": false,
+      "discoveredBy": "דגדגגכ"
+    },
+    "בוץ,תה": {
+      "result": "תה בוצי",
+      "failed": false,
+      "discoveredBy": "אילה"
+    },
+    "גולש,שורד": {
+      "result": "גולש",
+      "failed": false,
+      "discoveredBy": "מיע"
+    },
+    "טיטניק,צוללת חשמלית": {
+      "result": "חוקר",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "אפר,תחנת חלל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אזעקת הצפה,בוץ רעיל": {
+      "result": "זיהום",
+      "failed": false,
+      "discoveredBy": "האלוף מבית שמש"
+    },
+    "מים,מים": {
+      "result": "מים",
+      "failed": false,
+      "discoveredBy": "יחי"
+    },
+    "אש,ביצה": {
+      "result": "מדורת לילה",
+      "failed": false,
+      "discoveredBy": "שמחה"
+    },
+    "עשן,תנור": {
+      "result": "קטורת",
+      "failed": false,
+      "discoveredBy": "תססן"
+    },
+    "אפייה,שורד": {
+      "result": "לחם",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "קמין חשמלי,תנין": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חגיגה,סופה": {
+      "result": "מסיבה",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "הריסות,מלח": {
+      "result": "מלח",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "זמן,משתה": {
+      "result": "מסיבה",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "ניחוח,נצח": {
+      "result": "קטורת",
+      "failed": false,
+      "discoveredBy": "הדסה"
+    },
+    "אזעקה,רעיון": {
+      "result": "קריאת השכמה",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "גלשן,הצפה": {
+      "result": "צונאמי",
+      "failed": false,
+      "discoveredBy": "יהודית"
+    },
+    "סופת ברקים,ראשן": {
+      "result": "צלופח חשמלי",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "ברק,קיטור": {
+      "result": "חשמל",
+      "failed": false,
+      "discoveredBy": "שמחה"
+    },
+    "זיהום,סהרה": {
+      "result": "מדבר",
+      "failed": false,
+      "discoveredBy": "שייני"
+    },
+    "אפר,לבה": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "אדם אוכל לחם,שורד": {
+      "result": "ניצול",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "צפלין,תערוכת הצלה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גולם בוץ,חשמל": {
+      "result": "גולם חשמל",
+      "failed": false,
+      "discoveredBy": "יוסף חיים"
+    },
+    "אדם,אשליה": {
+      "result": "חלום",
+      "failed": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "להבה,קמין": {
+      "result": "מדורת לילה",
+      "failed": false,
+      "discoveredBy": "שמעון"
+    },
+    "גשם,התחממות גלובלית": {
+      "result": "סופת הוריקן",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "אש,קשת": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "שמעון"
+    },
+    "חווה,חוף בוצי": {
+      "result": "חוות חוף",
+      "failed": false,
+      "discoveredBy": "מרים"
+    },
+    "אבן,סופת ברקים": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "אוצר,חוות חוף": {
+      "result": "אוצר חוף",
+      "failed": false,
+      "discoveredBy": "מרים"
+    },
+    "אדמה,מים": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "מלי"
+    },
+    "אדמה,רפש": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "ענן,קצר": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "חום,חום": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מוקש,סופת אבק": {
+      "result": "סופת אבק",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "משקפי שמש,צלילה": {
+      "result": "משקפי צלילה",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "הזיה,חלום": {
+      "result": "מראה",
+      "failed": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "אדמה,אש": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "יחי"
+    },
+    "אדמה,בית": {
+      "result": "בית",
+      "failed": false,
+      "discoveredBy": "יחי"
+    },
+    "נחל,נחל": {
+      "result": "נהר",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "חגיגה,חוף בוצי": {
+      "result": "חוף מסיבות",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "ביצה,גלריה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אדם,לחם": {
+      "result": "אדם אוכל לחם",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "התעלות,מטר מטאורים": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "קיר,קמין": {
+      "result": "אח",
+      "failed": false,
+      "discoveredBy": "שייני"
+    },
+    "סופת ברקים,רכבת מים": {
+      "result": "סופת הוריקן",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "מעיין,פסיפס": {
+      "result": "מזרקה",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "הר געש,חברה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גנרטור,חוף": {
+      "result": "גנרטור רוח ים",
+      "failed": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "בוץ,נוף": {
+      "result": "בריכת בוץ",
+      "failed": false,
+      "discoveredBy": "יחי"
+    },
+    "אדמה,איטליה": {
+      "result": "איטליה",
+      "failed": false,
+      "discoveredBy": "ללי"
+    },
+    "אדמה,הד": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "דני6"
+    },
+    "גשם חומצי,סוף העולם": {
+      "result": "זיהום",
+      "failed": false,
+      "discoveredBy": "שייני"
+    },
+    "סופת חול,ציפור": {
+      "result": "ציפור נודדת",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "הישרדות,פעלול": {
+      "result": "גלישת פעלולים",
+      "failed": false,
+      "discoveredBy": "גדי"
+    },
+    "אנרכיה,לבנה": {
+      "result": "הרס",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "גודזילה,תפוח אדמה": {
+      "result": "פירה",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "לוטוס,מסוק": {
+      "result": "שפירית",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "חביתה שרופה,תיקן": {
+      "result": "מדורת לילה",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "לבה,תל אביב": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "אשליה,גלקסיית ים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אושר,אושר": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "ארובה,בניין": {
+      "result": "ארובת בניין",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "מראה,משקפי שמש": {
+      "result": "משקפי שמש",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "הוואי,הוואי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "ברק,צלילה עמוקה": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "אגם,טיל רקטי": {
+      "result": "צוללת",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "זיהום,מסכת גז": {
+      "result": "מסכה נגד זיהום",
+      "failed": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "הוואי,הר": {
+      "result": "הוואי",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "כבאי,סקייטבורד": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "פסטיבל,רוח": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "ברק,רכבת מים": {
+      "result": "סופת ברקים",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "התרסקות,חורבה": {
+      "result": "הרס",
+      "failed": false,
+      "discoveredBy": "היי"
+    },
+    "התחממות גלובלית,לבנה": {
+      "result": "תנור",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "אדמה,גשם": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "יאשיה"
+    },
+    "אדמה,נורה": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "יחי"
+    },
+    "מפלצת,רעיון": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "פיח,פיצוץ": {
+      "result": "אד",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "ארכיאולוגיה,לילה": {
+      "result": "חפירות לילה",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "בלבול,שלווה": {
+      "result": "חלום",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "גולם בוץ,מים": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "ים המלח,מלח": {
+      "result": "ים המלח",
+      "failed": false,
+      "discoveredBy": "מיע"
+    },
+    "הר,משקפת": {
+      "result": "משקפי צלילה",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "מנוע,רעיון מגניב": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אסון טבע,אשליה": {
+      "result": "שיטפון",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "קומזיץ,תיבת נח": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חוף,מטריה": {
+      "result": "גלישת גלים",
+      "failed": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "אסון טבע,פצצת עשן": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "גנרטור רוח ים,חלל": {
+      "result": "תחנת חלל נצחית",
+      "failed": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "אגם,זכוכית": {
+      "result": "מראה",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "חילוץ במעיין חם,תחנת חלל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "סלע,קו חוף": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "צביה"
+    },
+    "אדמה,נושאת מטוסים": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אדם,חול": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "אבק שריפה,מפולת בוץ": {
+      "result": "שיטפון בוצי",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "אדמה,קשת": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "שמעון"
+    },
+    "כדור הארץ,משקפי שמש": {
+      "result": "משקפי שמש",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "הוואי,נוף": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "סיר לחץ,ענן": {
+      "result": "קיטור",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "ארובה,רוגע": {
+      "result": "ארובה",
+      "failed": false,
+      "discoveredBy": "שייני"
+    },
+    "איטליה,ונציה": {
+      "result": "ונציה",
+      "failed": false,
+      "discoveredBy": "חני"
+    },
+    "הוואי,חוף": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "הארה,ים": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": "יאפצ'ק"
+    },
+    "מפלצת,קרפדה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "רחפת,רכבת": {
+      "result": "רכבת אווירית",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "מנוע,פירה": {
+      "result": "מנוע פירה",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "ארמון מעיין,ים": {
+      "result": "ארמון חוף",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "אוצר חוף,להבה": {
+      "result": "אוצר",
+      "failed": false,
+      "discoveredBy": "מרים"
+    },
+    "ירח,משתה": {
+      "result": "מסיבה",
+      "failed": false,
+      "discoveredBy": "נתנאל המלך"
+    },
+    "הצפה,מוזיאון": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "ברק,חוכמת האש": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "אי,פיח": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "סדום,סופת ברד": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "זיהום,מפלצת": {
+      "result": "מזהם",
+      "failed": false,
+      "discoveredBy": "מיע"
+    },
+    "חגיגה,מזרקה": {
+      "result": "מסיבה",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "הצפה,מסכת גז": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "סופת ברקים יבשה,פצצה": {
+      "result": "פיצוץ",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "הר,פארק שעשועים": {
+      "result": "פארק הרים",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "יבשת,מלח": {
+      "result": "מדבר",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "ארמון,מעיין": {
+      "result": "ארמון מעיין",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "מרק,משתה": {
+      "result": "ארוחה",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "נורה,פנס": {
+      "result": "נר",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "מקדש,מקדש": {
+      "result": "מקדש",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "אסטרונאוט,אפריקה": {
+      "result": "משימה לאפריקה",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "מעיין חם,רוגע": {
+      "result": "ארמון מעיין",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "אדם,קטורת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "סופת הוריקן,סופת הוריקן": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "ענן,ערפל": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "אבן,פסטיבל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חקר היקום,מגניב": {
+      "result": "טלסקופ",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "הוואי,ים": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "אש,שמש": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "שמעון"
+    },
+    "טעם,נשורת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אגם,הוואי": {
+      "result": "אגם הוואי",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "מאגר מים,מאגר מים": {
+      "result": "נהר",
+      "failed": false,
+      "discoveredBy": "מיכל"
+    },
+    "בוץ,זכוכית": {
+      "result": "זכוכית מותכת",
+      "failed": false,
+      "discoveredBy": "רבקה"
+    },
+    "איטליה,חמקן": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אוצר חוף,אוצר חוף": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מים,עתיקות": {
+      "result": "אתר ארכאולוגי",
+      "failed": false,
+      "discoveredBy": "צבי"
+    },
+    "גל חום,מפולת": {
+      "result": "צונאמי",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "גולם,חביתה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "הרס,הרס": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אירוע חם,לבנה": {
+      "result": "מדורת לילה",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "ברק,חוף": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "בנאי,זמן": {
+      "result": "שעון",
+      "failed": false,
+      "discoveredBy": "אפי"
+    },
+    "איש צפרדע,תאונה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "צלופח חשמלי,קצר": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גל,נמל": {
+      "result": "נמל",
+      "failed": false,
+      "discoveredBy": "תססן"
+    },
+    "גל,רוח": {
+      "result": "גל רוח",
+      "failed": false,
+      "discoveredBy": "מלי"
+    },
+    "אש,מרק": {
+      "result": "מרק",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "יבשת,מדורה": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "יונתן"
+    },
+    "טורנדו,סאונה": {
+      "result": "סופת הוריקן",
+      "failed": false,
+      "discoveredBy": "mem"
+    },
+    "גל חום,קיץ": {
+      "result": "סופת חום",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "ברק,לבנה": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "מדורה,רוגע": {
+      "result": "מדורת לילה",
+      "failed": false,
+      "discoveredBy": "טוט"
+    },
+    "בייקון,מלח": {
+      "result": "בייקון מעושן",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "עוף החול,פיצוץ": {
+      "result": "סופת חול",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "הוואי,קיטור": {
+      "result": "ספינת קיטור",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "טיל,סופת אש": {
+      "result": "טיל בוער",
+      "failed": false,
+      "discoveredBy": "עדי"
+    },
+    "התרסקות,סוללה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מגדלור,תפוח אדמה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "כתר,רעיון לאוצר": {
+      "result": "אוצר",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "אבק,ברק": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "כרמלה"
+    },
+    "עוף החול,קשת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מד,נצח": {
+      "result": "נצח",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "אור,השראה": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": "ar"
+    },
+    "מכת צפרדעים,סוף העולם": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "הוריקן,נהר": {
+      "result": "שיטפון",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "ארובה,סופת אבק": {
+      "result": "סופת אבק",
+      "failed": false,
+      "discoveredBy": "כחכח"
+    },
+    "ענן,קרינה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חימר,צוות חילוץ": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מלך,עיר": {
+      "result": "ממלכה",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "ביצה,תיאבון": {
+      "result": "תיאבון",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "אופק,הארה": {
+      "result": "אופק הארה",
+      "failed": false,
+      "discoveredBy": "תססן"
+    },
+    "קטורת,תבלין": {
+      "result": "תבלין",
+      "failed": false,
+      "discoveredBy": "הדסה"
+    },
+    "ברק,מגניב": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "אש,הוואי": {
+      "result": "הוואי",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "סכר,עשן": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "ים,מעיין חם": {
+      "result": "גייזר",
+      "failed": false,
+      "discoveredBy": "שרי"
+    },
+    "ערפיח,תיאבון": {
+      "result": "רעב",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "ים,שלווה": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "דגדגגכ"
+    },
+    "ג'ונגל,ג'ונגל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בריכה,נהר": {
+      "result": "נהר",
+      "failed": false,
+      "discoveredBy": "גיל"
+    },
+    "ספינת אם,רוגע": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "זיהום,חשמל": {
+      "result": "מסיכת גז",
+      "failed": false,
+      "discoveredBy": "גחהנכגנל"
+    },
+    "שלווה,שעון חול": {
+      "result": "שעון",
+      "failed": false,
+      "discoveredBy": "לאה"
+    },
+    "אסון טבע,ענן": {
+      "result": "סופת גשם",
+      "failed": false,
+      "discoveredBy": "יעכ"
+    },
+    "אור,זבל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "ביצה,קיר": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חזיר,סלמנדרה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אדמה,סופת חול": {
+      "result": "דיונות",
+      "failed": false,
+      "discoveredBy": "משה4"
+    },
+    "ברק,קשת": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "כע"
+    },
+    "אואזיס,אש": {
+      "result": "מדבר",
+      "failed": false,
+      "discoveredBy": "נתנאל המלך"
+    },
+    "הריסות,עתיקות": {
+      "result": "אתר ארכאולוגי",
+      "failed": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "הארה,זיקוקים": {
+      "result": "זיקוקים",
+      "failed": false,
+      "discoveredBy": "רחלה רחל"
+    },
+    "מנוע קיטור,עושר": {
+      "result": "ספינת קיטור",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "חומה,מבול": {
+      "result": "שיטפון",
+      "failed": false,
+      "discoveredBy": "ציפי"
+    },
+    "הר געש של בוץ,סירת הצלה": {
+      "result": "מילוט בסירה",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "אבק שריפה,מסיבה": {
+      "result": "אירוע חם",
+      "failed": false,
+      "discoveredBy": "MIRI"
+    },
+    "עיר,פצצה": {
+      "result": "הרס",
+      "failed": false,
+      "discoveredBy": "חני"
+    },
+    "אש,לחם": {
+      "result": "לחם משורף",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "גלריה,פסל": {
+      "result": "גלריה",
+      "failed": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "יבשת,שרב": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "באר,גולש": {
+      "result": "גולש גלים",
+      "failed": false,
+      "discoveredBy": "היי"
+    },
+    "בוץ,להבה": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "מוסי"
+    },
+    "נר,קרנבל": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "אפייה,מדורה": {
+      "result": "לחם משורף",
+      "failed": false,
+      "discoveredBy": "אילה"
+    },
+    "מרק,שמש": {
+      "result": "מרק שמש",
+      "failed": false,
+      "discoveredBy": "תססן"
+    },
+    "אש,שריפה": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "טבע,ערפילית": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "גמל,שבט": {
+      "result": "שבט בדואי",
+      "failed": false,
+      "discoveredBy": "תססן"
+    },
+    "נצח,צי": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "שמיים,שמש": {
+      "result": "יום",
+      "failed": false,
+      "discoveredBy": "תססן"
+    },
+    "טלסקופ,מנוע חיפוש": {
+      "result": "מנוע חיפוש",
+      "failed": false,
+      "discoveredBy": "דני"
+    },
+    "טבעת,שכונה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "יקום,פסטיבל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "נהר,ספינה": {
+      "result": "נהר",
+      "failed": false,
+      "discoveredBy": "היי"
+    },
+    "נחל,נר": {
+      "result": "נר מעיין",
+      "failed": false,
+      "discoveredBy": "טובי"
+    },
+    "אפר,מראה": {
+      "result": "זכוכית",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "חברה,עשן": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אנושות,בית": {
+      "result": "בית אדם",
+      "failed": false,
+      "discoveredBy": "Y"
+    },
+    "בוץ,חברה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,ברק": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "האלנד"
+    },
+    "ארכאולוגיה,גורד שחקים": {
+      "result": "אתר ארכאולוגי",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "אדם,אמנות להבות": {
+      "result": "להבות אדם",
+      "failed": false,
+      "discoveredBy": "אאא"
+    },
+    "אש,מעיין": {
+      "result": "מעיין חם",
+      "failed": false,
+      "discoveredBy": "אילה"
+    },
+    "חוף מזוהם,טבעת האש": {
+      "result": "להבות",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "אדם,לילה": {
+      "result": "לילה",
+      "failed": false,
+      "discoveredBy": "ללי"
+    },
+    "אדם,מסע": {
+      "result": "נווד",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "אגם,קשת": {
+      "result": "דייג",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "לבה,מבצר": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "אילה"
+    },
+    "ארכאולוגיה,קרנבל": {
+      "result": "פסטיבל",
+      "failed": false,
+      "discoveredBy": "אאא"
+    },
+    "גלישה,מלח": {
+      "result": "גלישת גלים",
+      "failed": false,
+      "discoveredBy": "היי"
+    },
+    "ארכיאולוגיה,הר געש": {
+      "result": "אתר ארכאולוגי",
+      "failed": false,
+      "discoveredBy": "אילה"
+    },
+    "התעלות,חורבה": {
+      "result": "אתר ארכאולוגי",
+      "failed": false,
+      "discoveredBy": "Y"
+    },
+    "אור,טיח": {
+      "result": "לפיד",
+      "failed": false,
+      "discoveredBy": "היי"
+    },
+    "יקום,ערפיח": {
+      "result": "נebula",
+      "failed": false,
+      "discoveredBy": "Y"
+    },
+    "אש,נהר": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "גשם,שמש": {
+      "result": "סופת גשם",
+      "failed": false,
+      "discoveredBy": "אתי"
+    },
+    "אור,סופה": {
+      "result": "ברק",
+      "failed": false,
+      "discoveredBy": "ar"
+    },
+    "חזיון תעתועים,שכונה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "נebula,שכונה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בית,סלע": {
+      "result": "בית אבן",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "כדור פורח,מיחזור": {
+      "result": "זבל",
+      "failed": false,
+      "discoveredBy": "פרדיגמה"
+    },
+    "יום,יום": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אטמוספירה,הצפה": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": "מנשה"
+    },
+    "זרקור,ערפל": {
+      "result": "זרקור",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "הריסות,פסטיבל קיץ": {
+      "result": "פסטיבל חורבות",
+      "failed": false,
+      "discoveredBy": "Y"
+    },
+    "אנרכיה,הצפה": {
+      "result": "שיטפון",
+      "failed": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "מים,ספר": {
+      "result": "ספר מים",
+      "failed": false,
+      "discoveredBy": "נפתלי"
+    },
+    "גרוטאה,סבון": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": "ar"
+    },
+    "לבה,קהילה": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "איךה"
+    },
+    "חום,נווד": {
+      "result": "בדואי",
+      "failed": false,
+      "discoveredBy": "Y"
+    },
+    "הד,ערפיח": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": "ER"
+    },
+    "להבה,שמש": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "שרה"
+    },
+    "כבאי,נשורת גרעינית": {
+      "result": "כיבוי",
+      "failed": false,
+      "discoveredBy": "יוחאי אביכזר בורכובסקי"
+    },
+    "נר,רחפת": {
+      "result": "נר",
+      "failed": false,
+      "discoveredBy": "איך אני?? :)"
+    },
+    "מדורה,נורה": {
+      "result": "להבה",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "אי,קשת": {
+      "result": "אי",
+      "failed": false,
+      "discoveredBy": "שמעון"
+    },
+    "זהב,רשת": {
+      "result": "רשת זהב",
+      "failed": false,
+      "discoveredBy": "דני"
+    },
+    "אש,שעון חול": {
+      "result": "שעון חול",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "בקתת הרים,ערפיח": {
+      "result": "כפר הרים",
+      "failed": false,
+      "discoveredBy": "איךה"
+    },
+    "אפר,פסולת": {
+      "result": "פח אשפה",
+      "failed": false,
+      "discoveredBy": "ללי"
+    },
+    "מים,שלווה": {
+      "result": "מעיין",
+      "failed": false,
+      "discoveredBy": "חח"
+    },
+    "מעיין,רוגע": {
+      "result": "מעיין",
+      "failed": false,
+      "discoveredBy": "דני"
+    },
+    "אדם,מפעל": {
+      "result": "מפעל תהליכים",
+      "failed": false,
+      "discoveredBy": "ללי"
+    },
+    "ספא,שינה": {
+      "result": "סאונה",
+      "failed": false,
+      "discoveredBy": "לאה"
+    },
+    "אח,ניצול": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אוצר,אש": {
+      "result": "אוצר",
+      "failed": false,
+      "discoveredBy": "מוישה זוכמיר"
+    },
+    "שבט,שלום": {
+      "result": "שלום עולמי",
+      "failed": false,
+      "discoveredBy": "דני"
+    },
+    "אנרגיה,אש": {
+      "result": "חשמל",
+      "failed": false,
+      "discoveredBy": "לאה"
+    },
+    "שלווה,שלום": {
+      "result": "שלווה עולמית",
+      "failed": false,
+      "discoveredBy": "דני"
+    },
+    "אפר,ים": {
+      "result": "חוף",
+      "failed": false,
+      "discoveredBy": "איש"
+    },
+    "גולש,יקום": {
+      "result": "גלקסיית ים",
+      "failed": false,
+      "discoveredBy": "אילה"
+    },
+    "ארבה,עש": {
+      "result": "ארבה עש",
+      "failed": false,
+      "discoveredBy": "ללי"
+    },
+    "ייצור,נווד": {
+      "result": "שבט בדואי",
+      "failed": false,
+      "discoveredBy": "Y"
+    },
+    "לבה,צפה": {
+      "result": "הר געש",
+      "failed": false,
+      "discoveredBy": "אני"
+    },
+    "להבה,עושר": {
+      "result": "עושר",
+      "failed": false,
+      "discoveredBy": "זהבי"
+    },
+    "הזיה,מים": {
+      "result": "הזיה",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "אש,חברה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מגדל,ערפיח": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": "וואב"
+    },
+    "קצר,רוח": {
+      "result": "רוח ים",
+      "failed": false,
+      "discoveredBy": "מוסי"
+    },
+    "ערפל,תיבת נח": {
+      "result": "ערפל האוקיינוס",
+      "failed": false,
+      "discoveredBy": "אני"
+    },
+    "ונציה,ערפל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,מלח תה": {
+      "result": "מלח",
+      "failed": false,
+      "discoveredBy": "היי"
+    },
+    "הארה,חווה": {
+      "result": "אורות פסטיבל",
+      "failed": false,
+      "discoveredBy": "אפרת"
+    },
+    "טבעת,כתר": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "ביצת חייזר,חללית": {
+      "result": "חללית חייזרית",
+      "failed": false,
+      "discoveredBy": "פילפלת"
+    },
+    "אדם,חלל": {
+      "result": "אסטרונאוט",
+      "failed": false,
+      "discoveredBy": "חני"
+    },
+    "מגדלור,ערפל": {
+      "result": "מגדלור",
+      "failed": false,
+      "discoveredBy": "אני"
+    },
+    "אדם,ים": {
+      "result": "רוח ים",
+      "failed": false,
+      "discoveredBy": "חני"
+    },
+    "אש,גולם אפר": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": "היי"
+    },
+    "יקום,להבות": {
+      "result": "להבות",
+      "failed": false,
+      "discoveredBy": "דסי"
+    },
+    "איטליה,מלח": {
+      "result": "מלח",
+      "failed": false,
+      "discoveredBy": "שו"
+    },
+    "בועות,סבון": {
+      "result": "סבון ליד הכיור",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אפוקליפסה,אפוקליפסה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מגניב,מגניב": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "האדם החושב,זמן": {
+      "result": "היסטוריה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "דבורים,מלכודת": {
+      "result": "דבוריות",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "בוץ,ביצה": {
+      "result": "קנים",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מגניב,ספארי חלל": {
+      "result": "ספארי",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אגם,אגם": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "צי,רכבת חשמלית": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מלח,קפה": {
+      "result": "מלח קפה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "הר,נוף": {
+      "result": "הרי נוף",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אבק,יער": {
+      "result": "אבק שריוני",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "קיטור,קיטור": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חימר,מים": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "פיצוץ,פיצוץ": {
+      "result": "אש",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מבול,מבול": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "ענן,שרת": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "מים,ספינה": {
+      "result": "ספינת מים",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "פיצוץ,פסולת גרעינית": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חוכמה,מדורה": {
+      "result": "מדורת לילה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "בוץ,מים": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "הארה,חוכמה": {
+      "result": "תבונה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אסון טבע,מגניב": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "זרנוק,כבשן": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בועות,בועות": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "לוויין,שמיים": {
+      "result": "לוויין",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "דג,רוח": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גלישת רוח,ערפל": {
+      "result": "ענן",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "גשם,נווה מדבר": {
+      "result": "אואזיס",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מים,ערפיח געשי": {
+      "result": "ערפל",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "זכוכית,מרחצאות רומיים": {
+      "result": "זכוכית למראה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "כוכב רוק,מגניב": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חול,מעיין חם": {
+      "result": "בוץ",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "גן עדן,ראשן": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "גולם אש,גולם אש": {
+      "result": "אש",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "פיצוץ,שכונה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אינטרנט,שיר": {
+      "result": "שיר אינטרנטי",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "ערפיח,ערפיח": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "התחממות גלובלית,יקום": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "חביתה שרופה,מסיבת טבע": {
+      "result": "אש",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "אקס-מן,קצף חול": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אבוד,חול טובעני": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אש,ערפיח געשי": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "חומה,חלל": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אוצר,מים": {
+      "result": "מעיין",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מאגר מים,שעון": {
+      "result": "שעון מים",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "משקפי שמש,משקפי שמש": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "אינסוף,זמן": {
+      "result": "נצח",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "חדר,לבנה": {
+      "result": "בית",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "חומה,מצפה כוכבים": {
+      "result": "מצפה כוכבים",
+      "failed": false,
+      "discoveredBy": null
+    },
+    "מעיין חם,מעיין חם": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "דיו,סירת הצלה": {
+      "result": null,
+      "failed": true,
+      "discoveredBy": null
+    },
+    "בוץ,סופת אש": {
+      "result": "לבה",
+      "failed": false,
+      "discoveredBy": null
+    }
+  }
+}
