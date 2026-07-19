@@ -177,7 +177,7 @@
     <div id="toolbar">
       <button class="tool-btn" id="btn-dark" title="מצב כהה">🌙</button>
       <button class="tool-btn" id="btn-recipe-book" title="ספר המתכונים שלי">📖</button>
-      <button class="tool-btn" id="btn-personal-key" title="מפתח API אישי שלי">🗝️</button>
+      <button class="tool-btn" id="btn-donate-key" title="תרמו מפתח API כדי לעזור למשחק">🔑</button>
       <button class="tool-btn" id="btn-clear" title="נקה לוח">🗑️</button>
     </div>
     <div id="nick-badge" title="לחצו להחלפת כינוי">👤 <span id="nick-label"></span></div>
@@ -185,7 +185,7 @@
     <div id="empty-hint"><div class="big">🧩</div><div>גררו אלמנטים מהתפריט ללוח<br>ושחררו אחד על השני כדי לשלב</div></div>
     <div id="info-panel"></div>
 
-    <div id="quota-gauge" title="בקשות שנכשלו כרגע בגלל בעיה במפתח האישי">
+    <div id="quota-gauge" title="בקשות שנכשלו כרגע בגלל חוסר במפתחות API">
       <svg viewBox="0 0 100 58" id="gauge-svg">
         <path d="M8,54 A42,42 0 0 1 92,54" fill="none" stroke="var(--border)" stroke-width="9" stroke-linecap="round"/>
         <path id="gauge-arc" d="M8,54 A42,42 0 0 1 92,54" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round"
@@ -195,7 +195,7 @@
       </svg>
       <div class="gauge-num" id="gauge-num">0</div>
       <div class="gauge-label">בקשות ללא מענה<br>(חסרים מפתחות)</div>
-      <button class="gauge-btn" id="gauge-donate-btn">עדכון מפתח 🗝️</button>
+      <button class="gauge-btn" id="gauge-donate-btn">תרמו מפתח 🔑</button>
     </div>
 
     <div id="discovered-banner" title="האלמנטים שאני גיליתי לראשונה בעולם">
@@ -262,13 +262,24 @@
     </div>
   </div>
 
+  <div id="donate-modal-backdrop" style="display:none;">
+    <div id="nick-modal">
+      <div class="big">🔑</div>
+      <h2>תרמו מפתח API</h2>
+      <p>המשחק משתמש ב-AI כדי ליצור שילובים חדשים. מפתח Groq חינמי (מ-<a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a>) הוא הכי מהיר להשגה - נרשמים בחינם ומעתיקים מפתח שמתחיל ב-"gsk_". גם מפתח Gemini מ-aistudio.google.com/apikey מתקבל בברכה. תרומתכם תיכנס אוטומטית לרוטציה ותעזור למנוע חסימות עומס לכל השחקנים.</p>
+      <input id="donate-key-input" type="text" placeholder="gsk_... או AIzaSy...">
+      <button id="donate-key-submit">תרמו מפתח</button>
+      <div id="donate-key-status" style="font-size:12.5px; margin-top:10px; display:none;"></div>
+    </div>
+  </div>
+
   <div id="personal-key-modal-backdrop" style="display:none;">
     <div id="nick-modal">
       <div class="big">🗝️</div>
       <h2>מפתח API אישי</h2>
-      <p>כדי לשחק, כל שחקן/ית מזין/ה כאן מפתח API אישי משל/ה. המפתח נשמר <b>רק בדפדפן שלכם</b>,
-      נשלח רק לצד הבקשות שאתם עצמכם מבקשים, ולעולם לא נכנס לרוטציה משותפת עם שחקנים אחרים -
-      כל אחד ואחת עם המפתח שלו/ה בלבד. אפשר Groq חינמי (מ-<a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a>,
+      <p>מפתח שרק אתם מזינים כאן משמש <b>רק את הבקשות שלכם</b> - הוא נשמר רק בדפדפן הזה, לא נשלח לאף מקום
+      חוץ מלצד השילובים שאתם עצמכם מבקשים, ולא נכנס לרוטציה המשותפת שכל שאר השחקנים חולקים.
+      כך אתם לא תלויים בעומס של אחרים. אפשר Groq חינמי (מ-<a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a>,
       מפתח שמתחיל ב-"gsk_") או Gemini (מ-aistudio.google.com/apikey).</p>
       <input id="personal-key-input" type="text" placeholder="gsk_... או AIzaSy...">
       <button id="personal-key-submit">שמרו מפתח אישי</button>
@@ -288,6 +299,7 @@ const CFG = JSON.parse(localStorage.getItem('jc_config') || '{}');
 const WORKER_URL = (CFG.workerUrl || HARDCODED_WORKER_URL).replace(/\/$/, '');
 
 const EDGE_FUNCTION_URL = WORKER_URL ? `${WORKER_URL}/combine` : '';
+const CONTRIBUTE_KEY_URL = WORKER_URL ? `${WORKER_URL}/contribute-key` : '';
 const CLAIM_NICKNAME_URL = WORKER_URL ? `${WORKER_URL}/claim-nickname` : '';
 const MY_ELEMENTS_URL = WORKER_URL ? `${WORKER_URL}/my-elements` : '';
 const QUOTA_GAUGE_URL = WORKER_URL ? `${WORKER_URL}/quota-gauge` : '';
@@ -341,18 +353,7 @@ function boot(){
     nickModalBackdrop.style.display = 'flex';
   } else {
     nickBadge.textContent = nickname;
-    requirePersonalKeyThenStart();
-  }
-}
-
-// כל שחקן/ית חייב/ת מפתח API אישי משל/ה לפני שמתחילים - אין יותר נפילה אוטומטית
-// למאגר משותף למי שלא הזין/ה מפתח.
-function requirePersonalKeyThenStart(){
-  const existingKey = localStorage.getItem('jc_personal_api_key');
-  if (existingKey) {
     startGame();
-  } else {
-    openPersonalKeyModal(true);
   }
 }
 
@@ -389,7 +390,7 @@ async function submitNickname(){
     if (wasTaken) {
       showToast(`הכינוי "${val}" כבר תפוס, לכן קיבלת את הכינוי "${finalNickname}"`, false);
     }
-    requirePersonalKeyThenStart();
+    startGame();
   }catch(err){
     if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'לא הצלחנו לקבוע כינוי, נסו שוב.'; }
   }finally{
@@ -614,11 +615,10 @@ const staticGameDataReady = (async () => {
   }
 })();
 
-/* ================= מפתח אישי (כפתור 🗝️ בסרגל הכלים, וגם קיצור מקלדת Alt+C+O) =================
-   כל שחקן/ית חייב/ת להזין מפתח API אישי משל/ה לפני שהמשחק מתחיל (נאכף ב-boot() /
-   requirePersonalKeyThenStart()). המפתח נשמר רק בדפדפן הזה, נשלח רק לצד הבקשות של
-   אותו שחקן/ית עצמו/ה, ואף פעם לא נכנס לרוטציה משותפת עם שחקנים אחרים - אין יותר
-   מאגר מפתחות משותף. */
+/* ================= מפתח אישי (קיצור מקלדת נסתר: Alt+C+O) =================
+   קיצור מקלדת נסתר, מקומי לדפדפן הזה בלבד: פותח אפשרות להזין מפתח API אישי שמשמש
+   רק אתכם (נשמר רק בדפדפן שלכם, נשלח רק לצד הבקשות שלכם עצמכם ולא נכנס לרוטציה
+   המשותפת של כל השחקנים) - כדי שלא תהיו תלויים בעומס על המאגר המשותף. */
 const pressedKeysForCheat = new Set();
 window.addEventListener('keydown', (e) => {
   pressedKeysForCheat.add(e.key.toLowerCase());
@@ -711,12 +711,12 @@ async function combineItems(div1, div2){
     div1.classList.remove('loading'); div2.classList.remove('loading');
     div1.classList.add('shake'); div2.classList.add('shake');
     if (isQuotaIssue) {
-      showToast('⚡ המפתח האישי שלכם נגמר לו המכסה או לא תקין, בדקו/עדכנו אותו', false, null, 'עדכון מפתח 🗝️', () => {
-        openPersonalKeyModal(false);
+      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה, אנא עזרו לכולנו ותרמו מפתח API בחינם', false, null, 'תרמו עכשיו 🔑', () => {
+        document.getElementById('btn-donate-key').click();
       });
     } else {
-      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה, נסו שוב או בדקו את המפתח האישי שלכם', false, null, 'עדכון מפתח 🗝️', () => {
-        openPersonalKeyModal(false);
+      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה, אנא עזרו לכולנו ותרמו מפתח API בחינם', false, null, 'תרמו עכשיו 🔑', () => {
+        document.getElementById('btn-donate-key').click();
       });
     }
     setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
@@ -827,9 +827,9 @@ async function refreshQuotaGauge(){
     setGaugeValue(count ?? 0);
   }catch{ /* לא קריטי אם זה נכשל */ }
 }
-document.getElementById('gauge-donate-btn').addEventListener('click', () => openPersonalKeyModal(false));
+document.getElementById('gauge-donate-btn').addEventListener('click', () => document.getElementById('btn-donate-key').click());
 document.getElementById('quota-gauge').addEventListener('click', (e) => {
-  if (e.target.id !== 'gauge-donate-btn') openPersonalKeyModal(false);
+  if (e.target.id !== 'gauge-donate-btn') document.getElementById('btn-donate-key').click();
 });
 refreshQuotaGauge();
 setInterval(refreshQuotaGauge, 8000);
@@ -961,43 +961,72 @@ document.getElementById('btn-close-recipe-book').addEventListener('click', () =>
 recipeBookBackdrop.addEventListener('click', (e) => { if (e.target === recipeBookBackdrop) recipeBookBackdrop.style.display = 'none'; });
 recipeBookSearch.addEventListener('input', renderRecipeBook);
 
-/* ================= מפתח API אישי (חובה לכל שחקן/ית, לא נכנס לרוטציה משותפת) ================= */
-document.getElementById('btn-personal-key').addEventListener('click', () => openPersonalKeyModal(false));
+/* ================= donate a Gemini key ================= */
+const donateModalBackdrop = document.getElementById('donate-modal-backdrop');
+const donateKeyInput = document.getElementById('donate-key-input');
+const donateKeyStatus = document.getElementById('donate-key-status');
 
+document.getElementById('btn-donate-key').addEventListener('click', () => {
+  donateKeyInput.value = '';
+  donateKeyStatus.style.display = 'none';
+  donateModalBackdrop.style.display = 'flex';
+  donateKeyInput.focus();
+});
+donateModalBackdrop.addEventListener('click', (e) => { if (e.target === donateModalBackdrop) donateModalBackdrop.style.display = 'none'; });
+
+document.getElementById('donate-key-submit').addEventListener('click', async () => {
+  const key = donateKeyInput.value.trim();
+  if (!key) return;
+  const btn = document.getElementById('donate-key-submit');
+  btn.disabled = true; btn.textContent = 'בודק ושומר...';
+  donateKeyStatus.style.display = 'none';
+
+  try {
+    const res = await fetch(CONTRIBUTE_KEY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey: key, nickname })
+    });
+    const result = await res.json();
+    if (res.ok && result.success) {
+      donateKeyStatus.style.color = 'var(--accent)';
+      donateKeyStatus.textContent = '🎉 תודה רבה! המפתח נכנס לרוטציה ויעזור לכל השחקנים.';
+      donateKeyInput.value = '';
+    } else {
+      donateKeyStatus.style.color = '#e53e3e';
+      donateKeyStatus.textContent = result.error || 'משהו השתבש, נסו שוב.';
+    }
+  } catch (err) {
+    donateKeyStatus.style.color = '#e53e3e';
+    donateKeyStatus.textContent = 'שגיאת רשת, נסו שוב.';
+  } finally {
+    donateKeyStatus.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'תרמו מפתח';
+  }
+});
+
+/* ================= מפתח API אישי (משמש רק אתכם, לא נכנס לרוטציה המשותפת) ================= */
 const personalKeyModalBackdrop = document.getElementById('personal-key-modal-backdrop');
 const personalKeyInput = document.getElementById('personal-key-input');
 const personalKeyStatus = document.getElementById('personal-key-status');
 
-let personalKeyRequired = false; // true כשהמודל נפתח כשלב חובה לפני תחילת המשחק (עדיין אין מפתח שמור)
-
-function openPersonalKeyModal(required = false){
-  personalKeyRequired = required;
+function openPersonalKeyModal(){
   personalKeyInput.value = localStorage.getItem('jc_personal_api_key') || '';
   personalKeyStatus.style.display = 'none';
-  document.getElementById('personal-key-clear').style.display = required ? 'none' : '';
   personalKeyModalBackdrop.style.display = 'flex';
   personalKeyInput.focus();
 }
-personalKeyModalBackdrop.addEventListener('click', (e) => {
-  // כשהמודל חובה (עוד אין מפתח אישי) אי אפשר לסגור אותו בלי להזין מפתח - אין משחק בלי מפתח משלכם.
-  if (e.target === personalKeyModalBackdrop && !personalKeyRequired) personalKeyModalBackdrop.style.display = 'none';
-});
+personalKeyModalBackdrop.addEventListener('click', (e) => { if (e.target === personalKeyModalBackdrop) personalKeyModalBackdrop.style.display = 'none'; });
 
 document.getElementById('personal-key-submit').addEventListener('click', () => {
   const key = personalKeyInput.value.trim();
-  if (!key){ personalKeyStatus.style.display = 'block'; personalKeyStatus.style.color = '#e53e3e'; personalKeyStatus.textContent = 'הזינו מפתח תחילה - חובה כדי לשחק.'; return; }
+  if (!key){ personalKeyStatus.style.display = 'block'; personalKeyStatus.style.color = '#e53e3e'; personalKeyStatus.textContent = 'הזינו מפתח תחילה.'; return; }
   const provider = key.startsWith('gsk_') ? 'groq' : 'gemini';
   localStorage.setItem('jc_personal_api_key', key);
   localStorage.setItem('jc_personal_api_provider', provider);
-  if (personalKeyRequired){
-    personalKeyRequired = false;
-    personalKeyModalBackdrop.style.display = 'none';
-    startGame();
-    return;
-  }
   personalKeyStatus.style.display = 'block';
   personalKeyStatus.style.color = 'var(--accent)';
-  personalKeyStatus.textContent = `✅ נשמר! מעתה הבקשות שלכם ישתמשו במפתח האישי הזה (${provider}) בלבד.`;
+  personalKeyStatus.textContent = `✅ נשמר! מעתה הבקשות שלכם ינסו קודם עם המפתח האישי הזה (${provider}).`;
 });
 
 document.getElementById('personal-key-clear').addEventListener('click', () => {
