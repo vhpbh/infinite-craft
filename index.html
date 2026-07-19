@@ -603,7 +603,62 @@ const staticGameDataReady = (async () => {
   }
 })();
 
+/* ================= מצב "אל תוותר" נסתר (Alt+C+O) =================
+   קיצור מקלדת נסתר, מקומי לדפדפן הזה בלבד (לא נשמר, לא משפיע על אף אחד אחר):
+   ברגע שמפעילים אותו, כל שילוב שנכשל כי ה-AI עמוס/חסר מכסה לא מוותר עליו - הוא ממשיך לנסות
+   ברקע ברקע עם השהיה גוברת (1 שנ' -> 2 -> 4 ... עד תקרה של 15 שנ') עד שמתקבלת תשובה בפועל,
+   בלי צורך לגרור את האלמנטים שוב. חוזר למצב רגיל אוטומטית ברענון הדף. */
+let persistentRetryMode = false;
+const pressedKeysForCheat = new Set();
+window.addEventListener('keydown', (e) => {
+  pressedKeysForCheat.add(e.key.toLowerCase());
+  if (e.altKey && pressedKeysForCheat.has('c') && pressedKeysForCheat.has('o') && !persistentRetryMode) {
+    persistentRetryMode = true;
+    showToast('🚀 מצב "אל תוותר" הופעל עד לרענון הדף', true);
+  }
+});
+window.addEventListener('keyup', (e) => pressedKeysForCheat.delete(e.key.toLowerCase()));
+
 function comboKeyOf(a, b){ return [a, b].sort().join(','); }
+
+async function fetchCombineResult(itemA, itemB, isRetry = false){
+  const res = await fetch(EDGE_FUNCTION_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ itemA, itemB, nickname, isRetry })
+  });
+  let result;
+  try { result = await res.json(); } catch { result = {}; }
+  if (!res.ok || result.error) {
+    const err = new Error(result.error || 'שגיאת שרת');
+    err.quotaExceeded = !!result.quotaExceeded;
+    throw err;
+  }
+  return result;
+}
+
+// רץ במצב "אל תוותר": ממשיך לנסות את אותו שילוב עם השהיה גוברת עד שמתקבלת תשובה בפועל,
+// כל עוד האלמנטים עדיין על הלוח (לא בוטלו/שולבו אחרת בינתיים).
+async function retryCombineUntilSuccess(div1, div2, name1, name2, x, y){
+  let delay = 1000;
+  const maxDelay = 15000;
+  while (true) {
+    await new Promise(r => setTimeout(r, delay));
+    if (!div1.isConnected || !div2.isConnected) return;
+    try {
+      const result = await fetchCombineResult(name1, name2, true);
+      if (result.failed) {
+        div1.classList.remove('loading'); div2.classList.remove('loading');
+        handleCombineFailed(div1, div2, name1, name2);
+        return;
+      }
+      handleCombineSuccess(result, div1, div2, name1, name2, x, y);
+      return;
+    } catch {
+      delay = Math.min(delay * 2, maxDelay);
+    }
+  }
+}
 
 /* ================= collision + combine (קובץ סטטי -> מסד נתונים -> AI) ================= */
 function checkCollision(draggedDiv){
@@ -647,18 +702,7 @@ async function combineItems(div1, div2){
 
   // שכבה 2+3: אין תשובה בקובץ - פונים ל-Edge Function, שבודקת קודם את מסד הנתונים ואז את ה-AI.
   try{
-    const res = await fetch(EDGE_FUNCTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
-      body: JSON.stringify({ itemA: name1, itemB: name2, nickname })
-    });
-    let result;
-    try { result = await res.json(); } catch { result = {}; }
-    if (!res.ok || result.error) {
-      const err = new Error(result.error || 'שגיאת שרת');
-      err.quotaExceeded = !!result.quotaExceeded;
-      throw err;
-    }
+    const result = await fetchCombineResult(name1, name2);
 
     if (result.failed) {
       div1.classList.remove('loading'); div2.classList.remove('loading');
@@ -668,11 +712,18 @@ async function combineItems(div1, div2){
 
     handleCombineSuccess(result, div1, div2, name1, name2, x, y);
   } catch(err){
+    const msg = String(err.message || err);
+    const isQuotaIssue = err.quotaExceeded || /מפתח|key|quota|429|502/i.test(msg);
+
+    if (persistentRetryMode) {
+      // במצב "אל תוותר" - לא מוותרים על השילוב, ממשיכים לנסות ברקע עד שמתקבלת תשובה בפועל.
+      retryCombineUntilSuccess(div1, div2, name1, name2, x, y);
+      return;
+    }
+
     console.error(err);
     div1.classList.remove('loading'); div2.classList.remove('loading');
     div1.classList.add('shake'); div2.classList.add('shake');
-    const msg = String(err.message || err);
-    const isQuotaIssue = err.quotaExceeded || /מפתח|key|quota|429|502/i.test(msg);
     if (isQuotaIssue) {
       showToast('⚡ אין מספיק טוקנים לשליחת הבקשה, אנא עזרו לכולנו ותרמו מפתח API בחינם', false, null, 'תרמו עכשיו 🔑', () => {
         document.getElementById('btn-donate-key').click();

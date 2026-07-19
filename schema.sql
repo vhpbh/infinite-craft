@@ -98,6 +98,25 @@ create policy "activity_log_public_read" on public.activity_log
   for select using (true);
 -- כתיבה מתבצעת רק דרך ה-Edge Function combine עם service_role (עוקף RLS).
 
+-- ================= ניקוי אוטומטי של לוג הפעילות =================
+-- activity_log גדל בלי הפסקה (שורה על כל ניסיון שילוב, מכל שחקן) ולא נזקק להיסטוריה ארוכה -
+-- מסך "מי היה פעיל" בניהול מציג רק פעילות אחרונה ממילא. מוחקים אוטומטית כל יום שורות ישנות
+-- מ-30 יום, כדי שהטבלה לא תמשיך לתפוח ותנפח את גודל מסד הנתונים.
+create extension if not exists pg_cron with schema extensions;
+
+do $$
+begin
+  if exists (select 1 from cron.job where jobname = 'cleanup-activity-log') then
+    perform cron.unschedule('cleanup-activity-log');
+  end if;
+end $$;
+
+select cron.schedule(
+  'cleanup-activity-log',
+  '0 3 * * *',  -- כל יום ב-03:00 UTC
+  $$ delete from public.activity_log where created_at < now() - interval '30 days'; $$
+);
+
 -- ================= מצב תחזוקה =================
 -- שורה יחידה שהאדמין שולט בה מדף הניהול (עם מפתח service_role) כדי להעביר את האתר
 -- למצב תחזוקה זמני עבור כל השחקנים, עם הודעה מותאמת אישית אופציונלית.
