@@ -101,6 +101,8 @@
     color:var(--text); font-family:inherit; font-size:14px; outline:none; transition:box-shadow .15s, border-color .15s; }
   #search-input:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
   #search-wrap .icon{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:14px; pointer-events:none; }
+  #sidebar-sort-row{ display:flex; gap:6px; margin-bottom:10px; }
+  #sidebar-sort-row .sort-pill{ flex:1; text-align:center; }
   #meta-row{ display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-dim); }
   #meta-row button{ border:none; background:none; color:var(--danger); cursor:pointer; font-size:12px; font-weight:600; font-family:inherit; padding:0; }
 
@@ -334,6 +336,10 @@
     <div id="sidebar-header">
       <h1>✨ יצירה אינסופית</h1>
       <div id="search-wrap"><span class="icon">🔍</span><input id="search-input" type="text" placeholder="חיפוש אלמנט..."></div>
+      <div id="sidebar-sort-row">
+        <button class="sort-pill" data-sort="time" title="מיין לפי סדר גילוי">🕒 זמן</button>
+        <button class="sort-pill" data-sort="alpha" title="מיין לפי א-ב">🔤 א-ב</button>
+      </div>
       <div id="meta-row"><span id="count-label">0 אלמנטים</span><button id="btn-reset">איפוס התקדמות</button></div>
     </div>
     <div id="items-list"></div>
@@ -607,11 +613,40 @@ function savePersonalProgress(){
 function findItem(name){ return unlockedItems.find(i => i.name === name); }
 
 /* ================= sidebar ================= */
+const SIDEBAR_SORT_KEY = 'jc_sidebar_sort';
+let sidebarSortMode = localStorage.getItem(SIDEBAR_SORT_KEY) || 'time'; // 'time' | 'alpha'
+
+function sortedUnlockedItems(){
+  const list = unlockedItems.slice();
+  if (sidebarSortMode === 'alpha'){
+    list.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+  } else {
+    list.sort((a, b) => (a.discovered_at || 0) - (b.discovered_at || 0));
+  }
+  return list;
+}
+
+function updateSortPillsUI(){
+  document.querySelectorAll('#sidebar-sort-row .sort-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sort === sidebarSortMode);
+  });
+}
+
+document.querySelectorAll('#sidebar-sort-row .sort-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    sidebarSortMode = btn.dataset.sort;
+    localStorage.setItem(SIDEBAR_SORT_KEY, sidebarSortMode);
+    updateSortPillsUI();
+    renderSidebar();
+  });
+});
+updateSortPillsUI();
+
 function renderSidebar(){
   const q = searchInput.value.trim().toLowerCase();
   itemsList.innerHTML = '';
   countLabel.textContent = unlockedItems.length + ' אלמנטים';
-  const filtered = unlockedItems.filter(i => i.name.toLowerCase().includes(q));
+  const filtered = sortedUnlockedItems().filter(i => i.name.toLowerCase().includes(q));
   if (filtered.length === 0){
     const div = document.createElement('div');
     div.id = 'no-results'; div.textContent = 'לא נמצאו אלמנטים תואמים';
@@ -734,6 +769,11 @@ function spawnOnBoard(item, x, y){
   div.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
   div.style.left = x + 'px'; div.style.top = y + 'px'; div.style.zIndex = ++zCounter;
   div.addEventListener('pointerdown', (e) => startDragging(div, e));
+  div.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    div.classList.add('merged-away');
+    setTimeout(() => { div.remove(); updateEmptyHint(); }, 180);
+  });
   div.addEventListener('dblclick', (e) => {
     e.stopPropagation();
     const offsetX = 18, offsetY = 18;
@@ -921,7 +961,7 @@ function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
   }, 160);
 
   if (isPersonallyNew){
-    unlockedItems.push({ name: result.name, emoji: result.emoji, discovered_by: result.discoveredBy || null });
+    unlockedItems.push({ name: result.name, emoji: result.emoji, discovered_by: result.discoveredBy || null, discovered_at: Date.now() });
     savePersonalProgress();
     recentlyDiscovered.add(result.name);
     renderSidebar();
