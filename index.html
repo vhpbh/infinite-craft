@@ -165,6 +165,13 @@
   #active-players .dot{ width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.2); }
   #active-players .count{ font-weight:700; }
 
+  /* ================= world elements found banner (bottom-right, above active-players) ================= */
+  #world-elements-banner{ position:absolute; bottom:60px; right:16px; z-index:25; background:var(--item-bg); border:1px solid var(--item-border);
+    backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border-radius:20px; padding:9px 16px; box-shadow:var(--item-shadow); display:flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:600; }
+  #world-elements-banner .count{ background:var(--accent-grad); color:#fff; border-radius:10px; padding:2px 8px; font-size:12px; font-weight:700; }
+
   /* ================= discovered-by-me banner (bottom-left) ================= */
   #discovered-banner{ position:absolute; bottom:16px; left:16px; z-index:25; background:var(--item-bg); border:1px solid var(--item-border);
     backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
@@ -354,6 +361,7 @@
 
   @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100% !important; height:42%; border-left:none; border-top:1px solid var(--border); } #sidebar-resizer{ display:none; } #play-area{ height:58%; }
     #active-players{ font-size:12px; padding:8px 12px; } #discovered-banner{ font-size:12px; padding:8px 12px; }
+    #world-elements-banner{ font-size:12px; padding:8px 12px; bottom:54px; }
     #daily-challenge-btn{ padding:6px 10px 6px 8px; font-size:11.5px; } #daily-challenge-btn .dc-label{ display:none; } }
 </style>
 </head>
@@ -381,6 +389,10 @@
 
     <div id="active-players" title="שחקנים פעילים במשחק כרגע">
       <span class="dot"></span><span>פעילים כרגע: <span class="count" id="active-players-count">–</span></span>
+    </div>
+
+    <div id="world-elements-banner" title="סה״כ אלמנטים שהתגלו במשחק ע״י כלל השחקנים/ות עד עכשיו">
+      🌍 <span>אלמנטים שהתגלו בעולם:</span> <span class="count" id="world-elements-count">–</span>
     </div>
 
     <div id="discovered-banner" title="האלמנטים שאני גיליתי לראשונה בעולם">
@@ -1170,6 +1182,23 @@ sendHeartbeat();
 refreshActivePlayers();
 setInterval(sendHeartbeat, 20000);
 setInterval(refreshActivePlayers, 20000);
+
+/* ================= סה"כ אלמנטים שהתגלו בעולם ע"י כלל השחקנים/ות =================
+   שולף מהנתיב הציבורי /stats (COUNT על טבלת elements בענן, לא כולל 4 אלמנטי הפתיחה). */
+const STATS_URL = WORKER_URL ? `${WORKER_URL}/stats` : '';
+const worldElementsCountEl = document.getElementById('world-elements-count');
+
+async function refreshWorldElementsCount(){
+  if (!WORKER_URL) return;
+  try{
+    const res = await fetch(STATS_URL);
+    const { elementsFound } = await res.json();
+    worldElementsCountEl.textContent = String(elementsFound ?? 0);
+  }catch{ /* לא קריטי אם זה נכשל */ }
+}
+
+refreshWorldElementsCount();
+setInterval(refreshWorldElementsCount, 20000);
 
 /* ================= האלמנטים שגיליתי (לפי המשחק המקורי - גילוי גלובלי ראשון) ================= */
 const discoveredCountEl = document.getElementById('discovered-count');
