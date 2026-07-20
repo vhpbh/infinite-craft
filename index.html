@@ -212,6 +212,29 @@
   .player-card-elements .sidebar-item{ cursor:default; }
   #players-empty{ color:var(--text-dim); font-size:13px; text-align:center; padding:20px 0; }
 
+  /* ================= גיבוי / העברת התקדמות ================= */
+  #backup-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #backup-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:18px; padding:22px; width:420px; max-width:92vw; max-height:85vh; overflow-y:auto;
+    box-shadow:0 20px 60px rgba(80,40,150,.25); animation:modal-pop .25s cubic-bezier(.34,1.56,.64,1); }
+  #backup-modal-header{ display:flex; justify-content:space-between; align-items:center; }
+  #backup-modal-header h2{ margin:0; font-size:18px; }
+  #backup-modal-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
+  #backup-modal-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 16px; }
+  .backup-section{ border-top:1px solid var(--item-border); padding-top:14px; margin-top:14px; }
+  .backup-section:first-of-type{ border-top:none; padding-top:0; margin-top:0; }
+  .backup-section h3{ margin:0 0 6px; font-size:14.5px; }
+  .backup-section p{ margin:0 0 10px; font-size:12.5px; color:var(--text-dim); line-height:1.55; }
+  .backup-btn{ width:100%; padding:10px; border:none; border-radius:10px; background:var(--accent-grad); color:#fff;
+    font-weight:600; font-family:inherit; font-size:14px; cursor:pointer; }
+  .backup-btn-outline{ width:100%; padding:9px; border:1px solid var(--border); background:transparent; color:var(--text);
+    border-radius:10px; font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; margin-top:8px; }
+  #import-file-input{ width:100%; font-size:12.5px; color:var(--text-dim); margin-bottom:4px; }
+  #backup-status{ font-size:12.5px; margin-top:10px; padding:8px 10px; border-radius:8px; display:none; line-height:1.5; }
+  #backup-status.ok{ display:block; background:rgba(34,197,94,.14); color:#16803c; }
+  html.dark #backup-status.ok{ color:#4ade80; }
+  #backup-status.err{ display:block; background:rgba(239,68,68,.12); color:var(--danger); }
+
   /* ================= צ'אט עם המנהל ================= */
   #btn-chat{ position:relative; }
   #chat-unread-dot{ position:absolute; top:-2px; left:-2px; width:11px; height:11px; border-radius:50%;
@@ -341,6 +364,7 @@
       <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי">🏅</button>
       <button class="tool-btn" id="btn-achievements" title="ההישגים שלי">🎖️</button>
       <button class="tool-btn" id="btn-personal-keys" title="מפתחות API אישיים שלי">🗝️</button>
+      <button class="tool-btn" id="btn-backup" title="ייצוא/ייבוא התקדמות">💾</button>
       <button class="tool-btn" id="btn-chat" title="צ'אט עם המנהל">💬<span id="chat-unread-dot" style="display:none;"></span></button>
       <button class="tool-btn" id="btn-clear" title="נקה לוח">🗑️</button>
     </div>
@@ -465,6 +489,30 @@
       <div id="share-card-actions">
         <button id="share-card-download">📥 שמירת תמונה</button>
         <button id="share-card-close">סגירה</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="backup-modal-backdrop" style="display:none;">
+    <div id="backup-modal">
+      <div id="backup-modal-header">
+        <h2>💾 גיבוי והעברת התקדמות</h2>
+        <button id="btn-close-backup">✕</button>
+      </div>
+      <div id="backup-modal-sub">שומר/מטעין את הכינוי, כל האלמנטים שגיליתם, ספר המתכונים וההישגים שלכם.</div>
+
+      <div class="backup-section">
+        <h3>⬇️ ייצוא לקובץ</h3>
+        <p>מוריד קובץ JSON עם כל ההתקדמות שלכם בדפדפן הזה. שמרו אותו במקום בטוח - מי שמחזיק בקובץ יכול להמשיך בתור החשבון שלכם.</p>
+        <button class="backup-btn" id="btn-export-progress">⬇️ הורדת קובץ גיבוי</button>
+      </div>
+
+      <div class="backup-section">
+        <h3>⬆️ ייבוא מקובץ</h3>
+        <p>העלו קובץ שיוצא בעבר כדי להמשיך בדיוק מהמקום שבו עצרתם - כולל הכינוי, האלמנטים וההישגים - גם ממחשב או דפדפן אחר. שימו לב: זה יחליף לגמרי את ההתקדמות הנוכחית בדפדפן הזה.</p>
+        <input type="file" id="import-file-input" accept="application/json">
+        <button class="backup-btn-outline" id="btn-import-progress">⬆️ ייבוא והמשך משם</button>
+        <div id="backup-status"></div>
       </div>
     </div>
   </div>
@@ -1298,6 +1346,104 @@ async function checkMaintenance(){
 }
 checkMaintenance();
 setInterval(checkMaintenance, 15000);
+
+/* ================= גיבוי / העברת התקדמות (ייצוא + ייבוא) =================
+   הקובץ המיוצא הוא בעצם "כרטיס כניסה" מלא לחשבון (כולל ה-client_id שמזהה את הכינוי מול השרת) -
+   כך שייבוא שלו בדפדפן/מחשב אחר ממשיך בדיוק מהמקום שנעצר, בלי צורך במערכת התחברות נפרדת. */
+const backupModalBackdrop = document.getElementById('backup-modal-backdrop');
+const backupStatusEl = document.getElementById('backup-status');
+
+function showBackupStatus(text, ok){
+  backupStatusEl.textContent = text;
+  backupStatusEl.className = ok ? 'ok' : 'err';
+}
+
+document.getElementById('btn-backup').addEventListener('click', () => {
+  backupStatusEl.className = '';
+  backupModalBackdrop.style.display = 'flex';
+});
+document.getElementById('btn-close-backup').addEventListener('click', () => { backupModalBackdrop.style.display = 'none'; });
+backupModalBackdrop.addEventListener('click', (e) => { if (e.target === backupModalBackdrop) backupModalBackdrop.style.display = 'none'; });
+
+function collectDailyCompletions(){
+  const out = {};
+  for (let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    if (key && key.startsWith(DAILY_KEY_PREFIX)) out[key.slice(DAILY_KEY_PREFIX.length)] = localStorage.getItem(key);
+  }
+  return out;
+}
+
+document.getElementById('btn-export-progress').addEventListener('click', () => {
+  if (!nickname || !clientId){ showBackupStatus('❌ עדיין אין לך כינוי פעיל - שחקו קצת קודם.', false); return; }
+  const payload = {
+    formatVersion: 1,
+    exportedAt: new Date().toISOString(),
+    clientId,
+    nickname,
+    unlockedItems,
+    myRecipes: getMyRecipes(),
+    unlockedBadges: [...getUnlockedBadges()],
+    bestStreak,
+    totalCombines,
+    sidebarSortMode,
+    dailyCompletions: collectDailyCompletions(),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `יצירה-אינסופית-גיבוי-${nickname}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showBackupStatus('✅ הקובץ ירד בהצלחה. שמרו אותו במקום בטוח.', true);
+});
+
+document.getElementById('btn-import-progress').addEventListener('click', async () => {
+  const fileInput = document.getElementById('import-file-input');
+  const file = fileInput.files && fileInput.files[0];
+  if (!file){ showBackupStatus('❌ בחרו קודם קובץ גיבוי (.json).', false); return; }
+
+  let data;
+  try{
+    const text = await file.text();
+    data = JSON.parse(text);
+  }catch{
+    showBackupStatus('❌ הקובץ לא תקין (לא JSON תקני).', false); return;
+  }
+
+  if (!data || typeof data !== 'object' || !data.clientId || !data.nickname || !Array.isArray(data.unlockedItems)){
+    showBackupStatus('❌ הקובץ לא נראה כמו קובץ גיבוי של המשחק הזה.', false); return;
+  }
+
+  if (!confirm(`לייבא את ההתקדמות של "${data.nickname}" לדפדפן הזה? זה יחליף לגמרי את ההתקדמות הנוכחית כאן (${nickname || 'ללא כינוי עדיין'}).`)) return;
+
+  // מזהה הדפדפן הזה משתנה למזהה שבקובץ - מרגע זה הדפדפן הזה "הוא" אותו חשבון מול השרת.
+  clientId = data.clientId;
+  localStorage.setItem(CLIENT_ID_KEY, clientId);
+
+  nickname = data.nickname;
+  localStorage.setItem('jc_nickname', nickname);
+
+  const personal = data.unlockedItems.filter(i => !STARTING_ITEMS.some(s => s.name === i.name));
+  localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify(personal));
+
+  localStorage.setItem(MY_RECIPES_KEY, JSON.stringify(Array.isArray(data.myRecipes) ? data.myRecipes : []));
+  localStorage.setItem(BADGES_KEY, JSON.stringify(Array.isArray(data.unlockedBadges) ? data.unlockedBadges : []));
+  localStorage.setItem(STREAK_KEY, String(Number.isFinite(data.bestStreak) ? data.bestStreak : 0));
+  localStorage.setItem(TOTAL_COMBINES_KEY, String(Number.isFinite(data.totalCombines) ? data.totalCombines : 0));
+  if (data.sidebarSortMode) localStorage.setItem(SIDEBAR_SORT_KEY, data.sidebarSortMode);
+  if (data.dailyCompletions && typeof data.dailyCompletions === 'object'){
+    Object.keys(data.dailyCompletions).forEach(dateKey => {
+      localStorage.setItem(DAILY_KEY_PREFIX + dateKey, data.dailyCompletions[dateKey]);
+    });
+  }
+
+  showBackupStatus('✅ יובא בהצלחה! טוענים מחדש...', true);
+  setTimeout(() => location.reload(), 900);
+});
 
 /* ================= צ'אט עם המנהל ================= */
 const chatModalBackdrop = document.getElementById('chat-modal-backdrop');
