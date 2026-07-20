@@ -271,6 +271,8 @@
   #ad-overlay-close{ position:absolute; top:-14px; right:-14px; width:32px; height:32px; border-radius:50%; border:none;
     background:#fff; color:#33313f; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.3); }
   #ad-overlay-close:hover{ filter:brightness(.95); }
+  #ad-overlay-close:disabled{ cursor:default; opacity:.75; font-size:14px; }
+  #ad-overlay-close:disabled:hover{ filter:none; }
 
   /* ================= מסך מצב תחזוקה (חוסם, בלי אפשרות סגירה) ================= */
   #maintenance-backdrop{ position:fixed; inset:0; background:var(--bg); z-index:500; display:none; align-items:center; justify-content:center;
@@ -1289,40 +1291,74 @@ playersSearch.addEventListener('input', renderPlayersList);
 /* ================= פרסומת שהאדמין הקפיץ (broadcast_ad) ================= */
 const adOverlayBackdrop = document.getElementById('ad-overlay-backdrop');
 const adOverlayImg = document.getElementById('ad-overlay-img');
+const adOverlayCloseBtn = document.getElementById('ad-overlay-close');
+const AD_CLOSE_DELAY_SEC = 3;
+let adCloseReady = false;
+let adCloseTimer = null;
+let adCurrentlyShownKey = null; // updated_at של הפרסומת שכרגע מוצגת, כדי לא לאתחל את הטיימר בכל poll
+
+function startAdCloseCountdown(){
+  adCloseReady = false;
+  adOverlayCloseBtn.disabled = true;
+  let remaining = AD_CLOSE_DELAY_SEC;
+  adOverlayCloseBtn.textContent = String(remaining);
+  clearInterval(adCloseTimer);
+  adCloseTimer = setInterval(() => {
+    remaining -= 1;
+    if (remaining <= 0){
+      clearInterval(adCloseTimer);
+      adCloseReady = true;
+      adOverlayCloseBtn.disabled = false;
+      adOverlayCloseBtn.textContent = '✕';
+    } else {
+      adOverlayCloseBtn.textContent = String(remaining);
+    }
+  }, 1000);
+}
+
+function dismissAd(){
+  if (!adCloseReady) return; // אי אפשר לסגור לפני שחלפו 3 שניות מרגע ההופעה
+  sessionStorage.setItem('jc_ad_dismissed_at', adOverlayBackdrop.dataset.updatedAt || '1');
+  adOverlayBackdrop.style.display = 'none';
+  clearInterval(adCloseTimer);
+  adCurrentlyShownKey = null;
+}
 
 async function checkBroadcastAd(){
   if (!WORKER_URL) return;
   try{
     const res = await fetch(BROADCAST_AD_URL);
     const { data: ad } = await res.json();
-    if (!ad || !ad.active || !ad.image_url) { adOverlayBackdrop.style.display = 'none'; return; }
+    if (!ad || !ad.active || !ad.image_url) {
+      adOverlayBackdrop.style.display = 'none';
+      clearInterval(adCloseTimer);
+      adCurrentlyShownKey = null;
+      return;
+    }
     const dismissedAt = sessionStorage.getItem('jc_ad_dismissed_at');
     if (dismissedAt && dismissedAt === ad.updated_at) return; // כבר נסגר על ידי המשתמש בסשן הזה
     adOverlayImg.onerror = () => {
       // התמונה לא נטענה (קישור שבור/לא ישיר) - עדיף לא להציג כלום מאשר להשאיר מסך אפור תקוע.
       adOverlayBackdrop.style.display = 'none';
+      clearInterval(adCloseTimer);
+      adCurrentlyShownKey = null;
     };
     adOverlayImg.src = ad.image_url;
     adOverlayImg.onclick = () => { if (ad.link_url) window.open(ad.link_url, '_blank'); };
     adOverlayBackdrop.style.display = 'flex';
     adOverlayBackdrop.dataset.updatedAt = ad.updated_at;
+    // מתחילים ספירה לאחור רק כשמדובר בהופעה חדשה (לא בכל poll חוזר על אותה פרסומת שכבר מוצגת) -
+    // כך שהמשתמש לא "יינעל" מחדש שוב ושוב כל 15 שניות כל עוד היא כבר פתוחה על המסך.
+    if (adCurrentlyShownKey !== ad.updated_at){
+      adCurrentlyShownKey = ad.updated_at;
+      startAdCloseCountdown();
+    }
   }catch{ /* לא קריטי אם זה נכשל */ }
 }
-document.getElementById('ad-overlay-close').addEventListener('click', () => {
-  sessionStorage.setItem('jc_ad_dismissed_at', adOverlayBackdrop.dataset.updatedAt || '1');
-  adOverlayBackdrop.style.display = 'none';
-});
-adOverlayBackdrop.addEventListener('click', (e) => {
-  if (e.target === adOverlayBackdrop){
-    sessionStorage.setItem('jc_ad_dismissed_at', adOverlayBackdrop.dataset.updatedAt || '1');
-    adOverlayBackdrop.style.display = 'none';
-  }
-});
+adOverlayCloseBtn.addEventListener('click', dismissAd);
+adOverlayBackdrop.addEventListener('click', (e) => { if (e.target === adOverlayBackdrop) dismissAd(); });
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && adOverlayBackdrop.style.display === 'flex'){
-    sessionStorage.setItem('jc_ad_dismissed_at', adOverlayBackdrop.dataset.updatedAt || '1');
-    adOverlayBackdrop.style.display = 'none';
-  }
+  if (e.key === 'Escape' && adOverlayBackdrop.style.display === 'flex') dismissAd();
 });
 checkBroadcastAd();
 setInterval(checkBroadcastAd, 15000);
