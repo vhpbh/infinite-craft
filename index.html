@@ -297,6 +297,8 @@
   #leaderboard-modal-header h2{ margin:0; font-size:18px; }
   #leaderboard-modal-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
   #leaderboard-modal-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 14px; }
+  #leaderboard-tabs{ display:flex; gap:6px; margin-bottom:12px; }
+  #leaderboard-tabs .sort-pill{ flex:1; text-align:center; }
   #leaderboard-list{ overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
   .lb-row{ display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; border:1px solid var(--item-border); background:var(--item-bg); font-size:14px; }
   .lb-row .rank{ width:26px; text-align:center; font-weight:800; color:var(--text-dim); font-size:13px; }
@@ -346,7 +348,7 @@
   #daily-challenge-modal .dc-big{ font-size:46px; margin-bottom:10px; }
   #daily-challenge-modal h2{ margin:0 0 6px; font-size:18px; }
   #daily-challenge-modal p{ margin:0 0 14px; font-size:13px; color:var(--text-dim); line-height:1.5; }
-  #daily-challenge-modal .dc-hint{ font-size:22px; font-weight:800; letter-spacing:4px; margin-bottom:12px; color:var(--accent); }
+  #daily-challenge-modal .dc-hint{ font-size:22px; font-weight:800; letter-spacing:.3px; margin-bottom:12px; color:var(--accent); }
   #dc-share-btn{ width:100%; padding:10px; border:none; border-radius:10px; background:var(--accent-grad); color:#fff; font-weight:600; font-family:inherit; font-size:14px; cursor:pointer; margin-top:6px; }
   #dc-close-btn{ width:100%; padding:9px; border:1px solid var(--border); background:transparent; color:var(--text-dim); border-radius:10px; font-family:inherit; font-size:13px; cursor:pointer; margin-top:8px; }
 
@@ -472,6 +474,10 @@
         <button id="btn-close-leaderboard">✕</button>
       </div>
       <div id="leaderboard-modal-sub">השחקנים שגילו הכי הרבה אלמנטים בעולם</div>
+      <div id="leaderboard-tabs">
+        <button class="sort-pill active" data-lb-tab="discoverers">🔎 הכי הרבה גילויים</button>
+        <button class="sort-pill" data-lb-tab="collectors">🧩 הכי הרבה אלמנטים</button>
+      </div>
       <div id="leaderboard-list"></div>
     </div>
   </div>
@@ -596,6 +602,7 @@ const CLAIM_NICKNAME_URL = WORKER_URL ? `${WORKER_URL}/claim-nickname` : '';
 const MY_ELEMENTS_URL = WORKER_URL ? `${WORKER_URL}/my-elements` : '';
 const HEARTBEAT_URL = WORKER_URL ? `${WORKER_URL}/heartbeat` : '';
 const ACTIVE_PLAYERS_URL = WORKER_URL ? `${WORKER_URL}/active-players` : '';
+const TOP_COLLECTORS_URL = WORKER_URL ? `${WORKER_URL}/top-collectors` : '';
 const BROADCAST_AD_URL = WORKER_URL ? `${WORKER_URL}/broadcast-ad` : '';
 const SITE_STATUS_URL = WORKER_URL ? `${WORKER_URL}/site-status` : '';
 const DAILY_POOL_URL = WORKER_URL ? `${WORKER_URL}/daily-pool` : '';
@@ -1164,7 +1171,9 @@ async function sendHeartbeat(){
     await fetch(HEARTBEAT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clientId }),
+      // nickname + elementsCount נוסעים יחד עם ה-heartbeat (בלי קריאה נפרדת) כדי שהשרת יוכל
+      // לעדכן כמה אלמנטים יש לשחקן/ית הזה/ו בלוח האישי - נדרש ללשונית "הכי הרבה אלמנטים" בלוח המובילים.
+      body: JSON.stringify({ clientId, nickname, elementsCount: unlockedItems.length }),
     });
   }catch{ /* לא קריטי אם זה נכשל */ }
 }
@@ -1795,42 +1804,88 @@ document.getElementById('personal-key-submit').addEventListener('click', () => {
 });
 
 
-/* ================= לוח מובילים גלובלי (top discoverers) =================
-   מבוסס על נתיב ה-Worker הקיים /discoveries (שכבר משמש את מסך "כל השחקנים") -
-   אין צורך בנתיב חדש, רק אגרגציה בצד הלקוח כי D1/Worker לא מחזיר GROUP BY מוכן. */
+/* ================= לוח מובילים גלובלי (שתי לשוניות) =================
+   1) "הכי הרבה גילויים" - מבוסס על נתיב ה-Worker הקיים /discoveries (שכבר משמש את מסך "כל
+      השחקנים"), אגרגציה בצד הלקוח כי D1/Worker לא מחזיר GROUP BY מוכן. מדרג לפי כמות אלמנטים
+      שכל שחקן/ית *גילה/תה ראשון/ה בעולם*.
+   2) "הכי הרבה אלמנטים" - מבוסס על נתיב חדש /top-collectors, מדרג לפי כמות האלמנטים שיש לכל
+      שחקן/ית *בלוח האישי שלו/ה בסך הכל* (כולל אלמנטים שגילו שחקנים אחרים) - ר' עדכון
+      elements_count דרך ה-heartbeat. */
 const leaderboardBackdrop = document.getElementById('leaderboard-modal-backdrop');
 const leaderboardList = document.getElementById('leaderboard-list');
+const leaderboardSubEl = document.getElementById('leaderboard-modal-sub');
+let leaderboardTab = 'discoverers'; // 'discoverers' | 'collectors'
+
+const LEADERBOARD_TAB_CFG = {
+  discoverers: {
+    sub: 'השחקנים שגילו הכי הרבה אלמנטים בעולם',
+    empty: 'עדיין אין גילויים מדורגים - היו הראשונים בעולם!',
+    unit: '🧩',
+  },
+  collectors: {
+    sub: 'השחקנים עם הכי הרבה אלמנטים בלוח האישי שלהם (לא רק מה שגילו בעצמם)',
+    empty: 'עדיין אין נתונים מספיקים - המשיכו לשחק!',
+    unit: '📦',
+  },
+};
+
+function renderLeaderboardRows(ranked, unit){
+  leaderboardList.innerHTML = '';
+  ranked.forEach(([name, count], i) => {
+    const row = document.createElement('div');
+    const rankClass = i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '';
+    row.className = 'lb-row' + rankClass + (name === nickname ? ' me' : '');
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
+    row.innerHTML = `<span class="rank">${medal}</span><span class="lb-name" title="לצפייה באלמנטים שגילה/תה">${escapeHtml(name)}${name === nickname ? ' (אני)' : ''}</span><span class="lb-count">${count} ${unit}</span>`;
+    row.querySelector('.lb-name').addEventListener('click', () => openPlayerFromLeaderboard(name));
+    leaderboardList.appendChild(row);
+  });
+}
 
 async function loadLeaderboard(){
+  const cfg = LEADERBOARD_TAB_CFG[leaderboardTab];
+  leaderboardSubEl.textContent = cfg.sub;
   leaderboardList.innerHTML = `<div id="leaderboard-loading">טוען...</div>`;
   if (!WORKER_URL){ leaderboardList.innerHTML = `<div id="leaderboard-empty">אין חיבור לשרת.</div>`; return; }
   try{
-    const res = await fetch(DISCOVERIES_URL);
-    const { data } = await res.json();
-    const counts = new Map();
-    (data || []).forEach(row => {
-      if (!row.discovered_by) return;
-      counts.set(row.discovered_by, (counts.get(row.discovered_by) || 0) + 1);
-    });
-    const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20);
-    leaderboardList.innerHTML = '';
+    let ranked;
+    if (leaderboardTab === 'collectors'){
+      const res = await fetch(TOP_COLLECTORS_URL);
+      const { data } = await res.json();
+      ranked = (data || [])
+        .filter(row => row.nickname && row.elements_count > 0)
+        .map(row => [row.nickname, row.elements_count])
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+    } else {
+      const res = await fetch(DISCOVERIES_URL);
+      const { data } = await res.json();
+      const counts = new Map();
+      (data || []).forEach(row => {
+        if (!row.discovered_by) return;
+        counts.set(row.discovered_by, (counts.get(row.discovered_by) || 0) + 1);
+      });
+      ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20);
+    }
     if (ranked.length === 0){
-      leaderboardList.innerHTML = `<div id="leaderboard-empty">עדיין אין גילויים מדורגים - היו הראשונים בעולם!</div>`;
+      leaderboardList.innerHTML = `<div id="leaderboard-empty">${cfg.empty}</div>`;
       return;
     }
-    ranked.forEach(([name, count], i) => {
-      const row = document.createElement('div');
-      const rankClass = i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '';
-      row.className = 'lb-row' + rankClass + (name === nickname ? ' me' : '');
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
-      row.innerHTML = `<span class="rank">${medal}</span><span class="lb-name" title="לצפייה באלמנטים שגילה/תה">${escapeHtml(name)}${name === nickname ? ' (אני)' : ''}</span><span class="lb-count">${count} 🧩</span>`;
-      row.querySelector('.lb-name').addEventListener('click', () => openPlayerFromLeaderboard(name));
-      leaderboardList.appendChild(row);
-    });
+    renderLeaderboardRows(ranked, cfg.unit);
   }catch{
     leaderboardList.innerHTML = `<div id="leaderboard-empty">לא הצלחנו לטעון את הלוח, נסו שוב.</div>`;
   }
 }
+
+document.querySelectorAll('#leaderboard-tabs .sort-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.lbTab === leaderboardTab) return;
+    leaderboardTab = btn.dataset.lbTab;
+    document.querySelectorAll('#leaderboard-tabs .sort-pill').forEach(b => b.classList.toggle('active', b === btn));
+    loadLeaderboard();
+  });
+});
+
 // לחיצה על שם בלוח המובילים - קפיצה ישירה למסך "כל השחקנים", מסונן כבר לשחקן/ית הזה/ו בלבד.
 async function openPlayerFromLeaderboard(name){
   leaderboardBackdrop.style.display = 'none';
@@ -1989,8 +2044,8 @@ function openDailyChallengeModal(){
   } else {
     emojiEl.textContent = '❓';
     titleEl.textContent = 'האתגר היומי';
-    descEl.textContent = `גלו את היצור המסתורי של היום על ידי שילוב אלמנטים בלוח. רמז: השם מתחיל באות "${dailyTarget.name[0]}" ומכיל ${dailyTarget.name.length} תווים.`;
-    hintEl.textContent = dailyTarget.name[0] + ' ' + '_ '.repeat(Math.max(0, dailyTarget.name.length - 1));
+    descEl.textContent = `גלו את היצור המסתורי של היום על ידי שילוב אלמנטים בלוח, עד שתקבלו את האלמנט הבא:`;
+    hintEl.textContent = dailyTarget.name;
     shareBtn.style.display = 'none';
   }
   modal.style.display = 'flex';
