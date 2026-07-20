@@ -212,6 +212,35 @@
   .player-card-elements .sidebar-item{ cursor:default; }
   #players-empty{ color:var(--text-dim); font-size:13px; text-align:center; padding:20px 0; }
 
+  /* ================= צ'אט עם המנהל ================= */
+  #btn-chat{ position:relative; }
+  #chat-unread-dot{ position:absolute; top:-2px; left:-2px; width:11px; height:11px; border-radius:50%;
+    background:var(--danger); border:2px solid var(--bg); }
+  #chat-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #chat-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:18px; padding:22px; width:420px; max-width:92vw; height:min(600px,80vh);
+    display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(80,40,150,.25); animation:modal-pop .25s cubic-bezier(.34,1.56,.64,1); }
+  #chat-modal-header{ display:flex; justify-content:space-between; align-items:center; }
+  #chat-modal-header h2{ margin:0; font-size:18px; }
+  #chat-modal-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
+  #chat-modal-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 12px; }
+  #chat-messages{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px 2px; }
+  #chat-messages::-webkit-scrollbar{ width:6px; }
+  #chat-messages::-webkit-scrollbar-thumb{ background:var(--border); border-radius:3px; }
+  #chat-empty{ color:var(--text-dim); font-size:13px; text-align:center; margin:auto; }
+  .chat-bubble{ max-width:78%; padding:9px 13px; border-radius:16px; font-size:14px; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+  .chat-bubble.from-user{ align-self:flex-end; background:var(--accent-grad); color:#fff; border-bottom-left-radius:5px; }
+  .chat-bubble.from-admin{ align-self:flex-start; background:var(--item-bg); border:1px solid var(--item-border); border-bottom-right-radius:5px; }
+  .chat-bubble .chat-time{ display:block; font-size:10.5px; opacity:.65; margin-top:3px; }
+  #chat-input-row{ display:flex; gap:8px; margin-top:12px; }
+  #chat-input{ flex:1; padding:10px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg);
+    color:var(--text); font-family:inherit; font-size:14px; outline:none; }
+  #chat-input:focus{ border-color:var(--accent); }
+  #chat-send-btn{ border:none; background:var(--accent-grad); color:#fff; font-weight:700; font-size:13.5px;
+    padding:0 18px; border-radius:20px; cursor:pointer; font-family:inherit; }
+  #chat-send-btn:hover{ filter:brightness(1.08); }
+  #chat-send-btn:disabled{ opacity:.6; cursor:default; }
+
   /* ================= admin-pushed ad popup ================= */
   #ad-overlay-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.55); backdrop-filter:blur(4px); z-index:400; display:none; align-items:center; justify-content:center; }
   #ad-overlay{ position:relative; max-width:min(92vw,420px); min-width:200px; min-height:120px; }
@@ -312,6 +341,7 @@
       <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי">🏅</button>
       <button class="tool-btn" id="btn-achievements" title="ההישגים שלי">🎖️</button>
       <button class="tool-btn" id="btn-personal-keys" title="מפתחות API אישיים שלי">🗝️</button>
+      <button class="tool-btn" id="btn-chat" title="צ'אט עם המנהל">💬<span id="chat-unread-dot" style="display:none;"></span></button>
       <button class="tool-btn" id="btn-clear" title="נקה לוח">🗑️</button>
     </div>
     <div id="daily-challenge-btn" title="האתגר היומי">
@@ -439,6 +469,21 @@
     </div>
   </div>
 
+  <div id="chat-modal-backdrop" style="display:none;">
+    <div id="chat-modal">
+      <div id="chat-modal-header">
+        <h2>💬 צ'אט עם המנהל</h2>
+        <button id="btn-close-chat">✕</button>
+      </div>
+      <div id="chat-modal-sub">שאלה, באג או רעיון? כתבו כאן - המנהל יראה ויענה.</div>
+      <div id="chat-messages"><div id="chat-empty">עדיין אין הודעות. כתבו לנו משהו! 👋</div></div>
+      <div id="chat-input-row">
+        <input id="chat-input" type="text" maxlength="1000" placeholder="כתבו הודעה...">
+        <button id="chat-send-btn">שליחה</button>
+      </div>
+    </div>
+  </div>
+
   <div id="ad-overlay-backdrop">
     <div id="ad-overlay">
       <button id="ad-overlay-close" title="סגירה">✕</button>
@@ -488,6 +533,8 @@ const ACTIVE_PLAYERS_URL = WORKER_URL ? `${WORKER_URL}/active-players` : '';
 const BROADCAST_AD_URL = WORKER_URL ? `${WORKER_URL}/broadcast-ad` : '';
 const SITE_STATUS_URL = WORKER_URL ? `${WORKER_URL}/site-status` : '';
 const DAILY_POOL_URL = WORKER_URL ? `${WORKER_URL}/daily-pool` : '';
+const CHAT_SEND_URL = WORKER_URL ? `${WORKER_URL}/chat/send` : '';
+const CHAT_MESSAGES_URL = WORKER_URL ? `${WORKER_URL}/chat/messages` : '';
 
 /* ================= STATE ================= */
 let unlockedItems = [];         // {name, emoji, discovered_by}
@@ -1251,6 +1298,124 @@ async function checkMaintenance(){
 }
 checkMaintenance();
 setInterval(checkMaintenance, 15000);
+
+/* ================= צ'אט עם המנהל ================= */
+const chatModalBackdrop = document.getElementById('chat-modal-backdrop');
+const chatMessagesEl = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
+const chatUnreadDot = document.getElementById('chat-unread-dot');
+let chatOpen = false;
+let chatPollTimer = null;
+let chatKnownIds = new Set();
+let chatHasUnread = false;
+
+function fmtChatTime(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString('he-IL', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  }catch{ return ''; }
+}
+
+function renderChatMessages(list){
+  if (!list || list.length === 0){
+    chatMessagesEl.innerHTML = '<div id="chat-empty">עדיין אין הודעות. כתבו לנו משהו! 👋</div>';
+    return;
+  }
+  chatMessagesEl.innerHTML = list.map(m => `
+    <div class="chat-bubble from-${m.sender}">
+      ${escapeHtml(m.message)}
+      <span class="chat-time">${fmtChatTime(m.created_at)}</span>
+    </div>
+  `).join('');
+  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function loadChatMessages(){
+  if (!WORKER_URL || !clientId) return;
+  try{
+    const res = await fetch(`${CHAT_MESSAGES_URL}?clientId=${encodeURIComponent(clientId)}`);
+    const { data } = await res.json();
+    const list = data || [];
+    const ids = new Set(list.map(m => m.id));
+    const changed = ids.size !== chatKnownIds.size || [...ids].some(id => !chatKnownIds.has(id));
+    if (changed) renderChatMessages(list);
+    chatKnownIds = ids;
+    if (chatOpen){
+      chatHasUnread = false;
+      chatUnreadDot.style.display = 'none';
+    }
+  }catch{ /* לא קריטי אם זה נכשל */ }
+}
+
+async function checkChatUnread(){
+  if (!WORKER_URL || !clientId || chatOpen) return;
+  try{
+    const res = await fetch(`${CHAT_MESSAGES_URL}?clientId=${encodeURIComponent(clientId)}`);
+    // ההודעות מסומנות "נקרא" רק כשהצ'אט פתוח בפועל (ר' loadChatMessages), אז כאן אפשר
+    // רק לבדוק אם הגיעה הודעת מנהל חדשה שעדיין לא ראינו (id חדש שלא היה קודם).
+    const { data } = await res.json();
+    const list = data || [];
+    const newAdminMsg = list.some(m => m.sender === 'admin' && !chatKnownIds.has(m.id));
+    if (newAdminMsg){
+      chatHasUnread = true;
+      chatUnreadDot.style.display = 'block';
+    }
+    chatKnownIds = new Set(list.map(m => m.id));
+  }catch{ /* לא קריטי */ }
+}
+
+function openChat(){
+  chatOpen = true;
+  chatModalBackdrop.style.display = 'flex';
+  chatUnreadDot.style.display = 'none';
+  chatHasUnread = false;
+  loadChatMessages();
+  clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(loadChatMessages, 4000);
+  chatInput.focus();
+}
+function closeChat(){
+  chatOpen = false;
+  chatModalBackdrop.style.display = 'none';
+  clearInterval(chatPollTimer);
+}
+
+document.getElementById('btn-chat').addEventListener('click', openChat);
+document.getElementById('btn-close-chat').addEventListener('click', closeChat);
+chatModalBackdrop.addEventListener('click', (e) => { if (e.target === chatModalBackdrop) closeChat(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && chatOpen) closeChat(); });
+
+async function sendChatMessage(){
+  const msg = chatInput.value.trim();
+  if (!msg || !WORKER_URL || !clientId) return;
+  chatSendBtn.disabled = true;
+  try{
+    await fetch(CHAT_SEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, nickname, message: msg }),
+    });
+    chatInput.value = '';
+    await loadChatMessages();
+  }catch{
+    showToast('❌ שליחת ההודעה נכשלה, נסו שוב');
+  }finally{
+    chatSendBtn.disabled = false;
+    chatInput.focus();
+  }
+}
+chatSendBtn.addEventListener('click', sendChatMessage);
+chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter'){ e.preventDefault(); sendChatMessage(); } });
+
+checkChatUnread();
+setInterval(checkChatUnread, 20000);
 
 /* ================= ספר המתכונים שלי ================= */
 const MY_RECIPES_KEY = 'jc_my_recipes';
