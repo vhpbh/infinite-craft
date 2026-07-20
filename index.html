@@ -105,6 +105,11 @@
   #nick-modal p{ margin:0 0 16px; font-size:13px; color:var(--text-dim); }
   #nick-modal input{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); font-family:inherit; font-size:14px; margin-bottom:12px; background:var(--bg); color:var(--text); }
   #nick-modal button{ width:100%; padding:10px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-weight:600; font-family:inherit; font-size:14px; cursor:pointer; }
+  .pkey-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--bg); border:1px solid var(--border);
+    border-radius:10px; padding:7px 10px; font-size:12.5px; }
+  .pkey-row .pkey-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pkey-row .pkey-remove{ width:auto; padding:2px 8px; border-radius:8px; background:var(--danger); font-size:12px; flex:0 0 auto; }
+  #personal-keys-empty{ font-size:12.5px; color:var(--text-dim); text-align:center; }
 
   #recipe-book-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.45); z-index:300; display:flex; align-items:center; justify-content:center; }
   #recipe-book{ background:var(--sidebar-bg); border-radius:16px; padding:22px; width:420px; max-height:78vh; display:flex; flex-direction:column;
@@ -123,16 +128,12 @@
   .recipe-row .arrow{ color:var(--accent); margin:0 6px; }
   #recipe-book-empty{ color:var(--text-dim); font-size:13px; text-align:center; padding:20px 0; }
 
-  /* ================= quota gauge (bottom-right speedometer) ================= */
-  #quota-gauge{ position:absolute; bottom:16px; right:16px; z-index:25; background:var(--item-bg); border:1px solid var(--item-border);
-    border-radius:16px; padding:10px 12px 8px; box-shadow:var(--item-shadow); display:flex; flex-direction:column; align-items:center;
-    width:118px; cursor:pointer; }
-  #quota-gauge svg{ width:100px; height:58px; }
-  #quota-gauge .gauge-label{ font-size:10.5px; color:var(--text-dim); text-align:center; margin-top:2px; line-height:1.3; }
-  #quota-gauge .gauge-num{ font-size:15px; font-weight:700; color:var(--text); }
-  #quota-gauge .gauge-btn{ margin-top:6px; background:var(--accent); color:#fff; border:none; border-radius:10px; padding:5px 10px;
-    font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; width:100%; }
-  #quota-gauge .gauge-btn:hover{ filter:brightness(1.08); }
+  /* ================= active players (bottom-right) ================= */
+  #active-players{ position:absolute; bottom:16px; right:16px; z-index:25; background:var(--item-bg); border:1px solid var(--item-border);
+    border-radius:20px; padding:9px 16px; box-shadow:var(--item-shadow); display:flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:600; }
+  #active-players .dot{ width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.2); }
+  #active-players .count{ font-weight:700; }
 
   /* ================= discovered-by-me banner (bottom-left) ================= */
   #discovered-banner{ position:absolute; bottom:16px; left:16px; z-index:25; background:var(--item-bg); border:1px solid var(--item-border);
@@ -260,7 +261,7 @@
   #share-card-close{ background:transparent; border:1px solid var(--border) !important; color:var(--text-dim); }
 
   @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100% !important; height:42%; border-left:none; border-top:1px solid var(--border); } #sidebar-resizer{ display:none; } #play-area{ height:58%; }
-    #quota-gauge{ width:96px; padding:8px 10px 6px; } #quota-gauge svg{ width:80px; height:48px; } #discovered-banner{ font-size:12px; padding:8px 12px; }
+    #active-players{ font-size:12px; padding:8px 12px; } #discovered-banner{ font-size:12px; padding:8px 12px; }
     #daily-challenge-btn{ padding:6px 10px 6px 8px; font-size:11.5px; } #daily-challenge-btn .dc-label{ display:none; } }
 </style>
 </head>
@@ -273,7 +274,7 @@
       <button class="tool-btn" id="btn-players" title="כל השחקנים והאלמנטים שגילו">👥</button>
       <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי">🏅</button>
       <button class="tool-btn" id="btn-achievements" title="ההישגים שלי">🎖️</button>
-      <button class="tool-btn" id="btn-donate-key" title="תרמו מפתח API כדי לעזור למשחק">🔑</button>
+      <button class="tool-btn" id="btn-personal-keys" title="מפתחות API אישיים שלי">🗝️</button>
       <button class="tool-btn" id="btn-clear" title="נקה לוח">🗑️</button>
     </div>
     <div id="daily-challenge-btn" title="האתגר היומי">
@@ -284,17 +285,8 @@
     <div id="empty-hint"><div class="big">🧩</div><div>גררו אלמנטים מהתפריט ללוח<br>ושחררו אחד על השני כדי לשלב</div></div>
     <div id="info-panel"></div>
 
-    <div id="quota-gauge" title="בקשות שנכשלו כרגע בגלל חוסר במפתחות API">
-      <svg viewBox="0 0 100 58" id="gauge-svg">
-        <path d="M8,54 A42,42 0 0 1 92,54" fill="none" stroke="var(--border)" stroke-width="9" stroke-linecap="round"/>
-        <path id="gauge-arc" d="M8,54 A42,42 0 0 1 92,54" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round"
-          stroke-dasharray="132" stroke-dashoffset="132"/>
-        <line id="gauge-needle" x1="50" y1="54" x2="50" y2="18" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="50" cy="54" r="4" fill="var(--text)"/>
-      </svg>
-      <div class="gauge-num" id="gauge-num">0</div>
-      <div class="gauge-label">בקשות ללא מענה<br>(חסרים מפתחות)</div>
-      <button class="gauge-btn" id="gauge-donate-btn">תרמו מפתח 🔑</button>
+    <div id="active-players" title="שחקנים פעילים במשחק כרגע">
+      <span class="dot"></span><span>פעילים כרגע: <span class="count" id="active-players-count">–</span></span>
     </div>
 
     <div id="discovered-banner" title="האלמנטים שאני גיליתי לראשונה בעולם">
@@ -421,28 +413,18 @@
     </div>
   </div>
 
-  <div id="donate-modal-backdrop" style="display:none;">
-    <div id="nick-modal">
-      <div class="big">🔑</div>
-      <h2>תרמו מפתח API</h2>
-      <p>המשחק משתמש ב-AI כדי ליצור שילובים חדשים. מפתח Groq חינמי (מ-<a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a>) הוא הכי מהיר להשגה - נרשמים בחינם ומעתיקים מפתח שמתחיל ב-"gsk_". גם מפתח Gemini מ-aistudio.google.com/apikey מתקבל בברכה. תרומתכם תיכנס אוטומטית לרוטציה ותעזור למנוע חסימות עומס לכל השחקנים.</p>
-      <input id="donate-key-input" type="text" placeholder="gsk_... או AIzaSy...">
-      <button id="donate-key-submit">תרמו מפתח</button>
-      <div id="donate-key-status" style="font-size:12.5px; margin-top:10px; display:none;"></div>
-    </div>
-  </div>
-
   <div id="personal-key-modal-backdrop" style="display:none;">
-    <div id="nick-modal">
+    <div id="nick-modal" style="width:360px;">
       <div class="big">🗝️</div>
-      <h2>מפתח API אישי</h2>
-      <p>מפתח שרק אתם מזינים כאן משמש <b>רק את הבקשות שלכם</b> - הוא נשמר רק בדפדפן הזה, לא נשלח לאף מקום
-      חוץ מלצד השילובים שאתם עצמכם מבקשים, ולא נכנס לרוטציה המשותפת שכל שאר השחקנים חולקים.
-      כך אתם לא תלויים בעומס של אחרים. אפשר Groq חינמי (מ-<a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a>,
-      מפתח שמתחיל ב-"gsk_") או Gemini (מ-aistudio.google.com/apikey).</p>
+      <h2>מפתחות API אישיים</h2>
+      <p style="text-align:right;">אפשר להזין כאן כמה מפתחות שרוצים - הם נשמרים <b>רק בדפדפן הזה</b> ולעולם לא נשלחים
+      לשום מקום חוץ מלצד השילובים שאתם עצמכם מבקשים (לא נשמרים בענן/שרת). כשיש כמה מפתחות, המשחק מסתובב
+      ביניהם (רוטציה) בין בקשה לבקשה, ומנסה את הבא בתור אם אחד נכשל - כך אתם לא תלויים באף אחד אחר.
+      אפשר Groq חינמי (<a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a>,
+      מפתח שמתחיל ב-"gsk_") או Gemini (aistudio.google.com/apikey).</p>
+      <div id="personal-keys-list" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px; text-align:right;"></div>
       <input id="personal-key-input" type="text" placeholder="gsk_... או AIzaSy...">
-      <button id="personal-key-submit">שמרו מפתח אישי</button>
-      <button id="personal-key-clear" style="margin-top:8px; background:transparent; border:1px solid var(--border); color:var(--text-dim);">הסירו מפתח אישי קיים</button>
+      <button id="personal-key-submit">➕ הוסיפו מפתח</button>
       <div id="personal-key-status" style="font-size:12.5px; margin-top:10px; display:none;"></div>
     </div>
   </div>
@@ -458,10 +440,10 @@ const CFG = JSON.parse(localStorage.getItem('jc_config') || '{}');
 const WORKER_URL = (CFG.workerUrl || HARDCODED_WORKER_URL).replace(/\/$/, '');
 
 const EDGE_FUNCTION_URL = WORKER_URL ? `${WORKER_URL}/combine` : '';
-const CONTRIBUTE_KEY_URL = WORKER_URL ? `${WORKER_URL}/contribute-key` : '';
 const CLAIM_NICKNAME_URL = WORKER_URL ? `${WORKER_URL}/claim-nickname` : '';
 const MY_ELEMENTS_URL = WORKER_URL ? `${WORKER_URL}/my-elements` : '';
-const QUOTA_GAUGE_URL = WORKER_URL ? `${WORKER_URL}/quota-gauge` : '';
+const HEARTBEAT_URL = WORKER_URL ? `${WORKER_URL}/heartbeat` : '';
+const ACTIVE_PLAYERS_URL = WORKER_URL ? `${WORKER_URL}/active-players` : '';
 const BROADCAST_AD_URL = WORKER_URL ? `${WORKER_URL}/broadcast-ad` : '';
 const SITE_STATUS_URL = WORKER_URL ? `${WORKER_URL}/site-status` : '';
 const DAILY_POOL_URL = WORKER_URL ? `${WORKER_URL}/daily-pool` : '';
@@ -792,15 +774,13 @@ window.addEventListener('keyup', (e) => pressedKeysForCheat.delete(e.key.toLower
 function comboKeyOf(a, b){ return [a, b].sort().join(','); }
 
 async function fetchCombineResult(itemA, itemB){
-  const personalKey = localStorage.getItem('jc_personal_api_key') || '';
-  const personalProvider = localStorage.getItem('jc_personal_api_provider') || '';
+  const personalKeysOrder = nextPersonalKeysRotationOrder();
   const res = await fetch(EDGE_FUNCTION_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       itemA, itemB, nickname,
-      personalKey: personalKey || undefined,
-      personalProvider: personalProvider || undefined,
+      personalKeys: personalKeysOrder.length ? personalKeysOrder : undefined,
     })
   });
   let result;
@@ -872,16 +852,13 @@ async function combineItems(div1, div2){
     div1.classList.remove('loading'); div2.classList.remove('loading');
     div1.classList.add('shake'); div2.classList.add('shake');
     if (isQuotaIssue) {
-      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה, אנא עזרו לכולנו ותרמו מפתח API בחינם', false, null, 'תרמו עכשיו 🔑', () => {
-        document.getElementById('btn-donate-key').click();
+      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה כרגע, אפשר להוסיף מפתח API אישי משלכם', false, null, 'הוסיפו מפתח 🗝️', () => {
+        document.getElementById('btn-personal-keys').click();
       });
     } else {
-      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה, אנא עזרו לכולנו ותרמו מפתח API בחינם', false, null, 'תרמו עכשיו 🔑', () => {
-        document.getElementById('btn-donate-key').click();
-      });
+      showToast('⚡ משהו השתבש בבקשה, נסו שוב', false);
     }
     setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
-    refreshQuotaGauge();
   }
 }
 
@@ -977,37 +954,36 @@ function showToast(text, isNew, credit, actionLabel, actionFn){
   setTimeout(() => t.remove(), 2700);
 }
 
-/* ================= מד "בקשות ללא מענה" (בקשות שנכשלו כי חסרים מפתחות) ================= */
-const gaugeNeedle = document.getElementById('gauge-needle');
-const gaugeArc = document.getElementById('gauge-arc');
-const gaugeNum = document.getElementById('gauge-num');
-const GAUGE_ARC_LENGTH = 132; // אורך המסלול של gauge-arc, תואם ל-stroke-dasharray שהוגדר ב-HTML
-const GAUGE_WINDOW_MS = 3 * 60 * 1000; // חלון "כרגע" - 3 הדקות האחרונות
+/* ================= שחקנים פעילים כרגע =================
+   כל דפדפן שולח "פעימה" תקופתית לשרת (heartbeat) כדי לספר שהוא עדיין כאן, והתצוגה שולפת כל כמה
+   שניות כמה פעימות "טריות" יש בסה"כ (ר' handleActivePlayers ב-worker.js) - כולל בוסט קבוע
+   שאפשר לקבוע מפאנל הניהול. */
+const activePlayersCountEl = document.getElementById('active-players-count');
 
-function setGaugeValue(count){
-  const capped = Math.min(count, 10);
-  const ratio = capped / 10;
-  const angleDeg = -90 + ratio * 180;
-  gaugeNeedle.setAttribute('transform', `rotate(${angleDeg} 50 54)`);
-  gaugeArc.setAttribute('stroke-dashoffset', String(GAUGE_ARC_LENGTH - GAUGE_ARC_LENGTH * ratio));
-  gaugeNum.textContent = String(count);
-}
-
-async function refreshQuotaGauge(){
+async function sendHeartbeat(){
   if (!WORKER_URL) return;
   try{
-    const since = new Date(Date.now() - GAUGE_WINDOW_MS).toISOString();
-    const res = await fetch(`${QUOTA_GAUGE_URL}?since=${encodeURIComponent(since)}`);
-    const { count } = await res.json();
-    setGaugeValue(count ?? 0);
+    await fetch(HEARTBEAT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId }),
+    });
   }catch{ /* לא קריטי אם זה נכשל */ }
 }
-document.getElementById('gauge-donate-btn').addEventListener('click', () => document.getElementById('btn-donate-key').click());
-document.getElementById('quota-gauge').addEventListener('click', (e) => {
-  if (e.target.id !== 'gauge-donate-btn') document.getElementById('btn-donate-key').click();
-});
-refreshQuotaGauge();
-setInterval(refreshQuotaGauge, 8000);
+
+async function refreshActivePlayers(){
+  if (!WORKER_URL) return;
+  try{
+    const res = await fetch(ACTIVE_PLAYERS_URL);
+    const { count } = await res.json();
+    activePlayersCountEl.textContent = String(count ?? 0);
+  }catch{ /* לא קריטי אם זה נכשל */ }
+}
+
+sendHeartbeat();
+refreshActivePlayers();
+setInterval(sendHeartbeat, 20000);
+setInterval(refreshActivePlayers, 20000);
 
 /* ================= האלמנטים שגיליתי (לפי המשחק המקורי - גילוי גלובלי ראשון) ================= */
 const discoveredCountEl = document.getElementById('discovered-count');
@@ -1237,82 +1213,117 @@ document.getElementById('btn-close-recipe-book').addEventListener('click', () =>
 recipeBookBackdrop.addEventListener('click', (e) => { if (e.target === recipeBookBackdrop) recipeBookBackdrop.style.display = 'none'; });
 recipeBookSearch.addEventListener('input', renderRecipeBook);
 
-/* ================= donate a Gemini key ================= */
-const donateModalBackdrop = document.getElementById('donate-modal-backdrop');
-const donateKeyInput = document.getElementById('donate-key-input');
-const donateKeyStatus = document.getElementById('donate-key-status');
+/* ================= מפתחות API אישיים (כמה שרוצים, נשמרים רק בדפדפן הזה, רוטציה בין הבקשות) ================= */
+const PERSONAL_KEYS_STORAGE = 'jc_personal_keys';
+const PERSONAL_KEYS_ROTATION = 'jc_personal_key_rotation_index';
 
-document.getElementById('btn-donate-key').addEventListener('click', () => {
-  donateKeyInput.value = '';
-  donateKeyStatus.style.display = 'none';
-  donateModalBackdrop.style.display = 'flex';
-  donateKeyInput.focus();
-});
-donateModalBackdrop.addEventListener('click', (e) => { if (e.target === donateModalBackdrop) donateModalBackdrop.style.display = 'none'; });
+function detectKeyProvider(key){ return key.startsWith('gsk_') ? 'groq' : 'gemini'; }
 
-document.getElementById('donate-key-submit').addEventListener('click', async () => {
-  const key = donateKeyInput.value.trim();
-  if (!key) return;
-  const btn = document.getElementById('donate-key-submit');
-  btn.disabled = true; btn.textContent = 'בודק ושומר...';
-  donateKeyStatus.style.display = 'none';
+function getPersonalKeysRaw(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(PERSONAL_KEYS_STORAGE) || '[]');
+    return Array.isArray(raw) ? raw.filter((e) => e && typeof e.key === 'string' && e.key) : [];
+  }catch{ return []; }
+}
+function savePersonalKeysRaw(list){ localStorage.setItem(PERSONAL_KEYS_STORAGE, JSON.stringify(list)); }
 
-  try {
-    const res = await fetch(CONTRIBUTE_KEY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey: key, nickname })
-    });
-    const result = await res.json();
-    if (res.ok && result.success) {
-      donateKeyStatus.style.color = 'var(--accent)';
-      donateKeyStatus.textContent = '🎉 תודה רבה! המפתח נכנס לרוטציה ויעזור לכל השחקנים.';
-      donateKeyInput.value = '';
-    } else {
-      donateKeyStatus.style.color = '#e53e3e';
-      donateKeyStatus.textContent = result.error || 'משהו השתבש, נסו שוב.';
+// מיגרציה חד-פעמית: מי שהיה לו מפתח אישי בודד (הפיצ'ר הישן, נסתר מאחורי Alt+C+O) -
+// מעביר אותו לרשימה החדשה של כמה מפתחות, ואז מוחק את הפורמט הישן.
+(function migrateLegacyPersonalKey(){
+  const legacyKey = (localStorage.getItem('jc_personal_api_key') || '').trim();
+  if (legacyKey) {
+    const legacyProvider = localStorage.getItem('jc_personal_api_provider') || detectKeyProvider(legacyKey);
+    const list = getPersonalKeysRaw();
+    if (!list.some((e) => e.key === legacyKey)) {
+      list.push({ key: legacyKey, provider: legacyProvider === 'groq' ? 'groq' : 'gemini' });
+      savePersonalKeysRaw(list);
     }
-  } catch (err) {
-    donateKeyStatus.style.color = '#e53e3e';
-    donateKeyStatus.textContent = 'שגיאת רשת, נסו שוב.';
-  } finally {
-    donateKeyStatus.style.display = 'block';
-    btn.disabled = false; btn.textContent = 'תרמו מפתח';
   }
-});
+  localStorage.removeItem('jc_personal_api_key');
+  localStorage.removeItem('jc_personal_api_provider');
+})();
 
-/* ================= מפתח API אישי (משמש רק אתכם, לא נכנס לרוטציה המשותפת) ================= */
+function addPersonalKey(key){
+  const trimmed = key.trim();
+  if (!trimmed) return false;
+  const list = getPersonalKeysRaw();
+  if (list.some((e) => e.key === trimmed)) return false;
+  list.push({ key: trimmed, provider: detectKeyProvider(trimmed) });
+  savePersonalKeysRaw(list);
+  return true;
+}
+function removePersonalKey(key){ savePersonalKeysRaw(getPersonalKeysRaw().filter((e) => e.key !== key)); }
+
+// מחזיר את המפתחות של השחקן/ית מסודרים ברוטציה (מתחילים מהמפתח הבא בתור), ומקדם את
+// האינדקס לבקשה הבאה - כך שכל בקשה מתחילה עם מפתח אחר, בלי לגעת בשום דבר בענן.
+function nextPersonalKeysRotationOrder(){
+  const list = getPersonalKeysRaw();
+  if (list.length === 0) return [];
+  let idx = parseInt(localStorage.getItem(PERSONAL_KEYS_ROTATION) || '0', 10);
+  if (!Number.isFinite(idx) || idx < 0) idx = 0;
+  idx = idx % list.length;
+  localStorage.setItem(PERSONAL_KEYS_ROTATION, String((idx + 1) % list.length));
+  return [...list.slice(idx), ...list.slice(0, idx)];
+}
+
+function renderPersonalKeysList(){
+  const container = document.getElementById('personal-keys-list');
+  const list = getPersonalKeysRaw();
+  container.innerHTML = '';
+  if (list.length === 0) {
+    const empty = document.createElement('div');
+    empty.id = 'personal-keys-empty';
+    empty.textContent = 'עוד לא הוספתם אף מפתח - הבקשות שלכם ישתמשו במאגר הבסיסי של האתר.';
+    container.appendChild(empty);
+    return;
+  }
+  list.forEach((entry) => {
+    const row = document.createElement('div');
+    row.className = 'pkey-row';
+    const label = document.createElement('span');
+    label.className = 'pkey-label';
+    const masked = entry.key.length > 8 ? `${entry.key.slice(0, 4)}••••${entry.key.slice(-4)}` : '••••';
+    label.textContent = `${entry.provider === 'groq' ? '⚡ Groq' : '✨ Gemini'} · ${masked}`;
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'pkey-remove';
+    removeBtn.textContent = 'הסירו';
+    removeBtn.addEventListener('click', () => { removePersonalKey(entry.key); renderPersonalKeysList(); });
+    row.appendChild(label);
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+  });
+}
+
 const personalKeyModalBackdrop = document.getElementById('personal-key-modal-backdrop');
 const personalKeyInput = document.getElementById('personal-key-input');
 const personalKeyStatus = document.getElementById('personal-key-status');
 
 function openPersonalKeyModal(){
-  personalKeyInput.value = localStorage.getItem('jc_personal_api_key') || '';
+  personalKeyInput.value = '';
   personalKeyStatus.style.display = 'none';
+  renderPersonalKeysList();
   personalKeyModalBackdrop.style.display = 'flex';
   personalKeyInput.focus();
 }
+document.getElementById('btn-personal-keys').addEventListener('click', openPersonalKeyModal);
 personalKeyModalBackdrop.addEventListener('click', (e) => { if (e.target === personalKeyModalBackdrop) personalKeyModalBackdrop.style.display = 'none'; });
 
 document.getElementById('personal-key-submit').addEventListener('click', () => {
   const key = personalKeyInput.value.trim();
   if (!key){ personalKeyStatus.style.display = 'block'; personalKeyStatus.style.color = '#e53e3e'; personalKeyStatus.textContent = 'הזינו מפתח תחילה.'; return; }
-  const provider = key.startsWith('gsk_') ? 'groq' : 'gemini';
-  localStorage.setItem('jc_personal_api_key', key);
-  localStorage.setItem('jc_personal_api_provider', provider);
+  const added = addPersonalKey(key);
+  personalKeyInput.value = '';
+  renderPersonalKeysList();
   personalKeyStatus.style.display = 'block';
-  personalKeyStatus.style.color = 'var(--accent)';
-  personalKeyStatus.textContent = `✅ נשמר! מעתה הבקשות שלכם ינסו קודם עם המפתח האישי הזה (${provider}).`;
+  if (added) {
+    personalKeyStatus.style.color = 'var(--accent)';
+    personalKeyStatus.textContent = '✅ נוסף! המפתח נשמר רק בדפדפן הזה ויכנס לרוטציה של הבקשות שלכם.';
+  } else {
+    personalKeyStatus.style.color = 'var(--text-dim)';
+    personalKeyStatus.textContent = 'המפתח הזה כבר נמצא ברשימה שלכם.';
+  }
 });
 
-document.getElementById('personal-key-clear').addEventListener('click', () => {
-  localStorage.removeItem('jc_personal_api_key');
-  localStorage.removeItem('jc_personal_api_provider');
-  personalKeyInput.value = '';
-  personalKeyStatus.style.display = 'block';
-  personalKeyStatus.style.color = 'var(--text-dim)';
-  personalKeyStatus.textContent = 'המפתח האישי הוסר. חוזרים למאגר המשותף.';
-});
 
 /* ================= לוח מובילים גלובלי (top discoverers) =================
    מבוסס על נתיב ה-Worker הקיים /discoveries (שכבר משמש את מסך "כל השחקנים") -
