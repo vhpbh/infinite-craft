@@ -192,6 +192,17 @@
   #discovered-modal-list .sidebar-item{ cursor:default; }
   #discovered-modal-empty{ color:var(--text-dim); font-size:13px; text-align:center; padding:20px 0; width:100%; }
 
+  /* ================= reviewer decision popup (human-reviewer result) ================= */
+  #review-result-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:400; display:flex; align-items:center; justify-content:center; }
+  #review-result-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:18px; padding:24px; width:380px; max-width:90vw;
+    box-shadow:0 20px 60px rgba(80,40,150,.25); animation:modal-pop .25s cubic-bezier(.34,1.56,.64,1); text-align:center; }
+  #review-result-title{ margin:0 0 12px; font-size:18px; }
+  #review-result-body{ font-size:14.5px; line-height:1.6; color:var(--text); margin-bottom:18px; }
+  #review-result-close{ background:var(--accent-grad); color:#fff; border:none; padding:9px 22px; border-radius:14px;
+    font-size:13.5px; font-weight:600; cursor:pointer; }
+  #review-result-close:hover{ filter:brightness(1.1); }
+
   /* ================= players directory modal ================= */
   #players-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; }
   #players-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
@@ -459,6 +470,14 @@
     </div>
   </div>
 
+  <div id="review-result-modal-backdrop" style="display:none;">
+    <div id="review-result-modal">
+      <h3 id="review-result-title"></h3>
+      <div id="review-result-body"></div>
+      <button id="review-result-close">הבנתי 🙌</button>
+    </div>
+  </div>
+
   <div id="players-modal-backdrop" style="display:none;">
     <div id="players-modal">
       <div id="players-modal-header">
@@ -617,6 +636,7 @@ const SITE_STATUS_URL = WORKER_URL ? `${WORKER_URL}/site-status` : '';
 const DAILY_POOL_URL = WORKER_URL ? `${WORKER_URL}/daily-pool` : '';
 const CHAT_SEND_URL = WORKER_URL ? `${WORKER_URL}/chat/send` : '';
 const CHAT_MESSAGES_URL = WORKER_URL ? `${WORKER_URL}/chat/messages` : '';
+const REVIEWER_MY_RESULTS_URL = WORKER_URL ? `${WORKER_URL}/reviewer/my-results` : '';
 
 /* ================= STATE ================= */
 let unlockedItems = [];         // {name, emoji, discovered_by}
@@ -720,6 +740,8 @@ async function startGame(){
   updateEmptyHint();
   refreshDiscoveredByMe();
   loadDailyChallenge();
+  pollReviewResults();
+  setInterval(pollReviewResults, 9000);
 }
 
 // פונקציה עצמאית בתוך ה-script
@@ -738,6 +760,68 @@ async function sendToHumanReviewer(itemA, itemB) {
     showToast("שגיאה בשליחה לבוחן אנושי", true);
   }
 }
+
+/* ================= תוצאות בוחן אנושי (פולינג + פופ-אפ) =================
+   מי ששלח שילוב לבוחן אנושי כבר לא מחכה מול המסך - הוא ממשיך לשחק, ואולי אפילו סוגר וחוזר
+   מאוחר יותר. הפולינג הזה בודק כל כמה שניות האם הניהול (הבוחן) כבר החליט משהו על אחת
+   הבקשות ששלחנו, ומציג פופ-אפ ברור: או שהשילוב אושר ויצר אלמנט חדש, או שהוחלט שזה לא
+   יוצר כלום. אם אושר - האלמנט מתווסף גם לרשימת "האלמנטים שגיליתי" וגם לרשימה בצד. */
+let reviewResultQueue = [];
+let reviewResultModalOpen = false;
+
+async function pollReviewResults(){
+  if (!WORKER_URL || !nickname) return;
+  try{
+    const res = await fetch(`${REVIEWER_MY_RESULTS_URL}?nickname=${encodeURIComponent(nickname)}`);
+    const { data } = await res.json();
+    if (data && data.length){
+      reviewResultQueue.push(...data);
+      if (!reviewResultModalOpen) showNextReviewResult();
+    }
+  }catch{ /* לא קריטי אם זה נכשל - ננסה שוב בפולינג הבא */ }
+}
+
+function showNextReviewResult(){
+  if (reviewResultQueue.length === 0){ reviewResultModalOpen = false; return; }
+  reviewResultModalOpen = true;
+  const r = reviewResultQueue.shift();
+
+  const titleEl = document.getElementById('review-result-title');
+  const bodyEl = document.getElementById('review-result-body');
+
+  if (r.failed || !r.resultName){
+    titleEl.textContent = '👀 החלטת הניהול';
+    bodyEl.innerHTML = `הניהול בדקו את השילוב שלכם <b>${r.itemA} + ${r.itemB}</b> והחליטו שזה לא יוצר כלום.`;
+  } else {
+    titleEl.textContent = '✅ הניהול אישרו שילוב!';
+    bodyEl.innerHTML = `הניהול אישרו לכם את השילוב <b>${r.itemA} + ${r.itemB}</b> וזה יצר: <b>${r.resultEmoji || ''} ${r.resultName}</b>`;
+    addApprovedElementToPlayer(r);
+  }
+
+  document.getElementById('review-result-modal-backdrop').style.display = 'flex';
+}
+
+function addApprovedElementToPlayer(r){
+  if (!findItem(r.resultName)){
+    unlockedItems.push({
+      name: r.resultName,
+      emoji: r.resultEmoji || '❓',
+      discovered_by: r.discoveredBy || null,
+      discovered_at: Date.now(),
+    });
+    savePersonalProgress();
+    recentlyDiscovered.add(r.resultName);
+    renderSidebar();
+    setTimeout(() => recentlyDiscovered.delete(r.resultName), 3400);
+  }
+  // מעדכן את מונה "האלמנטים שגיליתי" (גילוי עולמי ראשון) אם רלוונטי
+  setTimeout(refreshDiscoveredByMe, 600);
+}
+
+document.getElementById('review-result-close').addEventListener('click', () => {
+  document.getElementById('review-result-modal-backdrop').style.display = 'none';
+  showNextReviewResult();
+});
 
 /* ================= personal progress (local to this browser only) ================= */
 function loadPersonalProgress(){
