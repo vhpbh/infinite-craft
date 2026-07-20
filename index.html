@@ -193,8 +193,75 @@
   #maintenance-box h2{ margin:0 0 8px; font-size:20px; }
   #maintenance-box p{ margin:0; color:var(--text-dim); font-size:14px; max-width:360px; }
 
+  /* ================= לוח מובילים גלובלי ================= */
+  #leaderboard-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.45); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #leaderboard-modal{ background:var(--sidebar-bg); border-radius:16px; padding:22px; width:400px; max-height:78vh; display:flex; flex-direction:column;
+    box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  #leaderboard-modal-header{ display:flex; justify-content:space-between; align-items:center; }
+  #leaderboard-modal-header h2{ margin:0; font-size:18px; }
+  #leaderboard-modal-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
+  #leaderboard-modal-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 14px; }
+  #leaderboard-list{ overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+  .lb-row{ display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; border:1px solid var(--item-border); background:var(--item-bg); font-size:14px; }
+  .lb-row .rank{ width:26px; text-align:center; font-weight:800; color:var(--text-dim); font-size:13px; }
+  .lb-row.top1{ background:linear-gradient(90deg, rgba(245,158,11,.18), transparent); border-color:#f59e0b; }
+  .lb-row.top1 .rank{ color:#f59e0b; font-size:17px; }
+  .lb-row.top2{ background:linear-gradient(90deg, rgba(148,163,184,.2), transparent); }
+  .lb-row.top3{ background:linear-gradient(90deg, rgba(217,119,6,.15), transparent); }
+  .lb-row .lb-name{ flex:1; font-weight:600; }
+  .lb-row .lb-count{ font-weight:700; color:var(--accent); font-size:13px; }
+  .lb-row.me{ box-shadow:0 0 0 2px var(--accent) inset; }
+  #leaderboard-empty, #leaderboard-loading{ color:var(--text-dim); font-size:13px; text-align:center; padding:24px 0; }
+
+  /* ================= הישגים אישיים ================= */
+  #achievements-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.45); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #achievements-modal{ background:var(--sidebar-bg); border-radius:16px; padding:22px; width:440px; max-height:80vh; display:flex; flex-direction:column;
+    box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  #achievements-modal-header{ display:flex; justify-content:space-between; align-items:center; }
+  #achievements-modal-header h2{ margin:0; font-size:18px; }
+  #achievements-modal-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
+  #achievements-modal-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 14px; }
+  #achievements-grid{ overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:480px){ #achievements-grid{ grid-template-columns:1fr; } }
+  .badge-card{ border:1px solid var(--item-border); border-radius:14px; padding:12px; text-align:center; background:var(--item-bg); opacity:.5; filter:grayscale(.6); transition:transform .15s; }
+  .badge-card.unlocked{ opacity:1; filter:none; border-color:#f59e0b; background:linear-gradient(160deg, var(--accent-soft), transparent); }
+  .badge-card.unlocked:hover{ transform:translateY(-2px); }
+  .badge-card .badge-icon{ font-size:30px; margin-bottom:6px; }
+  .badge-card .badge-title{ font-size:13px; font-weight:700; margin-bottom:3px; }
+  .badge-card .badge-desc{ font-size:11px; color:var(--text-dim); line-height:1.35; }
+  @keyframes badge-pop{ 0%{transform:scale(0) rotate(-15deg);opacity:0;} 60%{transform:scale(1.15) rotate(4deg);} 100%{transform:scale(1) rotate(0);opacity:1;} }
+  .badge-card.just-unlocked{ animation:badge-pop .45s cubic-bezier(.34,1.56,.64,1); }
+  .toast.badge-toast{ border-color:#f59e0b; background:linear-gradient(135deg, var(--accent-soft), rgba(245,158,11,.18)); }
+
+  /* ================= אתגר יומי ================= */
+  #daily-challenge-btn{ position:absolute; top:64px; left:16px; z-index:20; background:var(--toolbar-btn);
+    border:1px solid var(--border); border-radius:20px; padding:7px 14px 7px 10px; display:flex; align-items:center; gap:7px;
+    box-shadow:var(--item-shadow); cursor:pointer; font-size:12.5px; font-weight:600; transition:transform .12s; }
+  #daily-challenge-btn:hover{ transform:translateY(-1px); }
+  #daily-challenge-btn .dc-icon{ font-size:16px; }
+  #daily-challenge-btn.done{ border-color:#f59e0b; background:linear-gradient(90deg, rgba(245,158,11,.15), var(--toolbar-btn)); }
+  #daily-challenge-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.45); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #daily-challenge-modal{ background:var(--sidebar-bg); border-radius:16px; padding:26px; width:340px; text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  #daily-challenge-modal .dc-big{ font-size:46px; margin-bottom:10px; }
+  #daily-challenge-modal h2{ margin:0 0 6px; font-size:18px; }
+  #daily-challenge-modal p{ margin:0 0 14px; font-size:13px; color:var(--text-dim); line-height:1.5; }
+  #daily-challenge-modal .dc-hint{ font-size:22px; font-weight:800; letter-spacing:4px; margin-bottom:12px; color:var(--accent); }
+  #dc-share-btn{ width:100%; padding:10px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-weight:600; font-family:inherit; font-size:14px; cursor:pointer; margin-top:6px; }
+  #dc-close-btn{ width:100%; padding:9px; border:1px solid var(--border); background:transparent; color:var(--text-dim); border-radius:10px; font-family:inherit; font-size:13px; cursor:pointer; margin-top:8px; }
+
+  /* ================= כרטיס שיתוף (canvas) ================= */
+  #share-card-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); z-index:320; display:flex; align-items:center; justify-content:center; }
+  #share-card-box{ background:var(--sidebar-bg); border:1px solid var(--item-border); border-radius:16px; padding:18px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.3); }
+  #share-card-canvas{ width:280px; max-width:80vw; height:auto; border-radius:14px; box-shadow:0 6px 24px rgba(0,0,0,.25); display:block; margin:0 auto 12px; }
+  #share-card-actions{ display:flex; gap:8px; }
+  #share-card-actions button{ flex:1; padding:9px; border:none; border-radius:10px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+  #share-card-download{ background:var(--accent); color:#fff; }
+  #share-card-close{ background:transparent; border:1px solid var(--border) !important; color:var(--text-dim); }
+
   @media (max-width:720px){ body{ flex-direction:column-reverse; } #sidebar{ width:100% !important; height:42%; border-left:none; border-top:1px solid var(--border); } #sidebar-resizer{ display:none; } #play-area{ height:58%; }
-    #quota-gauge{ width:96px; padding:8px 10px 6px; } #quota-gauge svg{ width:80px; height:48px; } #discovered-banner{ font-size:12px; padding:8px 12px; } }
+    #quota-gauge{ width:96px; padding:8px 10px 6px; } #quota-gauge svg{ width:80px; height:48px; } #discovered-banner{ font-size:12px; padding:8px 12px; }
+    #daily-challenge-btn{ padding:6px 10px 6px 8px; font-size:11.5px; } #daily-challenge-btn .dc-label{ display:none; } }
 </style>
 </head>
 <body>
@@ -204,8 +271,13 @@
       <button class="tool-btn" id="btn-dark" title="מצב כהה">🌙</button>
       <button class="tool-btn" id="btn-recipe-book" title="ספר המתכונים שלי">📖</button>
       <button class="tool-btn" id="btn-players" title="כל השחקנים והאלמנטים שגילו">👥</button>
+      <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי">🏅</button>
+      <button class="tool-btn" id="btn-achievements" title="ההישגים שלי">🎖️</button>
       <button class="tool-btn" id="btn-donate-key" title="תרמו מפתח API כדי לעזור למשחק">🔑</button>
       <button class="tool-btn" id="btn-clear" title="נקה לוח">🗑️</button>
+    </div>
+    <div id="daily-challenge-btn" title="האתגר היומי">
+      <span class="dc-icon">🎯</span><span class="dc-label" id="dc-label">אתגר יומי</span>
     </div>
     <div id="nick-badge" title="לחצו להחלפת כינוי">👤 <span id="nick-label"></span></div>
     <div id="toast-wrap"></div>
@@ -291,6 +363,49 @@
     </div>
   </div>
 
+  <div id="leaderboard-modal-backdrop" style="display:none;">
+    <div id="leaderboard-modal">
+      <div id="leaderboard-modal-header">
+        <h2>🏅 לוח המובילים</h2>
+        <button id="btn-close-leaderboard">✕</button>
+      </div>
+      <div id="leaderboard-modal-sub">השחקנים שגילו הכי הרבה אלמנטים בעולם</div>
+      <div id="leaderboard-list"></div>
+    </div>
+  </div>
+
+  <div id="achievements-modal-backdrop" style="display:none;">
+    <div id="achievements-modal">
+      <div id="achievements-modal-header">
+        <h2>🎖️ ההישגים שלי</h2>
+        <button id="btn-close-achievements">✕</button>
+      </div>
+      <div id="achievements-modal-sub">תגים שנפתחים ככל שמתקדמים במשחק, בדפדפן הזה</div>
+      <div id="achievements-grid"></div>
+    </div>
+  </div>
+
+  <div id="daily-challenge-modal-backdrop" style="display:none;">
+    <div id="daily-challenge-modal">
+      <div class="dc-big" id="dc-modal-emoji">🎯</div>
+      <h2 id="dc-modal-title">האתגר היומי</h2>
+      <p id="dc-modal-desc">גלו את היצור המסתורי של היום על ידי שילוב אלמנטים - ננסה לרמוז לכם.</p>
+      <div class="dc-hint" id="dc-modal-hint"></div>
+      <button id="dc-share-btn" style="display:none;">שתפו את ההצלחה 🎉</button>
+      <button id="dc-close-btn">סגירה</button>
+    </div>
+  </div>
+
+  <div id="share-card-backdrop" style="display:none;">
+    <div id="share-card-box">
+      <canvas id="share-card-canvas" width="600" height="750"></canvas>
+      <div id="share-card-actions">
+        <button id="share-card-download">📥 שמירת תמונה</button>
+        <button id="share-card-close">סגירה</button>
+      </div>
+    </div>
+  </div>
+
   <div id="ad-overlay-backdrop">
     <div id="ad-overlay">
       <button id="ad-overlay-close" title="סגירה">✕</button>
@@ -349,6 +464,7 @@ const MY_ELEMENTS_URL = WORKER_URL ? `${WORKER_URL}/my-elements` : '';
 const QUOTA_GAUGE_URL = WORKER_URL ? `${WORKER_URL}/quota-gauge` : '';
 const BROADCAST_AD_URL = WORKER_URL ? `${WORKER_URL}/broadcast-ad` : '';
 const SITE_STATUS_URL = WORKER_URL ? `${WORKER_URL}/site-status` : '';
+const DAILY_POOL_URL = WORKER_URL ? `${WORKER_URL}/daily-pool` : '';
 
 /* ================= STATE ================= */
 let unlockedItems = [];         // {name, emoji, discovered_by}
@@ -451,6 +567,7 @@ async function startGame(){
   loadPersonalProgress();
   updateEmptyHint();
   refreshDiscoveredByMe();
+  loadDailyChallenge();
 }
 
 /* ================= personal progress (local to this browser only) ================= */
@@ -772,6 +889,7 @@ function handleCombineFailed(div1, div2, name1, name2){
   div1.classList.add('shake'); div2.classList.add('shake');
   showToast(`🚫 אין שילוב הגיוני בין ${name1} ל-${name2}`, false);
   setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
+  comboStreak = 0;
 }
 
 function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
@@ -807,6 +925,19 @@ function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
   }
 
   recordMyRecipe(name1, name2, result.name, result.emoji);
+
+  comboStreak++;
+  if (comboStreak > bestStreak){
+    bestStreak = comboStreak;
+    localStorage.setItem(STREAK_KEY, String(bestStreak));
+  }
+  checkBadges();
+
+  if (markDailyComplete(result.name)){
+    setTimeout(() => {
+      showToast(`🎯 השלמתם את האתגר היומי: ${result.name}!`, true, nickname, 'שתפו 🎉', () => openShareCard(dailyTarget));
+    }, 500);
+  }
 }
 
 function spawnSparks(x, y){
@@ -890,6 +1021,8 @@ async function refreshDiscoveredByMe(){
     const res = await fetch(`${MY_ELEMENTS_URL}?nickname=${encodeURIComponent(nickname)}`);
     const { data } = await res.json();
     discoveredCountEl.textContent = String((data || []).length);
+    myWorldFirstCount = (data || []).length;
+    checkBadges();
     return data || [];
   }catch{ return []; }
 }
@@ -1058,8 +1191,6 @@ async function checkMaintenance(){
 checkMaintenance();
 setInterval(checkMaintenance, 15000);
 
-boot();
-
 /* ================= ספר המתכונים שלי ================= */
 const MY_RECIPES_KEY = 'jc_my_recipes';
 const recipeBookBackdrop = document.getElementById('recipe-book-backdrop');
@@ -1182,6 +1313,256 @@ document.getElementById('personal-key-clear').addEventListener('click', () => {
   personalKeyStatus.style.color = 'var(--text-dim)';
   personalKeyStatus.textContent = 'המפתח האישי הוסר. חוזרים למאגר המשותף.';
 });
+
+/* ================= לוח מובילים גלובלי (top discoverers) =================
+   מבוסס על נתיב ה-Worker הקיים /discoveries (שכבר משמש את מסך "כל השחקנים") -
+   אין צורך בנתיב חדש, רק אגרגציה בצד הלקוח כי D1/Worker לא מחזיר GROUP BY מוכן. */
+const leaderboardBackdrop = document.getElementById('leaderboard-modal-backdrop');
+const leaderboardList = document.getElementById('leaderboard-list');
+
+async function loadLeaderboard(){
+  leaderboardList.innerHTML = `<div id="leaderboard-loading">טוען...</div>`;
+  if (!WORKER_URL){ leaderboardList.innerHTML = `<div id="leaderboard-empty">אין חיבור לשרת.</div>`; return; }
+  try{
+    const res = await fetch(DISCOVERIES_URL);
+    const { data } = await res.json();
+    const counts = new Map();
+    (data || []).forEach(row => {
+      if (!row.discovered_by) return;
+      counts.set(row.discovered_by, (counts.get(row.discovered_by) || 0) + 1);
+    });
+    const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20);
+    leaderboardList.innerHTML = '';
+    if (ranked.length === 0){
+      leaderboardList.innerHTML = `<div id="leaderboard-empty">עדיין אין גילויים מדורגים - היו הראשונים בעולם!</div>`;
+      return;
+    }
+    ranked.forEach(([name, count], i) => {
+      const row = document.createElement('div');
+      const rankClass = i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '';
+      row.className = 'lb-row' + rankClass + (name === nickname ? ' me' : '');
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
+      row.innerHTML = `<span class="rank">${medal}</span><span class="lb-name">${escapeHtml(name)}${name === nickname ? ' (אני)' : ''}</span><span class="lb-count">${count} 🧩</span>`;
+      leaderboardList.appendChild(row);
+    });
+  }catch{
+    leaderboardList.innerHTML = `<div id="leaderboard-empty">לא הצלחנו לטעון את הלוח, נסו שוב.</div>`;
+  }
+}
+document.getElementById('btn-leaderboard').addEventListener('click', () => {
+  leaderboardBackdrop.style.display = 'flex';
+  loadLeaderboard();
+});
+document.getElementById('btn-close-leaderboard').addEventListener('click', () => { leaderboardBackdrop.style.display = 'none'; });
+leaderboardBackdrop.addEventListener('click', (e) => { if (e.target === leaderboardBackdrop) leaderboardBackdrop.style.display = 'none'; });
+
+/* ================= הישגים אישיים (localStorage בלבד, בלי צורך בטבלה חדשה) ================= */
+const BADGES_KEY = 'jc_unlocked_badges';
+const STREAK_KEY = 'jc_best_streak';
+let comboStreak = 0;
+let bestStreak = parseInt(localStorage.getItem(STREAK_KEY) || '0', 10);
+let myWorldFirstCount = 0;
+
+const BADGE_DEFS = [
+  { id: 'first-combo',   icon: '🧪', title: 'צעד ראשון',      desc: 'שילבתם אלמנט אחד בפעם הראשונה',        check: s => s.recipes >= 1 },
+  { id: 'collector-10',  icon: '🎒', title: 'אספן מתחיל',     desc: 'פתחתם 10 אלמנטים',                     check: s => s.elements >= 10 },
+  { id: 'collector-50',  icon: '📦', title: 'אספן מנוסה',     desc: 'פתחתם 50 אלמנטים',                     check: s => s.elements >= 50 },
+  { id: 'collector-100', icon: '🏰', title: 'אלוף האיסוף',    desc: 'פתחתם 100 אלמנטים',                    check: s => s.elements >= 100 },
+  { id: 'explorer-30',   icon: '🧭', title: 'חוקר',           desc: 'גיליתם 30 שילובים שונים',              check: s => s.recipes >= 30 },
+  { id: 'explorer-100',  icon: '🗺️', title: 'חוקר ראשי',      desc: 'גיליתם 100 שילובים שונים',             check: s => s.recipes >= 100 },
+  { id: 'pioneer-1',     icon: '🌟', title: 'חלוץ',           desc: 'הייתם ראשונים בעולם לגלות אלמנט',      check: s => s.worldFirst >= 1 },
+  { id: 'pioneer-10',    icon: '🚀', title: 'חלוץ מוביל',     desc: 'הייתם ראשונים בעולם ב-10 אלמנטים',     check: s => s.worldFirst >= 10 },
+  { id: 'streak-5',      icon: '🔥', title: 'על גלגלים',      desc: 'הצלחתם ב-5 שילובים ברצף',              check: s => s.bestStreak >= 5 },
+  { id: 'streak-15',     icon: '⚡', title: 'בלתי עצור',      desc: 'הצלחתם ב-15 שילובים ברצף',             check: s => s.bestStreak >= 15 },
+];
+
+function getUnlockedBadges(){
+  try{ return new Set(JSON.parse(localStorage.getItem(BADGES_KEY) || '[]')); }catch{ return new Set(); }
+}
+function saveUnlockedBadges(set){ localStorage.setItem(BADGES_KEY, JSON.stringify([...set])); }
+
+function currentStats(){
+  return { elements: unlockedItems.length, recipes: getMyRecipes().length, worldFirst: myWorldFirstCount, bestStreak };
+}
+
+function checkBadges(){
+  const stats = currentStats();
+  const unlocked = getUnlockedBadges();
+  const newlyUnlocked = BADGE_DEFS.filter(b => !unlocked.has(b.id) && b.check(stats));
+  if (newlyUnlocked.length === 0) return;
+  newlyUnlocked.forEach(b => unlocked.add(b.id));
+  saveUnlockedBadges(unlocked);
+  newlyUnlocked.forEach((b, i) => setTimeout(() => celebrateBadge(b), i * 900));
+}
+
+function celebrateBadge(b){
+  const t = document.createElement('div');
+  t.className = 'toast badge-toast';
+  t.innerHTML = `<span>${b.icon} תג חדש נפתח: ${b.title}!</span>`;
+  toastWrap.appendChild(t);
+  setTimeout(() => t.remove(), 3600);
+}
+
+function renderAchievements(){
+  const unlocked = getUnlockedBadges();
+  const grid = document.getElementById('achievements-grid');
+  grid.innerHTML = '';
+  BADGE_DEFS.forEach(b => {
+    const card = document.createElement('div');
+    card.className = 'badge-card' + (unlocked.has(b.id) ? ' unlocked' : '');
+    card.innerHTML = `<div class="badge-icon">${b.icon}</div><div class="badge-title">${b.title}</div><div class="badge-desc">${b.desc}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('btn-achievements').addEventListener('click', () => {
+  document.getElementById('achievements-modal-backdrop').style.display = 'flex';
+  renderAchievements();
+});
+document.getElementById('btn-close-achievements').addEventListener('click', () => { document.getElementById('achievements-modal-backdrop').style.display = 'none'; });
+document.getElementById('achievements-modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'achievements-modal-backdrop') e.target.style.display = 'none'; });
+
+/* ================= אתגר יומי =================
+   האלמנט של היום נבחר דטרמיניסטית (hash של תאריך) מתוך אלמנטים ציבוריים שכבר קיימים במשחק,
+   דרך נתיב ה-Worker /daily-pool (מקביל ל-D1 של: SELECT name, emoji FROM elements ORDER BY created_at LIMIT 300) -
+   כך שכל השחקנים רואים את אותו אתגר באותו יום, בלי שום צורך בטבלה/עמודה חדשה. */
+const DAILY_KEY_PREFIX = 'jc_daily_';
+function todayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function hashString(str){
+  let h = 0;
+  for (let i = 0; i < str.length; i++){ h = (h * 31 + str.charCodeAt(i)) >>> 0; }
+  return h;
+}
+
+let dailyTarget = null; // { name, emoji }
+let dailyCompleted = false;
+
+async function loadDailyChallenge(){
+  const dateKey = todayKey();
+  dailyCompleted = localStorage.getItem(DAILY_KEY_PREFIX + dateKey) === '1';
+  if (!WORKER_URL) return;
+  try{
+    const res = await fetch(DAILY_POOL_URL);
+    const { data } = await res.json();
+    const pool = (data || []).filter(e => !STARTING_ITEMS.some(s => s.name === e.name));
+    if (pool.length === 0) return;
+    dailyTarget = pool[hashString(dateKey) % pool.length];
+    updateDailyChallengeUI();
+  }catch{ /* לא קריטי - הכפתור פשוט יישאר לא פעיל */ }
+}
+
+function updateDailyChallengeUI(){
+  if (!dailyTarget) return;
+  document.getElementById('daily-challenge-btn').classList.toggle('done', dailyCompleted);
+  document.getElementById('dc-label').textContent = dailyCompleted ? 'אתגר הושלם!' : 'אתגר יומי';
+}
+
+function openDailyChallengeModal(){
+  const modal = document.getElementById('daily-challenge-modal-backdrop');
+  const emojiEl = document.getElementById('dc-modal-emoji');
+  const titleEl = document.getElementById('dc-modal-title');
+  const descEl = document.getElementById('dc-modal-desc');
+  const hintEl = document.getElementById('dc-modal-hint');
+  const shareBtn = document.getElementById('dc-share-btn');
+  if (!dailyTarget){
+    emojiEl.textContent = '🎯'; titleEl.textContent = 'האתגר היומי'; descEl.textContent = 'טוענים את אתגר היום...'; hintEl.textContent = '';
+    shareBtn.style.display = 'none';
+    modal.style.display = 'flex';
+    return;
+  }
+  if (dailyCompleted){
+    emojiEl.textContent = dailyTarget.emoji;
+    titleEl.textContent = 'השלמתם את האתגר היומי!';
+    descEl.textContent = `גיליתם בהצלחה את "${dailyTarget.name}" היום. חזרו מחר לאתגר חדש.`;
+    hintEl.textContent = dailyTarget.name;
+    shareBtn.style.display = 'block';
+  } else {
+    emojiEl.textContent = '❓';
+    titleEl.textContent = 'האתגר היומי';
+    descEl.textContent = `גלו את היצור המסתורי של היום על ידי שילוב אלמנטים בלוח. רמז: השם מתחיל באות "${dailyTarget.name[0]}" ומכיל ${dailyTarget.name.length} תווים.`;
+    hintEl.textContent = dailyTarget.name[0] + ' ' + '_ '.repeat(Math.max(0, dailyTarget.name.length - 1));
+    shareBtn.style.display = 'none';
+  }
+  modal.style.display = 'flex';
+}
+
+document.getElementById('daily-challenge-btn').addEventListener('click', openDailyChallengeModal);
+document.getElementById('dc-close-btn').addEventListener('click', () => { document.getElementById('daily-challenge-modal-backdrop').style.display = 'none'; });
+document.getElementById('daily-challenge-modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'daily-challenge-modal-backdrop') e.target.style.display = 'none'; });
+document.getElementById('dc-share-btn').addEventListener('click', () => {
+  document.getElementById('daily-challenge-modal-backdrop').style.display = 'none';
+  openShareCard(dailyTarget);
+});
+
+function markDailyComplete(resultName){
+  if (!dailyTarget || dailyCompleted) return false;
+  if (resultName !== dailyTarget.name) return false;
+  dailyCompleted = true;
+  localStorage.setItem(DAILY_KEY_PREFIX + todayKey(), '1');
+  updateDailyChallengeUI();
+  return true;
+}
+
+/* ================= כרטיס שיתוף (canvas, בלי שום שרת) ================= */
+function openShareCard(target){
+  if (!target) return;
+  const backdrop = document.getElementById('share-card-backdrop');
+  const canvas = document.getElementById('share-card-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#8b5cf6');
+  grad.addColorStop(.55, '#d946ef');
+  grad.addColorStop(1, '#ec4899');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalAlpha = .15;
+  ctx.fillStyle = '#fff';
+  [[100, 120, 90], [520, 180, 60], [480, 620, 110], [90, 650, 70]].forEach(([x, y, r]) => {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#fff';
+  ctx.font = '600 24px Rubik, sans-serif';
+  ctx.fillText('האתגר היומי הושלם! 🎉', W / 2, 110);
+
+  ctx.font = '160px sans-serif';
+  ctx.fillText(target.emoji, W / 2, 340);
+
+  ctx.font = '700 40px Rubik, sans-serif';
+  ctx.fillText(target.name, W / 2, 430);
+
+  ctx.font = '400 18px Rubik, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.85)';
+  ctx.fillText(`גיליתי ע"י ${nickname || 'שחקן אלמוני'}`, W / 2, 480);
+
+  ctx.font = '600 20px Rubik, sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('✨ יצירה אינסופית', W / 2, H - 60);
+
+  backdrop.style.display = 'flex';
+}
+document.getElementById('share-card-close').addEventListener('click', () => { document.getElementById('share-card-backdrop').style.display = 'none'; });
+document.getElementById('share-card-backdrop').addEventListener('click', (e) => { if (e.target.id === 'share-card-backdrop') e.target.style.display = 'none'; });
+document.getElementById('share-card-download').addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'האתגר-היומי.png';
+  link.href = document.getElementById('share-card-canvas').toDataURL('image/png');
+  link.click();
+});
+
+/* boot() מופעל כאן בסוף הקובץ בכוונה (לא בסמוך להגדרה שלו למעלה) - הוא מפעיל את startGame(),
+   שקוראת (בין השאר) ל-loadDailyChallenge()/checkBadges() שמשתמשות במשתנים (כמו DAILY_KEY_PREFIX,
+   BADGE_DEFS) שמוצהרים רק בהמשך הקובץ; חייבים לוודא שכל ה-const/let הרלוונטיים כבר "רצו" לפני
+   שקוראים ל-boot(). */
+boot();
 
 </script>
 </body>
