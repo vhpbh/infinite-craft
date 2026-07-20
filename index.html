@@ -297,7 +297,8 @@
   .lb-row.top1 .rank{ color:var(--gold); font-size:17px; }
   .lb-row.top2{ background:linear-gradient(90deg, rgba(148,163,184,.2), transparent); }
   .lb-row.top3{ background:linear-gradient(90deg, rgba(217,119,6,.15), transparent); }
-  .lb-row .lb-name{ flex:1; font-weight:600; }
+  .lb-row .lb-name{ flex:1; font-weight:600; cursor:pointer; }
+  .lb-row .lb-name:hover{ text-decoration:underline; color:var(--accent); }
   .lb-row .lb-count{ font-weight:700; color:var(--accent); font-size:13px; }
   .lb-row.me{ box-shadow:0 0 0 2px var(--accent) inset; }
   #leaderboard-empty, #leaderboard-loading{ color:var(--text-dim); font-size:13px; text-align:center; padding:24px 0; }
@@ -551,7 +552,10 @@
 
   <div id="personal-key-modal-backdrop" style="display:none;">
     <div id="nick-modal" style="width:360px;">
-      <div class="big">🗝️</div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="big">🗝️</div>
+        <button id="btn-close-personal-keys" title="סגירה" style="width:auto; padding:2px 4px; border:none; background:none; color:var(--text-dim); font-size:18px; cursor:pointer; box-shadow:none; transform:none;">✕</button>
+      </div>
       <h2>מפתחות API אישיים</h2>
       <p style="text-align:right;">אפשר להזין כאן כמה מפתחות שרוצים - הם נשמרים <b>רק בדפדפן הזה</b> ולעולם לא נשלחים
       לשום מקום חוץ מלצד השילובים שאתם עצמכם מבקשים (לא נשמרים בענן/שרת). כשיש כמה מפתחות, המשחק מסתובב
@@ -1739,7 +1743,11 @@ function openPersonalKeyModal(){
   personalKeyInput.focus();
 }
 document.getElementById('btn-personal-keys').addEventListener('click', openPersonalKeyModal);
+document.getElementById('btn-close-personal-keys').addEventListener('click', () => { personalKeyModalBackdrop.style.display = 'none'; });
 personalKeyModalBackdrop.addEventListener('click', (e) => { if (e.target === personalKeyModalBackdrop) personalKeyModalBackdrop.style.display = 'none'; });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && personalKeyModalBackdrop.style.display === 'flex') personalKeyModalBackdrop.style.display = 'none';
+});
 
 document.getElementById('personal-key-submit').addEventListener('click', () => {
   const key = personalKeyInput.value.trim();
@@ -1786,13 +1794,26 @@ async function loadLeaderboard(){
       const rankClass = i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '';
       row.className = 'lb-row' + rankClass + (name === nickname ? ' me' : '');
       const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
-      row.innerHTML = `<span class="rank">${medal}</span><span class="lb-name">${escapeHtml(name)}${name === nickname ? ' (אני)' : ''}</span><span class="lb-count">${count} 🧩</span>`;
+      row.innerHTML = `<span class="rank">${medal}</span><span class="lb-name" title="לצפייה באלמנטים שגילה/תה">${escapeHtml(name)}${name === nickname ? ' (אני)' : ''}</span><span class="lb-count">${count} 🧩</span>`;
+      row.querySelector('.lb-name').addEventListener('click', () => openPlayerFromLeaderboard(name));
       leaderboardList.appendChild(row);
     });
   }catch{
     leaderboardList.innerHTML = `<div id="leaderboard-empty">לא הצלחנו לטעון את הלוח, נסו שוב.</div>`;
   }
 }
+// לחיצה על שם בלוח המובילים - קפיצה ישירה למסך "כל השחקנים", מסונן כבר לשחקן/ית הזה/ו בלבד.
+async function openPlayerFromLeaderboard(name){
+  leaderboardBackdrop.style.display = 'none';
+  playersModalBackdrop.style.display = 'flex';
+  if (!discoveriesLoaded){
+    playersList.innerHTML = `<div id="players-empty">טוען...</div>`;
+    await loadDiscoveries();
+  }
+  playersSearch.value = name;
+  renderPlayersList();
+}
+
 document.getElementById('btn-leaderboard').addEventListener('click', () => {
   leaderboardBackdrop.style.display = 'flex';
   loadLeaderboard();
