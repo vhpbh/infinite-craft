@@ -412,6 +412,12 @@
         <button class="sort-pill" data-sort="alpha" title="מיין לפי א-ב">🔤 א-ב</button>
       </div>
       <div id="meta-row"><span id="count-label">0 אלמנטים</span><button id="btn-reset">איפוס התקדמות</button></div>
+<div style="margin: 12px 0 4px 0; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); font-size: 13px; display: flex; justify-content: center; align-items: center;">
+  <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: #555; user-select: none;">
+    <input type="checkbox" id="always-human-review" style="cursor: pointer; width: 15px; height: 15px;">
+    <span>שלח שילובים תמיד לבוחן אנושי 👥</span>
+  </label>
+</div>
     </div>
     <div id="items-list"></div>
   </div>
@@ -438,6 +444,9 @@
       <div id="nick-status" style="font-size:12.5px; margin-top:10px; display:none; color:#e53e3e;"></div>
     </div>
   </div>
+
+<!-- תוספת בתוך ה-Sidebar או הלוח לבחירת מצב בוחן אנושי תמידי -->
+
 
   <div id="discovered-modal-backdrop" style="display:none;">
     <div id="discovered-modal">
@@ -711,6 +720,23 @@ async function startGame(){
   updateEmptyHint();
   refreshDiscoveredByMe();
   loadDailyChallenge();
+}
+
+// פונקציה עצמאית בתוך ה-script
+async function sendToHumanReviewer(itemA, itemB) {
+  try {
+    const res = await fetch(`${WORKER_URL}/reviewer/submit-request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ itemA, itemB, nickname }) // ודא שמשתנה nickname קיים גלובלית אצלך
+    });
+    const data = await res.json();
+    if(data.success) {
+      showToast("הבקשה נשלחה לבוחן אנושי! התוצאה תעודכן במאגר בקרוב.", false);
+    }
+  } catch(e) {
+    showToast("שגיאה בשליחה לבוחן אנושי", true);
+  }
 }
 
 /* ================= personal progress (local to this browser only) ================= */
@@ -1008,6 +1034,13 @@ async function combineItems(div1, div2){
   const x = (parseFloat(div1.style.left) + parseFloat(div2.style.left)) / 2;
   const y = (parseFloat(div1.style.top) + parseFloat(div2.style.top)) / 2;
 
+  // 1️⃣ חלק בראשון: בדיקה אם לסגת מיד לבוחן אנושי (לפני כל בדיקה אחרת)
+  if (document.getElementById('always-human-review')?.checked) {
+    div1.classList.remove('loading'); div2.classList.remove('loading');
+    await sendToHumanReviewer(name1, name2); // שינוי שם ל-name1, name2
+    return; 
+  }
+
   // שכבה 1: קובץ סטטי מקומי - אם השילוב הזה כבר מוכר משם, פותרים אותו מיד בלי שום קריאת רשת.
   await staticGameDataReady;
   const staticHit = staticGameData.recipes[comboKeyOf(name1, name2)];
@@ -1022,7 +1055,7 @@ async function combineItems(div1, div2){
       name: staticHit.result,
       emoji: (staticElement && staticElement.emoji) || '❔',
       discoveredBy: staticHit.discoveredBy || (staticElement && staticElement.discoveredBy) || null,
-      isNew: false, // אם זה מופיע בקובץ הסטטי, מעצם ההגדרה זה כבר לא גילוי חדש בעולם
+      isNew: false, 
     };
     handleCombineSuccess(result, div1, div2, name1, name2, x, y);
     return;
@@ -1031,6 +1064,15 @@ async function combineItems(div1, div2){
   // שכבה 2+3: אין תשובה בקובץ - פונים ל-Edge Function, שבודקת קודם את מסד הנתונים ואז את ה-AI.
   try{
     const result = await fetchCombineResult(name1, name2);
+
+    // 2️⃣ חלק שני (א'): טיפול במקרה שה-API הניב תשובת חריגת מכסה תקינה ב-JSON
+    if (result.quotaExceeded) {
+      div1.classList.remove('loading'); div2.classList.remove('loading');
+      showToastWithAction("המפתחות הגיעו למכסה. לשלוח לבוחן אנושי?", () => {
+        sendToHumanReviewer(name1, name2);
+      }, "שליחה לבוחן");
+      return;
+    }
 
     if (result.failed) {
       div1.classList.remove('loading'); div2.classList.remove('loading');
@@ -1046,9 +1088,11 @@ async function combineItems(div1, div2){
     console.error(err);
     div1.classList.remove('loading'); div2.classList.remove('loading');
     div1.classList.add('shake'); div2.classList.add('shake');
+    
+    // 2️⃣ חלק שני (ב'): שילוב הכפתור של הבוחן האנושי בתוך ה-Toast של שגיאת ה-Catch
     if (isQuotaIssue) {
-      showToast('⚡ אין מספיק טוקנים לשליחת הבקשה כרגע, אפשר להוסיף מפתח API אישי משלכם', false, null, 'הוסיפו מפתח 🗝️', () => {
-        document.getElementById('btn-personal-keys').click();
+      showToast('⚡ אין מספיק טוקנים. לשלוח לשיפוט אנושי?', false, null, 'שלח לבוחן 👥', () => {
+        sendToHumanReviewer(name1, name2);
       });
     } else {
       showToast('⚡ משהו השתבש בבקשה, נסו שוב', false);
@@ -1056,7 +1100,6 @@ async function combineItems(div1, div2){
     setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
   }
 }
-
 function handleCombineFailed(div1, div2, name1, name2){
   div1.classList.add('shake'); div2.classList.add('shake');
   showToast(`🚫 אין שילוב הגיוני בין ${name1} ל-${name2}`, false);
