@@ -434,7 +434,7 @@
 /* עברנו מ-Supabase ל-Cloudflare Worker + D1. צריך רק כתובת אחת - ה-URL של ה-Worker
    שקיבלתם אחרי הפריסה (למשל https://yetzira-yehudit.YOUR-SUBDOMAIN.workers.dev).
    אפשר גם לעדכן דרך admin.html (נשמר ב-localStorage ומקבל עדיפות, לנוחות בזמן פיתוח). */
-const HARDCODED_WORKER_URL = 'https://yetzira-yehudit.arieldavid613.workers.dev';
+const HARDCODED_WORKER_URL = 'https://infinite-craft.arieldavid613.workers.dev';
 
 const CFG = JSON.parse(localStorage.getItem('jc_config') || '{}');
 const WORKER_URL = (CFG.workerUrl || HARDCODED_WORKER_URL).replace(/\/$/, '');
