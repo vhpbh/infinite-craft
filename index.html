@@ -334,6 +334,75 @@
   #achievements-modal-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 14px; }
   #achievements-grid{ overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   @media (max-width:480px){ #achievements-grid{ grid-template-columns:1fr; } }
+  /* ================= סחר חליפין + חבר מביא חבר ================= */
+  #trade-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #trade-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:20px; padding:26px; width:600px; max-width:94vw; max-height:90vh; display:flex; flex-direction:column; gap:18px;
+    box-shadow:0 20px 60px rgba(80,40,150,.25); animation:modal-pop .25s cubic-bezier(.34,1.56,.64,1); overflow-y:auto; }
+  #trade-modal-header{ display:flex; justify-content:space-between; align-items:center; padding-bottom:4px; border-bottom:1px solid var(--item-border); }
+  #trade-modal-header h2{ margin:0; font-size:21px; display:flex; align-items:center; gap:8px; }
+  #trade-modal-header button{ border:none; background:none; font-size:19px; cursor:pointer; color:var(--text-dim); }
+
+  /* כרטיס "חבר מביא חבר" - גלוי תמיד ובולט, לא רק מאחורי סימן שאלה */
+  #trade-referral-card{ background:var(--accent-soft); border:1.5px solid var(--accent); border-radius:14px; padding:14px 16px;
+    font-size:13px; line-height:1.6; color:var(--text); box-shadow:0 4px 16px rgba(139,92,246,.14); }
+  #trade-referral-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  #trade-referral-title{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:6px; }
+  #trade-referral-stat{ font-size:12.5px; font-weight:600; color:var(--accent); background:var(--item-bg); border-radius:10px; padding:3px 10px; white-space:nowrap; }
+  #trade-referral-tagline{ margin-top:6px; font-weight:500; }
+  #trade-referral-details-toggle{ border:none; background:none; color:var(--accent); font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit; padding:0; white-space:nowrap; }
+  #trade-referral-details{ display:none; margin-top:8px; padding-top:8px; border-top:1px dashed var(--item-border); }
+  #trade-referral-details.open{ display:block; }
+  #trade-referral-details ul{ margin:0; padding-inline-start:18px; }
+  #trade-referral-link-row{ display:flex; gap:6px; margin-top:10px; }
+  #trade-referral-link-row input{ flex:1; min-width:0; padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit; font-size:12.5px; }
+  #trade-referral-link-row button{ background:var(--accent-grad); color:#fff; border:none; border-radius:10px; padding:8px 14px; font-size:12.5px; font-weight:700; cursor:pointer; white-space:nowrap; }
+
+  /* מתי אפשר להעלות הצעה חדשה - חיווי בולט וברור */
+  #trade-availability{ display:flex; align-items:center; justify-content:center; gap:8px; text-align:center; padding:12px 14px;
+    border-radius:14px; font-size:14.5px; font-weight:700; border:1.5px solid transparent; }
+  #trade-availability.can{ background:rgba(34,197,94,.13); border-color:#22c55e; color:#16a34a; }
+  html.dark #trade-availability.can{ color:#4ade80; }
+  #trade-availability.wait{ background:rgba(245,158,11,.13); border-color:var(--gold); color:var(--gold); }
+  #trade-availability small{ display:block; font-size:12px; font-weight:500; color:var(--text-dim); margin-top:2px; }
+
+  #trade-status-bar{ display:flex; flex-wrap:wrap; gap:10px 18px; font-size:12.5px; color:var(--text-dim); background:var(--item-bg);
+    border:1px solid var(--item-border); border-radius:12px; padding:11px 14px; }
+  #trade-status-bar b{ color:var(--text); }
+  .trade-section-title{ font-size:14px; font-weight:700; margin:2px 0 4px; }
+  #trade-my-offer-box{ display:none; border:1px solid var(--item-border); border-radius:12px; padding:12px 14px; background:var(--item-bg); font-size:13.5px; align-items:center; justify-content:space-between; gap:10px; }
+  #trade-my-offer-box.show{ display:flex; }
+
+  #trade-create-section{ background:var(--item-bg); border:1px solid var(--item-border); border-radius:14px; padding:14px; }
+  #trade-create-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  #trade-create-row input{ flex:1 1 160px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit; font-size:13.5px; }
+  #trade-create-row .trade-swap-icon{ font-size:16px; color:var(--text-dim); }
+  #trade-create-row button{ background:var(--accent-grad); color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:13.5px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  #trade-create-row button:disabled{ opacity:.5; cursor:not-allowed; }
+  #trade-create-hint{ margin-top:6px; font-size:11.5px; color:var(--text-dim); }
+
+  /* בורר "מה לבקש" - אי אפשר להקליד חופשי, רק לבחור מתוך אלמנטים שעוד אין ברשותכם */
+  .trade-picker{ position:relative; flex:1 1 160px; min-width:0; }
+  .trade-picker input#trade-want-search{ width:100%; }
+  #trade-want-search.selected{ border-color:var(--accent); background:var(--accent-soft); font-weight:600; }
+  .trade-picker-results{ display:none; position:absolute; top:calc(100% + 4px); right:0; left:0; background:var(--item-bg);
+    border:1px solid var(--item-border); border-radius:10px; box-shadow:var(--item-shadow); max-height:220px; overflow-y:auto; z-index:60; }
+  .trade-picker-results.open{ display:block; }
+  .trade-picker-result{ padding:8px 12px; font-size:13px; cursor:pointer; }
+  .trade-picker-result:hover{ background:var(--accent-soft); }
+  .trade-picker-empty{ padding:9px 12px; font-size:12px; color:var(--text-dim); }
+  #trade-want-match-hint{ display:none; margin-top:8px; padding:9px 12px; border-radius:10px; font-size:12.5px; line-height:1.5; border:1px solid transparent; }
+  #trade-want-match-hint.show{ display:block; }
+  #trade-want-match-hint.match{ background:rgba(34,197,94,.12); border-color:#22c55e; color:#16a34a; }
+  html.dark #trade-want-match-hint.match{ color:#4ade80; }
+  #trade-want-match-hint.wait{ background:var(--accent-soft); border-color:var(--accent); color:var(--text); }
+
+  #trade-offers-list{ display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto; }
+  .trade-offer-row{ display:flex; align-items:center; gap:8px; border:1px solid var(--item-border); border-radius:12px; padding:9px 12px; background:var(--item-bg); font-size:13.5px; }
+  .trade-offer-row .trade-offer-swap{ flex:1; display:flex; align-items:center; gap:6px; }
+  .trade-offer-row button{ background:var(--accent-grad); color:#fff; border:none; border-radius:10px; padding:6px 12px; font-size:12.5px; font-weight:600; cursor:pointer; }
+  #trade-offers-empty{ color:var(--text-dim); font-size:12.5px; text-align:center; padding:10px 0; }
+
   .badge-card{ border:1px solid var(--item-border); border-radius:14px; padding:12px; text-align:center; background:var(--item-bg); opacity:.5; filter:grayscale(.6); transition:transform .15s; }
   .badge-card.unlocked{ opacity:1; filter:none; border-color:var(--gold); background:linear-gradient(160deg, var(--accent-soft), transparent); }
   .badge-card.unlocked:hover{ transform:translateY(-2px); }
@@ -387,6 +456,7 @@
       <button class="tool-btn" id="btn-players" title="כל השחקנים והאלמנטים שגילו">👥</button>
       <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי">🏅</button>
       <button class="tool-btn" id="btn-achievements" title="ההישגים שלי">🎖️</button>
+      <button class="tool-btn" id="btn-trade" title="סחר חליפין">🔄</button>
       <button class="tool-btn" id="btn-personal-keys" title="מפתחות API אישיים שלי">🗝️</button>
       <button class="tool-btn" id="btn-backup" title="ייצוא/ייבוא התקדמות">💾</button>
       <button class="tool-btn" id="btn-chat" title="צ'אט עם המנהל">💬<span id="chat-unread-dot" style="display:none;"></span></button>
@@ -518,6 +588,73 @@
       </div>
       <div id="achievements-modal-sub">תגים שנפתחים ככל שמתקדמים במשחק, בדפדפן הזה</div>
       <div id="achievements-grid"></div>
+    </div>
+  </div>
+
+  <div id="trade-modal-backdrop" style="display:none;">
+    <div id="trade-modal">
+      <div id="trade-modal-header">
+        <h2>🔄 סחר חליפין</h2>
+        <button id="btn-close-trade">✕</button>
+      </div>
+
+      <div id="trade-referral-card">
+        <div id="trade-referral-head">
+          <div id="trade-referral-title">👥 חבר מביא חבר</div>
+          <span id="trade-referral-stat">חברים מוסמכים: <b id="trade-status-referrals">–</b></span>
+        </div>
+        <div id="trade-referral-tagline">שתפו את הקישור האישי שלכם וקבלו עוד סחרים וטוקני בונוס! 🎁</div>
+        <button id="trade-referral-details-toggle" type="button">איך זה עובד? ▾</button>
+        <div id="trade-referral-details">
+          <ul>
+            <li>שתפו את הקישור האישי שלכם. כל חבר/ה שמצטרף/ת דרכו משויך/ת אליכם לצמיתות.</li>
+            <li>ברגע שהחבר/ה הזה/ו עשה/תה <b>3 הישגים</b> ב"ההישגים שלי" <b>או</b> גילה/תה <b>150+ אלמנטים</b> - תקבלו סחר קבוע נוסף בכל שעה (בנוסף לסחר הבסיסי, ולא נצבר בין שעות - זה פשוט מגדיל את המכסה שלכם מעכשיו).</li>
+            <li>מאותו רגע, כל הישג <b>נוסף</b> שהחבר/ה הזה/ו משיג/ה מזכה אתכם ב"טוקן סחר" בונוס - שמור לכם וניתן למימוש בכל זמן, לא רק בשעה שהתקבל.</li>
+          </ul>
+        </div>
+        <div id="trade-referral-link-row">
+          <input id="trade-referral-link-input" type="text" readonly>
+          <button id="trade-referral-copy-btn">העתקת קישור 📋</button>
+        </div>
+      </div>
+
+      <div id="trade-availability">
+        <span id="trade-availability-text">טוענים...</span>
+      </div>
+
+      <div id="trade-status-bar">
+        <span>סחרים לשעה זו: <b id="trade-status-remaining">–</b>/<b id="trade-status-limit">–</b></span>
+        <span>איפוס בעוד: <b id="trade-status-countdown">–</b></span>
+        <span>טוקני בונוס: <b id="trade-status-bonus">–</b></span>
+      </div>
+
+      <div id="trade-my-offer-box">
+        <span id="trade-my-offer-text"></span>
+        <button id="trade-my-offer-action"></button>
+      </div>
+
+      <div id="trade-create-section">
+        <div class="trade-section-title">📤 פרסום הצעת סחר</div>
+        <div id="trade-create-row">
+          <input id="trade-offer-input" type="text" list="trade-offer-datalist" placeholder="חפשו אלמנט שלכם...">
+          <datalist id="trade-offer-datalist"></datalist>
+          <span class="trade-swap-icon">⇄</span>
+          <div id="trade-want-picker" class="trade-picker">
+            <input id="trade-want-search" type="text" placeholder="חפשו אלמנט לבקש..." autocomplete="off">
+            <input type="hidden" id="trade-want-selected" value="">
+            <div id="trade-want-results" class="trade-picker-results"></div>
+          </div>
+          <button id="trade-create-btn">פרסום</button>
+        </div>
+        <div id="trade-want-match-hint"></div>
+        <div id="trade-create-hint">בחרו אלמנט מהאוסף שלכם להעלות, ומתוך הרשימה - אלמנט שעוד אין לכם ותרצו לקבל בתמורה.</div>
+      </div>
+
+      <div>
+        <div class="trade-section-title">📥 הצעות שאפשר לאשר לכם</div>
+        <div id="trade-offers-list"></div>
+        <div id="trade-offers-empty" style="display:none;">אין כרגע הצעות שמתאימות לכם - נסו לרענן מאוחר יותר.</div>
+      </div>
     </div>
   </div>
 
@@ -719,6 +856,7 @@ async function submitNickname(){
     localStorage.setItem('jc_nickname', nickname);
     nickBadge.textContent = nickname;
     nickModalBackdrop.style.display = 'none';
+    claimReferralIfPending();
     if (wasTaken) {
       showToast(`הכינוי "${val}" כבר תפוס, לכן קיבלת את הכינוי "${finalNickname}"`, false);
     }
@@ -2082,6 +2220,17 @@ function checkBadges(){
   newlyUnlocked.forEach(b => unlocked.add(b.id));
   saveUnlockedBadges(unlocked);
   newlyUnlocked.forEach((b, i) => setTimeout(() => celebrateBadge(b), i * 900));
+  newlyUnlocked.forEach(b => reportAchievementToServer(b.id));
+}
+
+// מדווח לשרת על הישג חדש (לצורך אימות תנאי "חבר מביא חבר" - ר' פופאפ הסחר). כשל בשקט אם אין רשת/כינוי.
+function reportAchievementToServer(achievementId){
+  if (!WORKER_URL || !clientId || !nickname) return;
+  fetch(`${WORKER_URL}/achievement/report`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clientId, nickname, achievementId })
+  }).catch(() => {});
 }
 
 function celebrateBadge(b){
@@ -2110,6 +2259,372 @@ document.getElementById('btn-achievements').addEventListener('click', () => {
 });
 document.getElementById('btn-close-achievements').addEventListener('click', () => { document.getElementById('achievements-modal-backdrop').style.display = 'none'; });
 document.getElementById('achievements-modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'achievements-modal-backdrop') e.target.style.display = 'none'; });
+
+/* ================= סחר חליפין + חבר מביא חבר =================
+   כל הלוגיקה הזו חיה בפופאפ נפרד (לא נוגעת בלוח המשחק/אינדקס עצמו), כדי לא להכביד על שאר הקוד.
+   השעון שקובע "פעם בשעה" הוא תמיד שעון השרת (ר' /trade/status, /trade/create וכו') - לא שעון
+   הדפדפן/המחשב - כדי שלא יהיה אפשר "לרמות" ע"י שינוי השעון המקומי. */
+const TRADE_URL = WORKER_URL ? `${WORKER_URL}/trade` : '';
+const REFERRAL_URL = WORKER_URL ? `${WORKER_URL}/referral` : '';
+const REFERRAL_STORAGE_KEY = 'jc_pending_referral';
+
+const tradeModalBackdrop = document.getElementById('trade-modal-backdrop');
+let tradeCountdownTimer = null;
+
+// שמירת ה-ref מהקישור (אם יש) לפני שנדע אם יש כבר כינוי - ננסה לשייך רק אחרי claim-nickname.
+(function capturePendingReferralFromUrl(){
+  try{
+    const params = new URLSearchParams(location.search);
+    const ref = (params.get('ref') || '').trim();
+    if (ref && ref !== clientId && !localStorage.getItem(REFERRAL_STORAGE_KEY)) {
+      localStorage.setItem(REFERRAL_STORAGE_KEY, ref);
+    }
+  }catch{}
+})();
+
+function claimReferralIfPending(){
+  if (!WORKER_URL || !clientId) return;
+  const pendingRef = localStorage.getItem(REFERRAL_STORAGE_KEY);
+  if (!pendingRef) return;
+  fetch(`${REFERRAL_URL}/claim`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clientId, refClientId: pendingRef })
+  }).then(() => localStorage.removeItem(REFERRAL_STORAGE_KEY)).catch(() => {});
+}
+// אם כבר יש כינוי מהביקור הקודם (טעינת עמוד חוזרת), ננסה לשייך מיד.
+if (nickname) claimReferralIfPending();
+
+function getReferralLink(){
+  return `${location.origin}${location.pathname}?ref=${encodeURIComponent(clientId)}`;
+}
+
+async function loadTradeStatus(){
+  if (!WORKER_URL || !clientId) return;
+  try{
+    const res = await fetch(`${TRADE_URL}/status?clientId=${encodeURIComponent(clientId)}`);
+    const data = await res.json();
+    if (!res.ok || data.error) return;
+    document.getElementById('trade-status-remaining').textContent = data.remaining;
+    document.getElementById('trade-status-limit').textContent = data.limit;
+    document.getElementById('trade-status-bonus').textContent = data.bonusTokens;
+    document.getElementById('trade-status-referrals').textContent = data.qualifiedReferrals;
+    startTradeCountdown(data.secondsToNextHour);
+    const canPost = (data.remaining > 0 || data.bonusTokens > 0);
+    document.getElementById('trade-create-btn').disabled = !canPost;
+    renderTradeAvailability(canPost, data);
+  }catch{}
+}
+
+// חיווי ברור מתי אפשר להעלות הצעת סחר חדשה - כדי שלא יהיה צריך לפענח את שורת הסטטוס
+function renderTradeAvailability(canPost, data){
+  const box = document.getElementById('trade-availability');
+  const textEl = document.getElementById('trade-availability-text');
+  box.classList.remove('can', 'wait');
+  if (canPost) {
+    box.classList.add('can');
+    if (data.remaining > 0) {
+      textEl.innerHTML = `✅ אפשר להעלות הצעה עכשיו <small>(${data.remaining} מתוך ${data.limit} לשעה זו)</small>`;
+    } else {
+      textEl.innerHTML = `🎫 אפשר להעלות בזכות טוקן בונוס <small>(${data.bonusTokens} טוקנים זמינים)</small>`;
+    }
+  } else {
+    box.classList.add('wait');
+    textEl.innerHTML = `⏳ המכסה לשעה זו נוצלה <small>אפשר יהיה להעלות שוב - ראו "איפוס בעוד" למטה</small>`;
+  }
+}
+
+function startTradeCountdown(seconds){
+  clearInterval(tradeCountdownTimer);
+  let remaining = seconds;
+  const el = document.getElementById('trade-status-countdown');
+  const render = () => {
+    const m = Math.floor(remaining / 60), s = remaining % 60;
+    el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+  };
+  render();
+  tradeCountdownTimer = setInterval(() => {
+    remaining = Math.max(0, remaining - 1);
+    render();
+    if (remaining <= 0) { clearInterval(tradeCountdownTimer); loadTradeStatus(); }
+  }, 1000);
+}
+
+// חיפוש חי בתוך האלמנטים שהשחקן/ית כבר מחזיק/ה בהם, לצורך בחירת מה להעלות לסחר
+function setupOfferSearch(){
+  const input = document.getElementById('trade-offer-input');
+  const datalist = document.getElementById('trade-offer-datalist');
+  const render = (q) => {
+    const query = (q || '').trim().toLowerCase();
+    datalist.innerHTML = '';
+    unlockedItems
+      .filter(it => !query || it.name.toLowerCase().includes(query))
+      .slice(0, 50)
+      .forEach(it => {
+        const opt = document.createElement('option');
+        opt.value = it.name;
+        opt.label = `${it.emoji} ${it.name}`;
+        datalist.appendChild(opt);
+      });
+  };
+  input.value = '';
+  input.oninput = () => render(input.value);
+  render('');
+}
+
+let wantSearchTimer = null;
+let availableOffersCache = [];
+
+// בורר "מה לבקש" - אי אפשר להקליד ולשלוח טקסט חופשי; אפשר רק לבחור מתוך אלמנטים שעדיין אין ברשותכם.
+function setupWantSearch(){
+  const search = document.getElementById('trade-want-search');
+  const selectedInput = document.getElementById('trade-want-selected');
+  const results = document.getElementById('trade-want-results');
+
+  search.value = '';
+  selectedInput.value = '';
+  search.classList.remove('selected');
+  updateWantMatchHint('');
+
+  const renderResults = (items) => {
+    results.innerHTML = '';
+    if (!items.length) {
+      results.innerHTML = '<div class="trade-picker-empty">לא נמצאו אלמנטים מתאימים (שעדיין אין ברשותכם)</div>';
+    } else {
+      items.slice(0, 30).forEach(el => {
+        const row = document.createElement('div');
+        row.className = 'trade-picker-result';
+        row.textContent = `${el.emoji} ${el.name}`;
+        row.addEventListener('mousedown', (e) => { e.preventDefault(); selectWant(el.name); });
+        results.appendChild(row);
+      });
+    }
+    results.classList.add('open');
+  };
+
+  const runSearch = async (q) => {
+    if (!WORKER_URL) return;
+    try{
+      const res = await fetch(`${WORKER_URL}/elements/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      const owned = new Set(unlockedItems.map(it => it.name));
+      renderResults((data.data || []).filter(el => !owned.has(el.name)));
+    }catch{ renderResults([]); }
+  };
+
+  const selectWant = (name) => {
+    selectedInput.value = name;
+    search.value = name;
+    search.classList.add('selected');
+    results.classList.remove('open');
+    updateWantMatchHint(name);
+  };
+
+  search.addEventListener('input', () => {
+    selectedInput.value = '';
+    search.classList.remove('selected');
+    updateWantMatchHint('');
+    clearTimeout(wantSearchTimer);
+    wantSearchTimer = setTimeout(() => runSearch(search.value.trim()), 250);
+  });
+  search.addEventListener('focus', () => { if (results.innerHTML) results.classList.add('open'); });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#trade-want-picker')) results.classList.remove('open');
+  });
+
+  runSearch(''); // מילוי ראשוני עם אלמנטים ותיקים, כדי שלא תהיה רשימה ריקה לגמרי
+}
+
+// מציג האם קיימת כבר הצעה עם האלמנט שנבחר (אפשר לקחת מיד) או שצריך להמתין שמישהו יציע אותו
+function updateWantMatchHint(name){
+  const hint = document.getElementById('trade-want-match-hint');
+  hint.classList.remove('show', 'match', 'wait');
+  if (!name) { hint.innerHTML = ''; return; }
+  const match = availableOffersCache.find(o => o.offered_element === name);
+  hint.classList.add('show');
+  if (match) {
+    hint.classList.add('match');
+    hint.innerHTML = `✅ יש כבר הצעה פתוחה עם ${match.offered_emoji} ${escapeHtml(match.offered_element)} - אפשר לגלול לרשימת ה"הצעות שאפשר לאשר" למטה ולקחת אותה ישירות!`;
+  } else {
+    hint.classList.add('wait');
+    hint.innerHTML = `🕒 עדיין אין הצעה עם האלמנט הזה. הבקשה שלכם תפורסם ותמתין עד שמישהו יציע אותו - תקבלו התראה כשזה יקרה.`;
+  }
+}
+
+async function loadMyOffer(){
+  const box = document.getElementById('trade-my-offer-box');
+  if (!WORKER_URL || !clientId) { box.classList.remove('show'); return; }
+  try{
+    const res = await fetch(`${TRADE_URL}/my-offers?clientId=${encodeURIComponent(clientId)}`);
+    const data = await res.json();
+    const offers = data.offers || [];
+    const open = offers.find(o => o.status === 'open');
+    const readyToClaim = offers.find(o => o.status === 'completed' && !o.poster_claimed);
+
+    if (readyToClaim) {
+      box.classList.add('show');
+      document.getElementById('trade-my-offer-text').textContent =
+        `${readyToClaim.accepted_by_nickname} אישר/ה את הסחר שלכם! מחכה לכם: ${readyToClaim.wanted_emoji} ${readyToClaim.wanted_element}`;
+      const btn = document.getElementById('trade-my-offer-action');
+      btn.textContent = 'לאסוף 🎁';
+      btn.onclick = () => claimCompletedOffer(readyToClaim.id);
+    } else if (open) {
+      box.classList.add('show');
+      document.getElementById('trade-my-offer-text').textContent =
+        `הצעה פתוחה: ${open.offered_emoji} ${open.offered_element} ⇄ ${open.wanted_emoji} ${open.wanted_element}`;
+      const btn = document.getElementById('trade-my-offer-action');
+      btn.textContent = 'ביטול';
+      btn.onclick = () => cancelMyOffer(open.id);
+    } else {
+      box.classList.remove('show');
+    }
+  }catch{ box.classList.remove('show'); }
+}
+
+async function claimCompletedOffer(offerId){
+  try{
+    const res = await fetch(`${TRADE_URL}/claim`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, offerId })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { showToast(data.error || 'שגיאה באיסוף', true); return; }
+    unlockReceivedElement(data.receivedElement);
+    loadMyOffer();
+  }catch{ showToast('שגיאה באיסוף', true); }
+}
+
+async function cancelMyOffer(offerId){
+  try{
+    await fetch(`${TRADE_URL}/cancel`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, offerId })
+    });
+    loadMyOffer();
+    loadTradeStatus();
+  }catch{}
+}
+
+// מוסיף אלמנט שהתקבל מסחר לרשימה האישית (אם עוד אין) - באותו אופן שבו מתווסף אלמנט משילוב מוצלח.
+function unlockReceivedElement(el){
+  if (!el) return;
+  if (!findItem(el.name)) {
+    unlockedItems.push({ name: el.name, emoji: el.emoji, discovered_by: null, discovered_at: Date.now() });
+    savePersonalProgress();
+    renderSidebar();
+    checkBadges();
+  }
+  showToast(`${el.emoji} קיבלתם מהסחר: ${el.name}`, true);
+}
+
+async function loadAvailableOffers(){
+  const list = document.getElementById('trade-offers-list');
+  const empty = document.getElementById('trade-offers-empty');
+  if (!WORKER_URL || !clientId) return;
+  try{
+    const owned = unlockedItems.map(it => it.name);
+    const res = await fetch(`${TRADE_URL}/offers/list`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, ownedElements: owned })
+    });
+    const data = await res.json();
+    const offers = data.offers || [];
+    availableOffersCache = offers;
+    list.innerHTML = '';
+    empty.style.display = offers.length ? 'none' : 'block';
+    offers.forEach(o => {
+      const row = document.createElement('div');
+      row.className = 'trade-offer-row';
+      row.innerHTML = `<span class="trade-offer-swap">${o.offered_emoji} ${o.offered_element} ⇄ ${o.wanted_emoji} ${o.wanted_element}<br><small style="color:var(--text-dim)">מאת ${escapeHtml(o.nickname)}</small></span>`;
+      const btn = document.createElement('button');
+      btn.textContent = 'אישור סחר';
+      btn.onclick = () => acceptOffer(o.id, btn);
+      row.appendChild(btn);
+      list.appendChild(row);
+    });
+    const selected = document.getElementById('trade-want-selected');
+    if (selected && selected.value) updateWantMatchHint(selected.value);
+  }catch{}
+}
+
+async function acceptOffer(offerId, btn){
+  btn.disabled = true;
+  try{
+    const res = await fetch(`${TRADE_URL}/accept`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, nickname, offerId })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { showToast(data.error || 'שגיאה באישור הסחר', true); btn.disabled = false; return; }
+    unlockReceivedElement(data.receivedElement);
+    loadTradeStatus();
+    loadAvailableOffers();
+  }catch{ showToast('שגיאה באישור הסחר', true); btn.disabled = false; }
+}
+
+document.getElementById('trade-create-btn').addEventListener('click', async () => {
+  const offered = document.getElementById('trade-offer-input').value.trim();
+  const wanted = document.getElementById('trade-want-selected').value.trim();
+  if (!offered || !wanted) { showToast('בחרו אלמנט להעלות ואלמנט לבקש מתוך הרשימה', false); return; }
+  if (!findItem(offered)) { showToast('בחרו אלמנט קיים מתוך האוסף שלכם', false); return; }
+  if (findItem(wanted)) { showToast('אי אפשר לבקש אלמנט שכבר יש לכם', false); return; }
+  if (offered === wanted) { showToast('לא ניתן להציע ולבקש את אותו אלמנט', false); return; }
+  const btn = document.getElementById('trade-create-btn');
+  btn.disabled = true;
+  try{
+    const res = await fetch(`${TRADE_URL}/create`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, nickname, offeredElement: offered, wantedElement: wanted })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { showToast(data.error || 'שגיאה בפרסום ההצעה', true); }
+    else {
+      showToast('ההצעה פורסמה! נחכה שמישהו יאשר 🤝', true);
+      document.getElementById('trade-offer-input').value = '';
+      document.getElementById('trade-want-search').value = '';
+      document.getElementById('trade-want-selected').value = '';
+      document.getElementById('trade-want-search').classList.remove('selected');
+      updateWantMatchHint('');
+    }
+    loadTradeStatus(); loadMyOffer();
+  }catch{ showToast('שגיאה בפרסום ההצעה', true); }
+  finally{ btn.disabled = false; }
+});
+
+document.getElementById('trade-referral-copy-btn').addEventListener('click', () => {
+  const input = document.getElementById('trade-referral-link-input');
+  input.select();
+  navigator.clipboard?.writeText(input.value).then(() => {
+    showToast('הקישור הועתק! שתפו עם חברים 🔗', true);
+  }).catch(() => {
+    document.execCommand('copy');
+    showToast('הקישור הועתק! שתפו עם חברים 🔗', true);
+  });
+});
+
+document.getElementById('trade-referral-details-toggle').addEventListener('click', (e) => {
+  const details = document.getElementById('trade-referral-details');
+  const isOpen = details.classList.toggle('open');
+  e.currentTarget.textContent = isOpen ? 'איך זה עובד? ▴' : 'איך זה עובד? ▾';
+});
+
+document.getElementById('btn-trade').addEventListener('click', () => {
+  if (!nickname) { showToast('קבעו קודם כינוי כדי להשתמש בסחר החליפין', false); return; }
+  document.getElementById('trade-referral-link-input').value = getReferralLink();
+  tradeModalBackdrop.style.display = 'flex';
+  setupOfferSearch();
+  setupWantSearch();
+  loadTradeStatus();
+  loadMyOffer();
+  loadAvailableOffers();
+});
+document.getElementById('btn-close-trade').addEventListener('click', () => {
+  tradeModalBackdrop.style.display = 'none';
+  clearInterval(tradeCountdownTimer);
+});
+tradeModalBackdrop.addEventListener('click', (e) => {
+  if (e.target.id === 'trade-modal-backdrop') { e.target.style.display = 'none'; clearInterval(tradeCountdownTimer); }
+});
 
 /* ================= אתגר יומי =================
    האלמנט של היום נבחר דטרמיניסטית (hash של תאריך) מתוך אלמנטים ציבוריים שכבר קיימים במשחק,
