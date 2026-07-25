@@ -2484,16 +2484,34 @@ async function cancelMyOffer(offerId){
   }catch{}
 }
 
-// מוסיף אלמנט שהתקבל מסחר לרשימה האישית (אם עוד אין) - באותו אופן שבו מתווסף אלמנט משילוב מוצלח.
+// מוסיף אלמנט שהתקבל מסחר לרשימה האישית (אם עוד אין) - באותו אופן שבו מתווסף אלמנט משילוב מוצלח,
+// וגם מדגיש אותו ומגלגל אליו את הרשימה כדי שיופיע ישירות לעין המשתמש.
 function unlockReceivedElement(el){
   if (!el) return;
-  if (!findItem(el.name)) {
+  const isNew = !findItem(el.name);
+  if (isNew) {
     unlockedItems.push({ name: el.name, emoji: el.emoji, discovered_by: null, discovered_at: Date.now() });
     savePersonalProgress();
-    renderSidebar();
-    checkBadges();
   }
+  recentlyDiscovered.add(el.name);
+  renderSidebar();
+  if (isNew) checkBadges();
+  scrollToSidebarItem(el.name);
+  setTimeout(() => recentlyDiscovered.delete(el.name), 3400);
   showToast(`${el.emoji} קיבלתם מהסחר: ${el.name}`, true);
+}
+
+// מגלגל את רשימת האלמנטים הצדדית כך שהאלמנט שצוין (למשל זה שהתקבל מסחר) ייכנס לתצוגה.
+function scrollToSidebarItem(name){
+  requestAnimationFrame(() => {
+    const rows = itemsList.querySelectorAll('.sidebar-item');
+    for (const row of rows){
+      if (row.textContent.trim().endsWith(name)){
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        break;
+      }
+    }
+  });
 }
 
 async function loadAvailableOffers(){
