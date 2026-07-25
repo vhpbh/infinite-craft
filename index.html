@@ -2490,7 +2490,7 @@ function unlockReceivedElement(el){
   if (!el) return;
   const isNew = !findItem(el.name);
   if (isNew) {
-    unlockedItems.push({ name: el.name, emoji: el.emoji, discovered_by: null, discovered_at: Date.now() });
+    unlockedItems.push({ name: el.name, emoji: el.emoji, discovered_by: el.discoveredBy || null, discovered_at: Date.now() });
     savePersonalProgress();
   }
   recentlyDiscovered.add(el.name);
