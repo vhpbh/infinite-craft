@@ -937,6 +937,8 @@ const CHAT_MESSAGES_URL = WORKER_URL ? `${WORKER_URL}/chat/messages` : '';
 const ACCOUNT_STATUS_URL = WORKER_URL ? `${WORKER_URL}/account/status` : '';
 const ACCOUNT_SET_PASSWORD_URL = WORKER_URL ? `${WORKER_URL}/account/set-password` : '';
 const ACCOUNT_LOGIN_URL = WORKER_URL ? `${WORKER_URL}/account/login` : '';
+const ACCOUNT_SAVE_PROGRESS_URL = WORKER_URL ? `${WORKER_URL}/account/save-progress` : '';
+const ACCOUNT_PROGRESS_URL = WORKER_URL ? `${WORKER_URL}/account/progress` : '';
 
 /* ================= STATE ================= */
 let unlockedItems = [];         // {name, emoji, discovered_by}
@@ -1094,6 +1096,7 @@ async function submitAuthLogin(){
     localStorage.setItem(CLIENT_ID_KEY, clientId);
     nickname = result.nickname;
     localStorage.setItem('jc_nickname', nickname);
+    await restoreProgressAfterLogin(clientId);
     location.reload();
   }catch{
     if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'שגיאת תקשורת עם השרת.'; }
@@ -1616,6 +1619,8 @@ function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
       showToast(`🎯 השלמתם את האתגר היומי: ${result.name}!`, true, nickname, 'שתפו 🎉', () => openShareCard(dailyTarget));
     }, 500);
   }
+
+  syncProgressToServer();
 }
 
 function spawnSparks(x, y){
@@ -2043,8 +2048,9 @@ document.getElementById('btn-login-account').addEventListener('click', async () 
     localStorage.setItem(CLIENT_ID_KEY, clientId);
     nickname = result.nickname;
     localStorage.setItem('jc_nickname', nickname);
-    setInlineStatus(statusEl, '✅ התחברת בהצלחה! טוענים מחדש...', true);
-    setTimeout(() => location.reload(), 900);
+    setInlineStatus(statusEl, '✅ התחברת בהצלחה! טוענים את ההתקדמות השמורה...', true);
+    await restoreProgressAfterLogin(clientId);
+    setTimeout(() => location.reload(), 400);
   }catch{
     setInlineStatus(statusEl, '❌ שגיאת תקשורת עם השרת.', false);
   }
@@ -2153,6 +2159,66 @@ document.getElementById('btn-import-progress').addEventListener('click', async (
   showBackupStatus('✅ יובא בהצלחה! טוענים מחדש...', true);
   setTimeout(() => location.reload(), 900);
 });
+
+/* ================= סנכרון התקדמות עם השרת (כדי שהתחברות מדפדפן אחר תשחזר בפועל את הלוח) ================= */
+// שולח (מנוכה-רעשים - debounce) את מצב הלוח המלא של החשבון הפעיל לשרת. נקרא אחרי כל שילוב מוצלח.
+let progressSyncTimer = null;
+function syncProgressToServer(){
+  if (!WORKER_URL || !ACCOUNT_SAVE_PROGRESS_URL || !nickname || !clientId) return;
+  clearTimeout(progressSyncTimer);
+  progressSyncTimer = setTimeout(async () => {
+    try{
+      await fetch(ACCOUNT_SAVE_PROGRESS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          progress: {
+            unlockedItems,
+            myRecipes: getMyRecipes(),
+            unlockedBadges: [...getUnlockedBadges()],
+            bestStreak,
+            totalCombines,
+            dailyCompletions: collectDailyCompletions(),
+          },
+        }),
+      });
+    }catch{ /* לא קריטי - הניסיון הבא (השילוב הבא) ינסה שוב */ }
+  }, 1500);
+}
+
+// מוחק את כל מפתחות ההתקדמות המקומיים של הזהות הקודמת בדפדפן הזה (כדי לא לערבב אותם בטעות
+// עם החשבון החדש שמתחברים אליו), ואז - אם יש לחשבון החדש התקדמות שמורה בשרת - טוען אותה.
+// בלי זה, login היה מחליף רק את השם/ה-clientId ומשאיר את הלוח ריק (או, גרוע יותר, את הלוח
+// הישן של הדפדפן הזה) - זה בדיוק הבאג שבו "מתחברים וכל ההתקדמות מתאפסת".
+async function restoreProgressAfterLogin(cid){
+  localStorage.removeItem(LOCAL_PROGRESS_KEY);
+  localStorage.removeItem(MY_RECIPES_KEY);
+  localStorage.removeItem(BADGES_KEY);
+  localStorage.removeItem(STREAK_KEY);
+  localStorage.removeItem(TOTAL_COMBINES_KEY);
+
+  if (!ACCOUNT_PROGRESS_URL) return;
+  try{
+    const res = await fetch(`${ACCOUNT_PROGRESS_URL}?clientId=${encodeURIComponent(cid)}`);
+    const { progress } = await res.json();
+    if (!progress) return; // חשבון בלי סנכרון קודם (למשל התחבר לפני התוספת) - יתחיל מהאלמנטים הבסיסיים
+
+    if (Array.isArray(progress.unlockedItems)){
+      const personal = progress.unlockedItems.filter(i => !STARTING_ITEMS.some(s => s.name === i.name));
+      localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify(personal));
+    }
+    localStorage.setItem(MY_RECIPES_KEY, JSON.stringify(Array.isArray(progress.myRecipes) ? progress.myRecipes : []));
+    localStorage.setItem(BADGES_KEY, JSON.stringify(Array.isArray(progress.unlockedBadges) ? progress.unlockedBadges : []));
+    localStorage.setItem(STREAK_KEY, String(Number.isFinite(progress.bestStreak) ? progress.bestStreak : 0));
+    localStorage.setItem(TOTAL_COMBINES_KEY, String(Number.isFinite(progress.totalCombines) ? progress.totalCombines : 0));
+    if (progress.dailyCompletions && typeof progress.dailyCompletions === 'object'){
+      Object.keys(progress.dailyCompletions).forEach(dateKey => {
+        localStorage.setItem(DAILY_KEY_PREFIX + dateKey, progress.dailyCompletions[dateKey]);
+      });
+    }
+  }catch{ /* אין תקשורת עם השרת - נטען עם מה שיש (בדרך כלל ריק אחרי הניקוי למעלה) */ }
+}
 
 /* ================= צ'אט עם המנהל ================= */
 const chatModalBackdrop = document.getElementById('chat-modal-backdrop');
