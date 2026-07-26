@@ -688,8 +688,8 @@
         <div id="trade-referral-details">
           <ul>
             <li>שתפו את הקישור האישי שלכם. כל חבר/ה שמצטרף/ת דרכו משויך/ת אליכם לצמיתות.</li>
-            <li>ברגע שהחבר/ה הזה/ו עשה/תה <b>3 הישגים</b> ב"ההישגים שלי" <b>או</b> גילה/תה <b>150+ אלמנטים</b> - תקבלו סחר קבוע נוסף בכל שעה (בנוסף לסחר הבסיסי, ולא נצבר בין שעות - זה פשוט מגדיל את המכסה שלכם מעכשיו).</li>
-            <li>מאותו רגע, כל הישג <b>נוסף</b> שהחבר/ה הזה/ו משיג/ה מזכה אתכם ב"טוקן סחר" בונוס - שמור לכם וניתן למימוש בכל זמן, לא רק בשעה שהתקבל.</li>
+            <li>ברגע שהחבר/ה הזה/ו עשה/תה <b>5 הישגים</b> ב"ההישגים שלי" <b>או</b> גילה/תה <b>150+ אלמנטים</b> - תקבלו סחר קבוע נוסף בכל שעה (בנוסף לסחר הבסיסי, ולא נצבר בין שעות - זה פשוט מגדיל את המכסה שלכם מעכשיו).</li>
+            <li>מאותו רגע, כל הישג <b>נוסף</b> שהחבר/ה הזה/ו משיג/ה מזכה אתכם ב"טוקני סחר" בונוס - שמורים לכם וניתנים למימוש בכל זמן, לא רק בשעה שהתקבלו. <b>ככל שההישג קשה יותר להשגה, כך תקבלו יותר טוקנים ממנו</b> (הישג פשוט = טוקן אחד, הישג נדיר במיוחד = עד 5 טוקנים).</li>
           </ul>
         </div>
         <div id="trade-referral-link-row">
@@ -1130,6 +1130,8 @@ document.getElementById('menu-logout').addEventListener('click', () => {
   localStorage.removeItem(BADGES_KEY);
   localStorage.removeItem(STREAK_KEY);
   localStorage.removeItem(TOTAL_COMBINES_KEY);
+  localStorage.removeItem(TRADES_KEY);
+  localStorage.removeItem(DAILY_COUNT_KEY);
   location.reload();
 });
 
@@ -2077,6 +2079,8 @@ document.getElementById('btn-export-progress').addEventListener('click', () => {
     unlockedBadges: [...getUnlockedBadges()],
     bestStreak,
     totalCombines,
+    tradesCompleted,
+    dailyCompletedCount,
     sidebarSortMode,
     dailyCompletions: collectDailyCompletions(),
   };
@@ -2149,6 +2153,8 @@ document.getElementById('btn-import-progress').addEventListener('click', async (
   localStorage.setItem(BADGES_KEY, JSON.stringify(Array.isArray(data.unlockedBadges) ? data.unlockedBadges : []));
   localStorage.setItem(STREAK_KEY, String(Number.isFinite(data.bestStreak) ? data.bestStreak : 0));
   localStorage.setItem(TOTAL_COMBINES_KEY, String(Number.isFinite(data.totalCombines) ? data.totalCombines : 0));
+  localStorage.setItem(TRADES_KEY, String(Number.isFinite(data.tradesCompleted) ? data.tradesCompleted : 0));
+  localStorage.setItem(DAILY_COUNT_KEY, String(Number.isFinite(data.dailyCompletedCount) ? data.dailyCompletedCount : 0));
   if (data.sidebarSortMode) localStorage.setItem(SIDEBAR_SORT_KEY, data.sidebarSortMode);
   if (data.dailyCompletions && typeof data.dailyCompletions === 'object'){
     Object.keys(data.dailyCompletions).forEach(dateKey => {
@@ -2179,6 +2185,8 @@ function syncProgressToServer(){
             unlockedBadges: [...getUnlockedBadges()],
             bestStreak,
             totalCombines,
+            tradesCompleted,
+            dailyCompletedCount,
             dailyCompletions: collectDailyCompletions(),
           },
         }),
@@ -2197,6 +2205,8 @@ async function restoreProgressAfterLogin(cid){
   localStorage.removeItem(BADGES_KEY);
   localStorage.removeItem(STREAK_KEY);
   localStorage.removeItem(TOTAL_COMBINES_KEY);
+  localStorage.removeItem(TRADES_KEY);
+  localStorage.removeItem(DAILY_COUNT_KEY);
 
   if (!ACCOUNT_PROGRESS_URL) return;
   try{
@@ -2212,6 +2222,8 @@ async function restoreProgressAfterLogin(cid){
     localStorage.setItem(BADGES_KEY, JSON.stringify(Array.isArray(progress.unlockedBadges) ? progress.unlockedBadges : []));
     localStorage.setItem(STREAK_KEY, String(Number.isFinite(progress.bestStreak) ? progress.bestStreak : 0));
     localStorage.setItem(TOTAL_COMBINES_KEY, String(Number.isFinite(progress.totalCombines) ? progress.totalCombines : 0));
+    localStorage.setItem(TRADES_KEY, String(Number.isFinite(progress.tradesCompleted) ? progress.tradesCompleted : 0));
+    localStorage.setItem(DAILY_COUNT_KEY, String(Number.isFinite(progress.dailyCompletedCount) ? progress.dailyCompletedCount : 0));
     if (progress.dailyCompletions && typeof progress.dailyCompletions === 'object'){
       Object.keys(progress.dailyCompletions).forEach(dateKey => {
         localStorage.setItem(DAILY_KEY_PREFIX + dateKey, progress.dailyCompletions[dateKey]);
@@ -2606,33 +2618,63 @@ leaderboardBackdrop.addEventListener('click', (e) => { if (e.target === leaderbo
 const BADGES_KEY = 'jc_unlocked_badges';
 const STREAK_KEY = 'jc_best_streak';
 const TOTAL_COMBINES_KEY = 'jc_total_combines';
+const TRADES_KEY = 'jc_trades_completed';
+const DAILY_COUNT_KEY = 'jc_daily_completed_count';
 let comboStreak = 0;
 let bestStreak = parseInt(localStorage.getItem(STREAK_KEY) || '0', 10);
 let totalCombines = parseInt(localStorage.getItem(TOTAL_COMBINES_KEY) || '0', 10);
+let tradesCompleted = parseInt(localStorage.getItem(TRADES_KEY) || '0', 10);
+let dailyCompletedCount = parseInt(localStorage.getItem(DAILY_COUNT_KEY) || '0', 10);
+let myQualifiedReferrals = 0; // מתעדכן מ-loadTradeStatus (ר' פופאפ הסחר)
 let myWorldFirstCount = 0;
 
+// כל תג כולל עכשיו גם points (1-5): כמה טוקני סחר בונוס מקבל/ת מי שהפנה אתכם למשחק בכל פעם
+// שאתם משיגים את התג הזה (אחרי שכבר עברתם את סף ההסמכה כ"חבר מוסמך" - ר' פופאפ הסחר).
+// ערך גבוה יותר = תג נדיר/קשה יותר. השרת (worker.js: ACHIEVEMENT_POINTS) הוא מקור האמת בפועל
+// לגבי כמה טוקנים ניתנים בפועל - הערך כאן משמש בעיקר לתצוגה, וחייב להישאר מסונכרן איתו.
 const BADGE_DEFS = [
-  { id: 'first-combo',   icon: '🧪', title: 'צעד ראשון',      desc: 'שילבתם אלמנט אחד בפעם הראשונה',        check: s => s.recipes >= 1 },
-  { id: 'collector-10',  icon: '🎒', title: 'אספן מתחיל',     desc: 'פתחתם 10 אלמנטים',                     check: s => s.elements >= 10 },
-  { id: 'collector-50',  icon: '📦', title: 'אספן מנוסה',     desc: 'פתחתם 50 אלמנטים',                     check: s => s.elements >= 50 },
-  { id: 'collector-100', icon: '🏰', title: 'אלוף האיסוף',    desc: 'פתחתם 100 אלמנטים',                    check: s => s.elements >= 100 },
-  { id: 'collector-250', icon: '🏯', title: 'אספן על',        desc: 'פתחתם 250 אלמנטים',                    check: s => s.elements >= 250 },
-  { id: 'collector-500', icon: '🏛️', title: 'אגדת האיסוף',    desc: 'פתחתם 500 אלמנטים - הישג נדיר ביותר',  check: s => s.elements >= 500 },
-  { id: 'explorer-30',   icon: '🧭', title: 'חוקר',           desc: 'גיליתם 30 שילובים שונים',              check: s => s.recipes >= 30 },
-  { id: 'explorer-100',  icon: '🗺️', title: 'חוקר ראשי',      desc: 'גיליתם 100 שילובים שונים',             check: s => s.recipes >= 100 },
-  { id: 'explorer-250',  icon: '🔭', title: 'חוקר-על',        desc: 'גיליתם 250 שילובים שונים',             check: s => s.recipes >= 250 },
-  { id: 'explorer-500',  icon: '🛰️', title: 'כובש היקום',     desc: 'גיליתם 500 שילובים שונים - כמעט בלתי אפשרי', check: s => s.recipes >= 500 },
-  { id: 'pioneer-1',     icon: '🌟', title: 'חלוץ',           desc: 'הייתם ראשונים בעולם לגלות אלמנט',      check: s => s.worldFirst >= 1 },
-  { id: 'pioneer-10',    icon: '🚀', title: 'חלוץ מוביל',     desc: 'הייתם ראשונים בעולם ב-10 אלמנטים',     check: s => s.worldFirst >= 10 },
-  { id: 'pioneer-25',    icon: '🛸', title: 'סוללי דרך',      desc: 'הייתם ראשונים בעולם ב-25 אלמנטים',     check: s => s.worldFirst >= 25 },
-  { id: 'pioneer-50',    icon: '👑', title: 'אלוף החלוצים',   desc: 'הייתם ראשונים בעולם ב-50 אלמנטים - הישג יוצא דופן', check: s => s.worldFirst >= 50 },
-  { id: 'streak-5',      icon: '🔥', title: 'על גלגלים',      desc: 'הצלחתם ב-5 שילובים חדשים ושונים ברצף', check: s => s.bestStreak >= 5 },
-  { id: 'streak-15',     icon: '⚡', title: 'בלתי עצור',      desc: 'הצלחתם ב-15 שילובים חדשים ושונים ברצף', check: s => s.bestStreak >= 15 },
-  { id: 'streak-30',     icon: '🌪️', title: 'יד ברזל',        desc: 'הצלחתם ב-30 שילובים חדשים ושונים ברצף - בלי אף חזרה', check: s => s.bestStreak >= 30 },
-  { id: 'streak-50',     icon: '🐉', title: 'אגדה חיה',       desc: 'הצלחתם ב-50 שילובים חדשים ושונים ברצף - מעטים יגיעו לזה', check: s => s.bestStreak >= 50 },
-  { id: 'grind-100',     icon: '💪', title: 'שקדן',           desc: 'ביצעתם 100 שילובים מוצלחים בסך הכל',   check: s => s.totalCombines >= 100 },
-  { id: 'grind-500',     icon: '🏋️', title: 'בלתי נלאה',      desc: 'ביצעתם 500 שילובים מוצלחים בסך הכל',   check: s => s.totalCombines >= 500 },
-  { id: 'grind-1000',    icon: '💎', title: 'מכור למשחק',     desc: 'ביצעתם 1,000 שילובים מוצלחים בסך הכל - הישג של אלופים אמיתיים', check: s => s.totalCombines >= 1000 },
+  { id: 'first-combo',   icon: '🧪', title: 'צעד ראשון',      desc: 'שילבתם אלמנט אחד בפעם הראשונה',        points: 1, check: s => s.recipes >= 1 },
+  { id: 'collector-10',  icon: '🎒', title: 'אספן מתחיל',     desc: 'פתחתם 10 אלמנטים',                     points: 1, check: s => s.elements >= 10 },
+  { id: 'collector-50',  icon: '📦', title: 'אספן מנוסה',     desc: 'פתחתם 50 אלמנטים',                     points: 1, check: s => s.elements >= 50 },
+  { id: 'collector-100', icon: '🏰', title: 'אלוף האיסוף',    desc: 'פתחתם 100 אלמנטים',                    points: 2, check: s => s.elements >= 100 },
+  { id: 'collector-250', icon: '🏯', title: 'אספן על',        desc: 'פתחתם 250 אלמנטים',                    points: 3, check: s => s.elements >= 250 },
+  { id: 'collector-500', icon: '🏛️', title: 'אגדת האיסוף',    desc: 'פתחתם 500 אלמנטים - הישג נדיר ביותר',  points: 4, check: s => s.elements >= 500 },
+  { id: 'collector-750', icon: '🗼', title: 'אימפריית אלמנטים', desc: 'פתחתם 750 אלמנטים',                  points: 4, check: s => s.elements >= 750 },
+  { id: 'collector-1000',icon: '🌌', title: 'אוסף אינסופי',   desc: 'פתחתם 1,000 אלמנטים - כמעט אף אחד לא מגיע לכאן', points: 5, check: s => s.elements >= 1000 },
+  { id: 'explorer-30',   icon: '🧭', title: 'חוקר',           desc: 'גיליתם 30 שילובים שונים',              points: 1, check: s => s.recipes >= 30 },
+  { id: 'explorer-100',  icon: '🗺️', title: 'חוקר ראשי',      desc: 'גיליתם 100 שילובים שונים',             points: 2, check: s => s.recipes >= 100 },
+  { id: 'explorer-250',  icon: '🔭', title: 'חוקר-על',        desc: 'גיליתם 250 שילובים שונים',             points: 3, check: s => s.recipes >= 250 },
+  { id: 'explorer-500',  icon: '🛰️', title: 'כובש היקום',     desc: 'גיליתם 500 שילובים שונים - כמעט בלתי אפשרי', points: 4, check: s => s.recipes >= 500 },
+  { id: 'explorer-750',  icon: '🌠', title: 'ממפה המולטיברס', desc: 'גיליתם 750 שילובים שונים',             points: 4, check: s => s.recipes >= 750 },
+  { id: 'explorer-1000', icon: '🕳️', title: 'מעבר לגבולות',   desc: 'גיליתם 1,000 שילובים שונים - הישג אגדי', points: 5, check: s => s.recipes >= 1000 },
+  { id: 'pioneer-1',     icon: '🌟', title: 'חלוץ',           desc: 'הייתם ראשונים בעולם לגלות אלמנט',      points: 1, check: s => s.worldFirst >= 1 },
+  { id: 'pioneer-10',    icon: '🚀', title: 'חלוץ מוביל',     desc: 'הייתם ראשונים בעולם ב-10 אלמנטים',     points: 2, check: s => s.worldFirst >= 10 },
+  { id: 'pioneer-25',    icon: '🛸', title: 'סוללי דרך',      desc: 'הייתם ראשונים בעולם ב-25 אלמנטים',     points: 3, check: s => s.worldFirst >= 25 },
+  { id: 'pioneer-50',    icon: '👑', title: 'אלוף החלוצים',   desc: 'הייתם ראשונים בעולם ב-50 אלמנטים - הישג יוצא דופן', points: 4, check: s => s.worldFirst >= 50 },
+  { id: 'pioneer-100',   icon: '🏆', title: 'אבי הבריאה',     desc: 'הייתם ראשונים בעולם ב-100 אלמנטים - כמעט בלתי אפשרי', points: 5, check: s => s.worldFirst >= 100 },
+  { id: 'streak-5',      icon: '🔥', title: 'על גלגלים',      desc: 'הצלחתם ב-5 שילובים חדשים ושונים ברצף', points: 1, check: s => s.bestStreak >= 5 },
+  { id: 'streak-15',     icon: '⚡', title: 'בלתי עצור',      desc: 'הצלחתם ב-15 שילובים חדשים ושונים ברצף', points: 2, check: s => s.bestStreak >= 15 },
+  { id: 'streak-30',     icon: '🌪️', title: 'יד ברזל',        desc: 'הצלחתם ב-30 שילובים חדשים ושונים ברצף - בלי אף חזרה', points: 3, check: s => s.bestStreak >= 30 },
+  { id: 'streak-50',     icon: '🐉', title: 'אגדה חיה',       desc: 'הצלחתם ב-50 שילובים חדשים ושונים ברצף - מעטים יגיעו לזה', points: 4, check: s => s.bestStreak >= 50 },
+  { id: 'streak-75',     icon: '🌋', title: 'כוח טבע',        desc: 'הצלחתם ב-75 שילובים חדשים ושונים ברצף', points: 4, check: s => s.bestStreak >= 75 },
+  { id: 'streak-100',    icon: '☄️', title: 'בלתי ניתן לעצירה', desc: 'הצלחתם ב-100 שילובים חדשים ושונים ברצף - כמעט בלתי אפשרי', points: 5, check: s => s.bestStreak >= 100 },
+  { id: 'grind-100',     icon: '💪', title: 'שקדן',           desc: 'ביצעתם 100 שילובים מוצלחים בסך הכל',   points: 1, check: s => s.totalCombines >= 100 },
+  { id: 'grind-500',     icon: '🏋️', title: 'בלתי נלאה',      desc: 'ביצעתם 500 שילובים מוצלחים בסך הכל',   points: 2, check: s => s.totalCombines >= 500 },
+  { id: 'grind-1000',    icon: '💎', title: 'מכור למשחק',     desc: 'ביצעתם 1,000 שילובים מוצלחים בסך הכל - הישג של אלופים אמיתיים', points: 3, check: s => s.totalCombines >= 1000 },
+  { id: 'grind-2000',    icon: '⛏️', title: 'עמל בלתי נלאה',  desc: 'ביצעתם 2,000 שילובים מוצלחים בסך הכל', points: 4, check: s => s.totalCombines >= 2000 },
+  { id: 'grind-5000',    icon: '🗿', title: 'נצח המשחק',      desc: 'ביצעתם 5,000 שילובים מוצלחים בסך הכל - הישג יוצא מן הכלל', points: 5, check: s => s.totalCombines >= 5000 },
+  { id: 'trader-1',      icon: '🤝', title: 'סוחר מתחיל',     desc: 'השלמתם סחר חליפין אחד',                points: 1, check: s => s.trades >= 1 },
+  { id: 'trader-10',     icon: '📈', title: 'סוחר פעיל',      desc: 'השלמתם 10 סחרי חליפין',                points: 2, check: s => s.trades >= 10 },
+  { id: 'trader-50',     icon: '💹', title: 'ברון הסחר',      desc: 'השלמתם 50 סחרי חליפין',                points: 3, check: s => s.trades >= 50 },
+  { id: 'trader-100',    icon: '🏦', title: 'שליט השוק',      desc: 'השלמתם 100 סחרי חליפין - הישג נדיר',   points: 4, check: s => s.trades >= 100 },
+  { id: 'recruiter-1',   icon: '🎣', title: 'מגייס מתחיל',    desc: 'חבר/ה אחד/ת שהזמנתם הפכו לחברים מוסמכים', points: 2, check: s => s.qualifiedReferrals >= 1 },
+  { id: 'recruiter-3',   icon: '📣', title: 'משפיען מקומי',   desc: '3 חברים שהזמנתם הפכו לחברים מוסמכים',  points: 3, check: s => s.qualifiedReferrals >= 3 },
+  { id: 'recruiter-10',  icon: '🌐', title: 'בונה קהילה',     desc: '10 חברים שהזמנתם הפכו לחברים מוסמכים - הישג חברתי נדיר', points: 5, check: s => s.qualifiedReferrals >= 10 },
+  { id: 'daily-5',       icon: '🎯', title: 'מתחיל אתגרים',   desc: 'השלמתם 5 אתגרים יומיים',               points: 1, check: s => s.dailyCompleted >= 5 },
+  { id: 'daily-15',      icon: '📅', title: 'קבוע/ה בשטח',    desc: 'השלמתם 15 אתגרים יומיים',              points: 2, check: s => s.dailyCompleted >= 15 },
+  { id: 'daily-30',      icon: '🗓️', title: 'חודש שלם',       desc: 'השלמתם 30 אתגרים יומיים',              points: 3, check: s => s.dailyCompleted >= 30 },
+  { id: 'daily-100',     icon: '🏵️', title: 'מסירות אמיתית',  desc: 'השלמתם 100 אתגרים יומיים - התמדה יוצאת דופן', points: 5, check: s => s.dailyCompleted >= 100 },
+  { id: 'supporter',     icon: '⭐', title: 'תומכ/ת המשחק',   desc: 'הצטרפתם למנוי VIP',                    points: 2, check: s => s.isSubscriber },
 ];
 
 function getUnlockedBadges(){
@@ -2641,7 +2683,17 @@ function getUnlockedBadges(){
 function saveUnlockedBadges(set){ localStorage.setItem(BADGES_KEY, JSON.stringify([...set])); }
 
 function currentStats(){
-  return { elements: unlockedItems.length, recipes: getMyRecipes().length, worldFirst: myWorldFirstCount, bestStreak, totalCombines };
+  return {
+    elements: unlockedItems.length,
+    recipes: getMyRecipes().length,
+    worldFirst: myWorldFirstCount,
+    bestStreak,
+    totalCombines,
+    trades: tradesCompleted,
+    dailyCompleted: dailyCompletedCount,
+    qualifiedReferrals: myQualifiedReferrals,
+    isSubscriber: isSubscriberNow,
+  };
 }
 
 function checkBadges(){
@@ -2680,7 +2732,7 @@ function renderAchievements(){
   BADGE_DEFS.forEach(b => {
     const card = document.createElement('div');
     card.className = 'badge-card' + (unlocked.has(b.id) ? ' unlocked' : '');
-    card.innerHTML = `<div class="badge-icon">${b.icon}</div><div class="badge-title">${b.title}</div><div class="badge-desc">${b.desc}</div>`;
+    card.innerHTML = `<div class="badge-icon">${b.icon}</div><div class="badge-title">${b.title}</div><div class="badge-desc">${b.desc}</div><div class="badge-progress">🎁 ${'⭐'.repeat(b.points)} למי שהזמין/ה אתכם</div>`;
     grid.appendChild(card);
   });
 }
@@ -2751,8 +2803,10 @@ async function loadTradeStatus(){
 
     isSubscriberNow = !!data.isSubscriber;
     subscriptionExpiresAtNow = data.subscriptionExpiresAt || null;
+    myQualifiedReferrals = data.qualifiedReferrals ?? 0;
     renderVipBanner();
     updateAutoWantPreview();
+    checkBadges();
   }catch{}
 }
 
@@ -3001,6 +3055,8 @@ async function cancelMyOffer(offerId){
 // וגם מדגיש אותו ומגלגל אליו את הרשימה כדי שיופיע ישירות לעין המשתמש.
 function unlockReceivedElement(el){
   if (!el) return;
+  tradesCompleted++;
+  localStorage.setItem(TRADES_KEY, String(tradesCompleted));
   const isNew = !findItem(el.name);
   if (isNew) {
     unlockedItems.push({ name: el.name, emoji: el.emoji, discovered_by: el.discoveredBy || null, discovered_at: Date.now() });
@@ -3008,7 +3064,7 @@ function unlockReceivedElement(el){
   }
   recentlyDiscovered.add(el.name);
   renderSidebar();
-  if (isNew) checkBadges();
+  checkBadges();
   scrollToSidebarItem(el.name);
   setTimeout(() => recentlyDiscovered.delete(el.name), 3400);
   showToast(`${el.emoji} קיבלתם מהסחר: ${el.name}`, true);
@@ -3261,7 +3317,10 @@ function markDailyComplete(resultName){
   if (resultName !== dailyTarget.name) return false;
   dailyCompleted = true;
   localStorage.setItem(DAILY_KEY_PREFIX + todayKey(), '1');
+  dailyCompletedCount++;
+  localStorage.setItem(DAILY_COUNT_KEY, String(dailyCompletedCount));
   updateDailyChallengeUI();
+  checkBadges();
   return true;
 }
 
