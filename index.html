@@ -474,10 +474,15 @@
   #trade-vip-banner button{ background:var(--accent-grad); color:#fff; border:none; border-radius:10px; padding:7px 14px; font-size:12.5px; font-weight:700; cursor:pointer; white-space:nowrap; }
   #trade-subscriber-picker{ display:none; background:var(--item-bg); border:1.5px dashed var(--gold); border-radius:12px; padding:10px 12px; margin-top:8px; }
   #trade-subscriber-picker.show{ display:block; }
-  #trade-subscriber-picker-label{ font-size:12.5px; font-weight:700; color:var(--gold); margin-bottom:6px; }
-  #trade-subscriber-picker-list{ display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto; }
-  .trade-picker-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; border:1px solid var(--item-border); border-radius:10px; padding:7px 10px; background:var(--bg); font-size:13px; }
+  .trade-subscriber-picker-label{ font-size:12.5px; font-weight:700; color:var(--gold); margin-bottom:6px; }
+  #trade-subscriber-picker-exact{ margin-bottom:12px; }
+  #trade-subscriber-picker-exact-list, #trade-subscriber-picker-general-list{ display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto; }
+  .trade-picker-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; border:1px solid var(--item-border); border-radius:10px; padding:7px 10px; background:var(--bg); font-size:13px; transition:border-color .15s, background .15s; }
   .trade-picker-row button{ background:var(--accent-grad); color:#fff; border:none; border-radius:9px; padding:6px 11px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .trade-picker-row.picked{ border-color:var(--gold); background:rgba(245,158,11,.13); }
+  .trade-picker-row.picked button{ background:var(--gold); }
+  #trade-auto-want-box.chosen{ border-style:solid; border-color:var(--gold); background:rgba(245,158,11,.13); color:#b45309; font-weight:600; }
+  html.dark #trade-auto-want-box.chosen{ color:var(--gold); }
 
   /* ================= מנוי VIP: מודל הצטרפות ================= */
   #subscribe-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; }
@@ -776,8 +781,14 @@
         </div>
         <div id="trade-create-hint">בוחרים רק מה להעלות - האלמנט שתקבלו נקבע אוטומטית מבין אלמנטים שהוצעו ושעוד אין לכם.</div>
         <div id="trade-subscriber-picker">
-          <div id="trade-subscriber-picker-label">⭐ יש כמה הצעות שמבקשות בדיוק את מה שהעליתם - בחרו מה תרצו לקבל:</div>
-          <div id="trade-subscriber-picker-list"></div>
+          <div id="trade-subscriber-picker-exact" style="display:none;">
+            <div class="trade-subscriber-picker-label">⭐ יש הצעות שמבקשות בדיוק את מה שהעליתם - אשרו סחר מיידי:</div>
+            <div id="trade-subscriber-picker-exact-list"></div>
+          </div>
+          <div id="trade-subscriber-picker-general" style="display:none;">
+            <div class="trade-subscriber-picker-label">⭐ בחרו בעצמכם מה לבקש בתמורה מתוך כל האלמנטים הזמינים כרגע:</div>
+            <div id="trade-subscriber-picker-general-list"></div>
+          </div>
         </div>
       </div>
 
@@ -2952,6 +2963,16 @@ async function loadTradeStatus(){
 function renderVipBanner(){
   const banner = document.getElementById('trade-vip-banner');
   banner.classList.toggle('show', !isSubscriberNow);
+  updateCreateHint();
+}
+
+// שורת ההסבר מתחת לתיבת הסחר - מתעדכנת דינמית לפי סטטוס המנוי, כדי לא להבטיח בחירה חופשית למי שאין לו/ה אותה.
+function updateCreateHint(){
+  const hint = document.getElementById('trade-create-hint');
+  if (!hint) return;
+  hint.textContent = isSubscriberNow
+    ? 'כמנוי/ת VIP תוכלו לבחור בעצמכם מה לקבל בתמורה מתוך כל האלמנטים הזמינים כרגע.'
+    : 'בוחרים רק מה להעלות - האלמנט שתקבלו נקבע אוטומטית מבין אלמנטים שהוצעו ושעוד אין לכם.';
 }
 
 // חיווי ברור מתי אפשר להעלות הצעת סחר חדשה - כדי שלא יהיה צריך לפענח את שורת הסטטוס
@@ -3032,10 +3053,10 @@ let autoWantChoice = null; // {name, emoji, instantOfferId|null} - נקבע או
 async function computeAutoWant(offeredName){
   if (!offeredName || !findItem(offeredName)) return null;
 
-  const instant = availableOffersCache.find(o => o.wanted_element === offeredName && !findItem(o.offered_element));
+  const instant = getInstantMatches(offeredName)[0];
   if (instant) return { name: instant.offered_element, emoji: instant.offered_emoji, instantOfferId: instant.id };
 
-  const candidates = availableOffersCache.filter(o => o.offered_element !== offeredName && !findItem(o.offered_element));
+  const candidates = getCandidateOffers(offeredName);
   if (candidates.length) {
     const pick = candidates[Math.floor(Math.random() * candidates.length)];
     return { name: pick.offered_element, emoji: pick.offered_emoji, instantOfferId: null };
@@ -3055,32 +3076,75 @@ async function computeAutoWant(offeredName){
   return null;
 }
 
-// מנוי VIP: כל ההצעות הפתוחות של אחרים שמבקשות בדיוק את האלמנט שהוצע (offeredName) ושעדיין
-// אין לי - במקום לבחור אחת מהן אוטומטית/אקראית (כמו computeAutoWant), מנויים רואים את כולן
-// ובוחרים בעצמם איזו לאשר.
+// כל ההצעות הפתוחות של אחרים שמבקשות בדיוק את האלמנט שהוצע (offeredName) ושעדיין אין לי -
+// אפשר לאשר אותן מיד (סחר מיידי), בלי לפרסם הצעה חדשה.
 function getInstantMatches(offeredName){
   return availableOffersCache.filter(o => o.wanted_element === offeredName && !findItem(o.offered_element));
 }
 
-function renderSubscriberPicker(matches){
+// כל ההצעות הפתוחות של אחרים שמציעות משהו שעוד אין לי (ולא בדיוק תואמות את מה שהצעתי) -
+// המאגר שממנו נבחר בעבר אלמנט "לבקש" באופן אקראי/אוטומטי בעת פרסום הצעה חדשה.
+// מנוי VIP: במקום לבחור אחד מהם אקראית, מנויים רואים את כולם ובוחרים בעצמם מה לבקש.
+function getCandidateOffers(offeredName){
+  return availableOffersCache.filter(o => o.offered_element !== offeredName && !findItem(o.offered_element));
+}
+
+function renderSubscriberPicker(matches, candidates){
   const wrap = document.getElementById('trade-subscriber-picker');
-  const list = document.getElementById('trade-subscriber-picker-list');
-  list.innerHTML = '';
+  const exactWrap = document.getElementById('trade-subscriber-picker-exact');
+  const exactList = document.getElementById('trade-subscriber-picker-exact-list');
+  const genWrap = document.getElementById('trade-subscriber-picker-general');
+  const genList = document.getElementById('trade-subscriber-picker-general-list');
+
+  exactList.innerHTML = '';
   matches.forEach(o => {
     const row = document.createElement('div');
     row.className = 'trade-picker-row';
     row.innerHTML = `<span>${o.offered_emoji} ${o.offered_element} <small style="color:var(--text-dim)">מאת ${escapeHtml(o.nickname)}</small></span>`;
     const btn = document.createElement('button');
-    btn.textContent = 'בחרו ואשרו';
+    btn.textContent = 'אשרו סחר מיידי';
     btn.onclick = () => acceptOffer(o.id, btn);
     row.appendChild(btn);
-    list.appendChild(row);
+    exactList.appendChild(row);
   });
+  exactWrap.style.display = matches.length ? 'block' : 'none';
+
+  // אותו אלמנט מוצע עשוי להופיע בכמה הצעות פתוחות - מציגים כל אלמנט פעם אחת בלבד לבחירה.
+  genList.innerHTML = '';
+  const seen = new Set();
+  const uniqueCandidates = candidates.filter(o => {
+    if (seen.has(o.offered_element)) return false;
+    seen.add(o.offered_element);
+    return true;
+  });
+  uniqueCandidates.forEach(o => {
+    const row = document.createElement('div');
+    row.className = 'trade-picker-row';
+    row.innerHTML = `<span>${o.offered_emoji} ${o.offered_element}</span>`;
+    const btn = document.createElement('button');
+    btn.textContent = 'בחרו לבקש';
+    btn.onclick = () => selectWantedChoice(o, row);
+    row.appendChild(btn);
+    genList.appendChild(row);
+  });
+  genWrap.style.display = uniqueCandidates.length ? 'block' : 'none';
+
   wrap.classList.add('show');
 }
 
 function hideSubscriberPicker(){
   document.getElementById('trade-subscriber-picker').classList.remove('show');
+}
+
+// מנוי VIP בוחר/ת בעצמו/ה מה לבקש בתמורה (מתוך הבחירה החופשית), במקום שהמשחק יבחר אקראית.
+function selectWantedChoice(o, row){
+  autoWantChoice = { name: o.offered_element, emoji: o.offered_emoji, instantOfferId: null };
+  const box = document.getElementById('trade-auto-want-box');
+  const label = document.getElementById('trade-auto-want-label');
+  box.classList.remove('pending', 'unavailable', 'instant'); box.classList.add('chosen');
+  label.textContent = `תקבלו: ${o.offered_emoji} ${o.offered_element} (הבחירה שלכם)`;
+  document.querySelectorAll('#trade-subscriber-picker-general-list .trade-picker-row').forEach(r => r.classList.remove('picked'));
+  row.classList.add('picked');
 }
 
 async function updateAutoWantPreview(){
@@ -3090,38 +3154,39 @@ async function updateAutoWantPreview(){
   hideSubscriberPicker();
   if (!offered || !findItem(offered)) {
     autoWantChoice = null;
-    box.classList.remove('instant', 'unavailable'); box.classList.add('pending');
+    box.classList.remove('instant', 'unavailable', 'chosen'); box.classList.add('pending');
     label.textContent = 'בחרו קודם מה תרצו להעלות';
     return;
   }
   if (tradedAwayElements.has(offered)) {
     autoWantChoice = null;
-    box.classList.remove('instant', 'pending'); box.classList.add('unavailable');
+    box.classList.remove('instant', 'pending', 'chosen'); box.classList.add('unavailable');
     label.textContent = `🚫 כבר החלפתם את "${offered}" בעבר - לא ניתן להציע אותו שוב`;
     return;
   }
   if (isSubscriberNow) {
     const matches = getInstantMatches(offered);
-    if (matches.length) {
+    const candidates = getCandidateOffers(offered);
+    if (matches.length || candidates.length) {
       autoWantChoice = null;
-      box.classList.remove('instant', 'unavailable'); box.classList.add('pending');
+      box.classList.remove('instant', 'unavailable', 'chosen'); box.classList.add('pending');
       label.textContent = 'בחרו למטה מה תרצו לקבל ⬇️';
-      renderSubscriberPicker(matches);
+      renderSubscriberPicker(matches, candidates);
       return;
     }
   }
-  box.classList.remove('instant', 'unavailable'); box.classList.add('pending');
+  box.classList.remove('instant', 'unavailable', 'chosen'); box.classList.add('pending');
   label.textContent = 'בודקים מה אפשר לקבל...';
   const choice = await computeAutoWant(offered);
   // ה-offered אולי כבר השתנה עד שהתשובה חזרה - נוודא שעדיין רלוונטי
   if (document.getElementById('trade-offer-input').value.trim() !== offered) return;
   autoWantChoice = choice;
   if (!choice) {
-    box.classList.remove('instant', 'unavailable'); box.classList.add('pending');
+    box.classList.remove('instant', 'unavailable', 'chosen'); box.classList.add('pending');
     label.textContent = 'אין כרגע אלמנטים זמינים לקבל - נסו שוב מאוחר יותר';
     return;
   }
-  box.classList.remove('pending', 'unavailable');
+  box.classList.remove('pending', 'unavailable', 'chosen');
   if (choice.instantOfferId) {
     box.classList.add('instant');
     label.textContent = `⚡ תקבלו מיד: ${choice.emoji} ${choice.name}`;
