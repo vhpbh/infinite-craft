@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" href="https://i.ibb.co/hFnPhkc2/Gemini-Generated-Image-b1pnfbb1pnfbb1pn.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <!-- מנוי VIP: PayPal SDK - להדביק פעם אחת בלבד בכל עמוד (ר' גם admin.html אם יתווסף שם כפתור תשלום) -->
 <script
   src="https://www.paypal.com/sdk/js?client-id=BAAfq5cQ8gpSb17c802ACbTJyrAaBk3YJEOs48r7H8EDaUjVPGUtO23-umwjQNMMHGKXOFB4bWli3feYx0&components=hosted-buttons&disable-funding=venmo&currency=ILS">
@@ -50,12 +51,29 @@
   #sfx-credit a{ color:inherit; pointer-events:auto; }
   #sfx-credit:hover{ opacity:.8; }
 
-  #toolbar{ position:absolute; top:16px; left:16px; display:flex; gap:8px; z-index:20; }
-  .tool-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--toolbar-btn);
+  #toolbar{ position:absolute; top:16px; left:16px; z-index:20; display:flex; gap:8px; align-items:flex-start; }
+  .tool-standalone-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--toolbar-btn);
     backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
-    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; box-shadow:var(--item-shadow);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; box-shadow:var(--item-shadow);
     transition:transform .15s, box-shadow .15s; }
-  .tool-btn:hover{ transform:scale(1.1) rotate(-4deg); box-shadow:0 4px 16px rgba(139,92,246,.35); }
+  .tool-standalone-btn:hover{ transform:scale(1.08); box-shadow:0 4px 16px rgba(239,68,68,.35); }
+  #grid-menu-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--toolbar-btn);
+    backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text); box-shadow:var(--item-shadow);
+    transition:transform .15s, box-shadow .15s; }
+  #grid-menu-btn:hover{ transform:scale(1.08); box-shadow:0 4px 16px rgba(139,92,246,.35); }
+  #grid-menu-dropdown{ display:none; position:absolute; top:46px; left:0; background:var(--item-bg); color:var(--text);
+    border:1px solid var(--border); border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,.18); z-index:1001; padding:10px;
+    width:236px; backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    animation:dropdownSlideIn .18s ease; transform-origin:top left; }
+  #grid-menu-dropdown.open{ display:block; }
+  .grid-menu-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  @keyframes dropdownSlideIn{ from{ opacity:0; transform:translateY(-8px) scale(.97); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  .tool-btn{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+    padding:10px 4px; border-radius:10px; background:transparent; border:none; cursor:pointer; font-size:10.5px; font-weight:600;
+    color:var(--text); min-height:58px; text-align:center; width:100%; font-family:inherit; line-height:1.2; }
+  .tool-btn:hover{ background:var(--accent-soft); }
+  .tool-btn i{ font-size:18px; }
 
   #nick-badge{ position:absolute; top:16px; right:16px; z-index:20; background:var(--toolbar-btn); border:1px solid var(--border);
     backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
@@ -544,7 +562,7 @@
   .badge-card.just-unlocked{ animation:badge-pop .45s cubic-bezier(.34,1.56,.64,1); }
 
   /* ================= אתגר יומי ================= */
-  #daily-challenge-btn{ position:absolute; top:64px; left:16px; z-index:20; background:var(--toolbar-btn);
+  #daily-challenge-btn{ position:absolute; top:112px; right:16px; z-index:20; background:var(--toolbar-btn);
     backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
     border:1px solid var(--item-border); border-radius:20px; padding:7px 14px 7px 10px; display:flex; align-items:center; gap:7px;
     box-shadow:var(--item-shadow); cursor:pointer; font-size:12.5px; font-weight:600; transition:transform .12s; }
@@ -581,31 +599,42 @@
 
   <div id="play-area">
     <div id="bg-layer"></div>
-    <div id="money-badge" title="יתרת כסף - נצברת מהישגים, נפדית בחנות הרקעים">💰 <span id="money-balance-label">$0.00</span></div>
+    <div id="money-badge" title="יתרת כסף - נצברת מהישגים, נפדית בחנות הרקעים"><i class="fa-solid fa-sack-dollar" style="color:#22a06b;"></i> <span id="money-balance-label">$0.00</span></div>
     <div id="toolbar">
-      <button class="tool-btn" id="btn-settings" title="הגדרות">⚙️</button>
-      <button class="tool-btn" id="btn-recipe-book" title="ספר המתכונים שלי">📖</button>
-      <button class="tool-btn" id="btn-players" title="כל השחקנים והאלמנטים שגילו">👥</button>
-      <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי">🏅</button>
-      <button class="tool-btn" id="btn-achievements" title="ההישגים שלי">🎖️</button>
-      <button class="tool-btn" id="btn-bg-shop" title="חנות רקעים">🎨</button>
-      <button class="tool-btn" id="btn-trade" title="סחר חליפין">🔄</button>
-      <button class="tool-btn" id="btn-subscribe" title="מנוי VIP">⭐</button>
-      <button class="tool-btn" id="btn-personal-keys" title="מפתחות API אישיים שלי">🗝️</button>
-      <button class="tool-btn" id="btn-backup" title="ייצוא/ייבוא התקדמות">💾</button>
-      <button class="tool-btn" id="btn-chat" title="צ'אט עם המנהל">💬<span id="chat-unread-dot" style="display:none;"></span></button>
-      <button class="tool-btn" id="btn-clear" title="נקה לוח">🗑️</button>
+      <button class="tool-standalone-btn" id="btn-clear" title="נקה לוח"><i class="fa-solid fa-trash" style="color:#ef4444;"></i></button>
+      <button id="grid-menu-btn" title="תפריט">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+          <circle cx="3" cy="3" r="1.8"/><circle cx="9" cy="3" r="1.8"/><circle cx="15" cy="3" r="1.8"/>
+          <circle cx="3" cy="9" r="1.8"/><circle cx="9" cy="9" r="1.8"/><circle cx="15" cy="9" r="1.8"/>
+          <circle cx="3" cy="15" r="1.8"/><circle cx="9" cy="15" r="1.8"/><circle cx="15" cy="15" r="1.8"/>
+        </svg>
+      </button>
+      <div id="grid-menu-dropdown">
+        <div class="grid-menu-grid">
+          <button class="tool-btn" id="btn-settings" title="הגדרות"><i class="fa-solid fa-gear" style="color:#64748b;"></i><span>הגדרות</span></button>
+          <button class="tool-btn" id="btn-recipe-book" title="ספר המתכונים שלי"><i class="fa-solid fa-book" style="color:#6366f1;"></i><span>ספר מתכונים</span></button>
+          <button class="tool-btn" id="btn-players" title="כל השחקנים והאלמנטים שגילו"><i class="fa-solid fa-users" style="color:#3b82f6;"></i><span>שחקנים</span></button>
+          <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי"><i class="fa-solid fa-medal" style="color:#f59e0b;"></i><span>מובילים</span></button>
+          <button class="tool-btn" id="btn-achievements" title="ההישגים שלי"><i class="fa-solid fa-trophy" style="color:#d97706;"></i><span>הישגים</span></button>
+          <button class="tool-btn" id="btn-bg-shop" title="חנות רקעים"><i class="fa-solid fa-palette" style="color:#10b981;"></i><span>חנות רקעים</span></button>
+          <button class="tool-btn" id="btn-trade" title="סחר חליפין"><i class="fa-solid fa-right-left" style="color:#8b5cf6;"></i><span>סחר חליפין</span></button>
+          <button class="tool-btn" id="btn-subscribe" title="מנוי VIP"><i class="fa-solid fa-star" style="color:#f59e0b;"></i><span>מנוי VIP</span></button>
+          <button class="tool-btn" id="btn-personal-keys" title="מפתחות API אישיים שלי"><i class="fa-solid fa-key" style="color:#475569;"></i><span>מפתחות API</span></button>
+          <button class="tool-btn" id="btn-backup" title="ייצוא/ייבוא התקדמות"><i class="fa-solid fa-floppy-disk" style="color:#0d9488;"></i><span>גיבוי</span></button>
+          <button class="tool-btn" id="btn-chat" title="צ'אט עם המנהל"><i class="fa-solid fa-comment-dots" style="color:#0ea5e9;"></i><span>צ'אט</span><span id="chat-unread-dot" style="display:none;"></span></button>
+        </div>
+      </div>
     </div>
     <div id="daily-challenge-btn" title="האתגר היומי">
-      <span class="dc-icon">🎯</span><span class="dc-label" id="dc-label">אתגר יומי</span>
+      <span class="dc-icon"><i class="fa-solid fa-bullseye" style="color:#ef4444;"></i></span><span class="dc-label" id="dc-label">אתגר יומי</span>
     </div>
-    <div id="nick-badge" title="ניהול חשבון">👤 <span id="nick-label"></span> <span id="nick-badge-caret">▾</span></div>
+    <div id="nick-badge" title="ניהול חשבון"><i class="fa-solid fa-circle-user"></i> <span id="nick-label"></span> <span id="nick-badge-caret">▾</span></div>
     <div id="nick-account-menu" style="display:none;">
       <button id="menu-edit-password">🔑 <span id="menu-edit-password-label">קביעת סיסמה</span></button>
       <button id="menu-logout">🚪 התנתקות</button>
     </div>
     <div id="toast-wrap"></div>
-    <div id="empty-hint"><div class="big">🧩</div><div>גררו אלמנטים מהתפריט ללוח<br>ושחררו אחד על השני כדי לשלב</div></div>
+    <div id="empty-hint"><div class="big"><i class="fa-solid fa-puzzle-piece"></i></div><div>גררו אלמנטים מהתפריט ללוח<br>ושחררו אחד על השני כדי לשלב</div></div>
     <div id="sfx-credit">אפקטים קוליים: <a href="https://pixabay.com" target="_blank" rel="noopener">Pixabay</a></div>
     <div id="info-panel"></div>
 
@@ -614,22 +643,22 @@
     </div>
 
     <div id="world-elements-banner" title="סה״כ אלמנטים שהתגלו במשחק ע״י כלל השחקנים/ות עד עכשיו">
-      🌍 <span>אלמנטים שהתגלו בעולם:</span> <span class="count" id="world-elements-count">–</span>
+      <i class="fa-solid fa-earth-americas" style="color:#3b82f6;"></i> <span>אלמנטים שהתגלו בעולם:</span> <span class="count" id="world-elements-count">–</span>
     </div>
 
     <div id="discovered-banner" title="האלמנטים שאני גיליתי לראשונה בעולם">
-      🏆 <span>האלמנטים שגיליתי</span> <span class="count" id="discovered-count">0</span>
+      <i class="fa-solid fa-trophy" style="color:#f59e0b;"></i> <span>האלמנטים שגיליתי</span> <span class="count" id="discovered-count">0</span>
     </div>
   </div>
 
   <div id="sidebar-resizer" title="גררו כדי לשנות את רוחב הסרגל"></div>
   <div id="sidebar">
     <div id="sidebar-header">
-      <h1>✨ יצירה אינסופית</h1>
-      <div id="search-wrap"><span class="icon">🔍</span><input id="search-input" type="text" placeholder="חיפוש אלמנט..."></div>
+      <h1><i class="fa-solid fa-sparkles" style="color:#8b5cf6;"></i> יצירה אינסופית</h1>
+      <div id="search-wrap"><span class="icon"><i class="fa-solid fa-magnifying-glass"></i></span><input id="search-input" type="text" placeholder="חיפוש אלמנט..."></div>
       <div id="sidebar-sort-row">
-        <button class="sort-pill" data-sort="time" title="מיין לפי סדר גילוי">🕒 זמן</button>
-        <button class="sort-pill" data-sort="alpha" title="מיין לפי א-ב">🔤 א-ב</button>
+        <button class="sort-pill" data-sort="time" title="מיין לפי סדר גילוי"><i class="fa-regular fa-clock"></i> זמן</button>
+        <button class="sort-pill" data-sort="alpha" title="מיין לפי א-ב"><i class="fa-solid fa-arrow-down-a-z"></i> א-ב</button>
       </div>
       <div id="meta-row"><span id="count-label">0 אלמנטים</span><button id="btn-reset">איפוס התקדמות</button></div>
     </div>
@@ -697,8 +726,8 @@
       <input id="players-search" type="text" placeholder="חיפוש שחקן/ית...">
       <div id="players-sort-row">
         <button class="sort-pill active" data-sort="alpha">א-ב</button>
-        <button class="sort-pill" data-sort="oldest">ישן ← חדש</button>
-        <button class="sort-pill" data-sort="newest">חדש ← ישן</button>
+        <button class="sort-pill" data-sort="oldest">ישן <i class="fa-solid fa-arrow-left-long"></i> חדש</button>
+        <button class="sort-pill" data-sort="newest">חדש <i class="fa-solid fa-arrow-left-long"></i> ישן</button>
       </div>
       <div id="players-list"></div>
     </div>
@@ -712,8 +741,8 @@
       </div>
       <div id="leaderboard-modal-sub">השחקנים שגילו הכי הרבה אלמנטים בעולם</div>
       <div id="leaderboard-tabs">
-        <button class="sort-pill active" data-lb-tab="discoverers">🔎 הכי הרבה גילויים</button>
-        <button class="sort-pill" data-lb-tab="collectors">🧩 הכי הרבה אלמנטים</button>
+        <button class="sort-pill active" data-lb-tab="discoverers"><i class="fa-solid fa-magnifying-glass"></i> הכי הרבה גילויים</button>
+        <button class="sort-pill" data-lb-tab="collectors"><i class="fa-solid fa-puzzle-piece"></i> הכי הרבה אלמנטים</button>
       </div>
       <div id="leaderboard-list"></div>
     </div>
@@ -1483,6 +1512,20 @@ function openSettingsModal(){
 document.getElementById('btn-settings').addEventListener('click', openSettingsModal);
 document.getElementById('btn-close-settings').addEventListener('click', () => { settingsModalBackdrop.style.display = 'none'; });
 settingsModalBackdrop.addEventListener('click', (e) => { if (e.target.id === 'settings-modal-backdrop') e.target.style.display = 'none'; });
+
+/* ================= תפריט 9 הנקודות (מחליף את שורת האייקונים הישנה) ================= */
+const gridMenuBtn = document.getElementById('grid-menu-btn');
+const gridMenuDropdown = document.getElementById('grid-menu-dropdown');
+gridMenuBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  gridMenuDropdown.classList.toggle('open');
+});
+gridMenuDropdown.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (e.target.closest('.tool-btn')) gridMenuDropdown.classList.remove('open');
+});
+document.addEventListener('click', () => { gridMenuDropdown.classList.remove('open'); });
+
 
 darkToggle.addEventListener('change', () => {
   document.documentElement.classList.toggle('dark', darkToggle.checked);
