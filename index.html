@@ -374,7 +374,28 @@
   .lb-row.me{ box-shadow:0 0 0 2px var(--accent) inset; }
   #leaderboard-empty, #leaderboard-loading{ color:var(--text-dim); font-size:13px; text-align:center; padding:24px 0; }
 
-  /* ================= הישגים אישיים ================= */
+  /* ================= הגדרות (מצב כהה/בהיר, סאונד) ================= */
+  #settings-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; }
+  #settings-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:18px; padding:22px; width:340px; max-width:92vw; display:flex; flex-direction:column;
+    box-shadow:0 20px 60px rgba(80,40,150,.25); animation:modal-pop .25s cubic-bezier(.34,1.56,.64,1); }
+  #settings-modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  #settings-modal-header h2{ margin:0; font-size:18px; }
+  #settings-modal-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 4px; }
+  .settings-row + .settings-row{ border-top:1px solid var(--item-border); }
+  .settings-row-label{ display:flex; align-items:center; gap:10px; font-size:14.5px; font-weight:500; }
+  .settings-row-label .emoji{ font-size:19px; }
+  .toggle-switch{ position:relative; display:inline-block; width:44px; height:26px; flex:0 0 auto; }
+  .toggle-switch input{ opacity:0; width:0; height:0; }
+  .toggle-switch .track{ position:absolute; inset:0; background:var(--border); border-radius:999px; cursor:pointer; transition:background .18s; }
+  .toggle-switch .track::before{ content:''; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%;
+    box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform .18s; }
+  .toggle-switch input:checked + .track{ background:var(--accent-grad); }
+  html[dir="rtl"] .toggle-switch input:checked + .track::before{ transform:translateX(-18px); }
+  html:not([dir="rtl"]) .toggle-switch input:checked + .track::before{ transform:translateX(18px); }
+
+
   #achievements-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; }
   #achievements-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
     border:1px solid var(--item-border); border-radius:18px; padding:22px; width:440px; max-height:80vh; display:flex; flex-direction:column;
@@ -525,7 +546,7 @@
 
   <div id="play-area">
     <div id="toolbar">
-      <button class="tool-btn" id="btn-dark" title="מצב כהה">🌙</button>
+      <button class="tool-btn" id="btn-settings" title="הגדרות">⚙️</button>
       <button class="tool-btn" id="btn-recipe-book" title="ספר המתכונים שלי">📖</button>
       <button class="tool-btn" id="btn-players" title="כל השחקנים והאלמנטים שגילו">👥</button>
       <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי">🏅</button>
@@ -660,6 +681,29 @@
     </div>
   </div>
 
+  <div id="settings-modal-backdrop" style="display:none;">
+    <div id="settings-modal">
+      <div id="settings-modal-header">
+        <h2>⚙️ הגדרות</h2>
+        <button id="btn-close-settings">✕</button>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label"><span class="emoji">🌙</span> מצב כהה</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="settings-dark-toggle">
+          <span class="track"></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label"><span class="emoji">🔊</span> סאונדים</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="settings-sound-toggle">
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
   <div id="achievements-modal-backdrop" style="display:none;">
     <div id="achievements-modal">
       <div id="achievements-modal-header">
@@ -670,6 +714,7 @@
       <div id="achievements-grid"></div>
     </div>
   </div>
+
 
   <div id="trade-modal-backdrop" style="display:none;">
     <div id="trade-modal">
@@ -972,26 +1017,62 @@ const nickModalBackdrop = document.getElementById('nick-modal-backdrop');
 const nickInput = document.getElementById('nick-input');
 
 /* ================= אפקטים קוליים (SFX) =================
-   כל קובצי הסאונד יושבים באותה תיקייה כמו index.html. משתמשים ב-cloneNode בכל השמעה
-   כדי לאפשר חפיפה (למשל כמה שילובים מהירים ברצף) בלי לחתוך סאונד קודם. */
+   משתמשים ב-Web Audio API: כל הקבצים נטענים ומפוענחים (decode) מראש ל-buffers בזיכרון,
+   כך שההשמעה בפועל היא מיידית לגמרי (בלי ההשהיה שיש ב-new Audio().play() שטוען מהרשת כל פעם).
+   כל קובצי הסאונד יושבים באותה תיקייה כמו index.html. */
 const SFX_VOLUME = 0.55;
-const SFX = {
-  click:       new Audio('sfx-click.mp3'),        // לחיצה כללית על משהו במשחק (כפתורי סרגל כלים, לקיחת אלמנט מהרשימה)
-  combine:     new Audio('sfx-combine.mp3'),       // שילוב אלמנטים על הלוח
-  discover:    new Audio('sfx-discover.mp3'),      // אלמנט חדש התגלה (עבור השחקן/ה, גלובלית או אישית)
-  clearBoard:  new Audio('sfx-clear-board.mp3'),   // ניקוי הלוח
-  achievement: new Audio('sfx-achievement.mp3'),   // פתיחת תג/הישג בהישגים
-  error:       new Audio('sfx-error.mp3'),         // חוסר טוקנים / שגיאה כללית / שילוב לא הגיוני
+const SFX_MUTE_KEY = 'jc_sfx_muted';
+let sfxMuted = localStorage.getItem(SFX_MUTE_KEY) === '1';
+
+const SFX_FILES = {
+  click:       'sfx-click.mp3',        // ממש כל לחיצה/פעולה של השחקן/ית במשחק
+  combine:     'sfx-combine.mp3',      // שילוב אלמנטים על הלוח
+  discover:    'sfx-discover.mp3',     // אלמנט חדש התגלה (עבור השחקן/ה, גלובלית או אישית)
+  clearBoard:  'sfx-clear-board.mp3',  // ניקוי הלוח
+  achievement: 'sfx-achievement.mp3',  // פתיחת תג/הישג בהישגים
+  error:       'sfx-error.mp3',        // חוסר טוקנים / שגיאה כללית / שילוב לא הגיוני
 };
+
+const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+const audioCtx = AudioCtxClass ? new AudioCtxClass() : null;
+const sfxBuffers = {};
+
+async function preloadSfx(){
+  if (!audioCtx) return;
+  await Promise.all(Object.entries(SFX_FILES).map(async ([key, file]) => {
+    try{
+      const res = await fetch(file);
+      const arrBuf = await res.arrayBuffer();
+      sfxBuffers[key] = await audioCtx.decodeAudioData(arrBuf);
+    }catch(e){ /* קובץ בודד שלא נטען לא אמור להפיל את שאר הסאונדים */ }
+  }));
+}
+preloadSfx();
+
+// בדפדפנים רבים AudioContext נפתח "מושהה" עד לאינטראקציה ראשונה של המשתמש/ת - מוודאים שהוא ער.
+function resumeAudioCtxOnce(){
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+document.addEventListener('pointerdown', resumeAudioCtxOnce, { once: true });
+
 function playSfx(name){
-  const base = SFX[name];
-  if (!base) return;
+  if (sfxMuted || !audioCtx) return;
+  const buf = sfxBuffers[name];
+  if (!buf) return;
   try{
-    const node = base.cloneNode();
-    node.volume = SFX_VOLUME;
-    node.play().catch(() => {}); // מתעלמים משגיאות autoplay (למשל לפני אינטראקציה ראשונה של המשתמש/ת)
+    resumeAudioCtxOnce();
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    const gain = audioCtx.createGain();
+    gain.gain.value = SFX_VOLUME;
+    src.connect(gain).connect(audioCtx.destination);
+    src.start(0);
   }catch(e){ /* לא קריטי - המשחק ממשיך גם בלי סאונד */ }
 }
+
+// כל לחיצה/מגע בכל מקום במשחק משמיעים את צליל הקליק - חוץ מזה, פעולות ספציפיות
+// (שילוב, גילוי, ניקוי לוח, הישג, שגיאה) משמיעות בנוסף גם את הסאונד הייעודי שלהן.
+document.addEventListener('pointerdown', () => playSfx('click'), true);
 
 const LOCAL_PROGRESS_KEY = 'jc_personal_progress'; // האלמנטים שהמשתמש הזה עצמו גילה (בדפדפן הזה בלבד)
 
@@ -1328,15 +1409,32 @@ document.getElementById('btn-clear').addEventListener('click', () => {
   playArea.querySelectorAll('.board-item').forEach(n => n.remove());
   updateEmptyHint();
 });
-document.getElementById('btn-dark').addEventListener('click', () => {
-  document.documentElement.classList.toggle('dark');
-  document.getElementById('btn-dark').textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+
+/* ================= הגדרות (מצב כהה/בהיר, סאונד) ================= */
+const DARK_MODE_KEY = 'jc_dark_mode';
+if (localStorage.getItem(DARK_MODE_KEY) === '1') document.documentElement.classList.add('dark');
+
+const settingsModalBackdrop = document.getElementById('settings-modal-backdrop');
+const darkToggle = document.getElementById('settings-dark-toggle');
+const soundToggle = document.getElementById('settings-sound-toggle');
+
+function openSettingsModal(){
+  darkToggle.checked = document.documentElement.classList.contains('dark');
+  soundToggle.checked = !sfxMuted;
+  settingsModalBackdrop.style.display = 'flex';
+}
+document.getElementById('btn-settings').addEventListener('click', openSettingsModal);
+document.getElementById('btn-close-settings').addEventListener('click', () => { settingsModalBackdrop.style.display = 'none'; });
+settingsModalBackdrop.addEventListener('click', (e) => { if (e.target.id === 'settings-modal-backdrop') e.target.style.display = 'none'; });
+
+darkToggle.addEventListener('change', () => {
+  document.documentElement.classList.toggle('dark', darkToggle.checked);
+  localStorage.setItem(DARK_MODE_KEY, darkToggle.checked ? '1' : '0');
 });
 
-// סאונד לחיצה כללי לשאר כפתורי סרגל הכלים (לניקוי הלוח יש כבר סאונד ייעודי משלו למעלה)
-document.querySelectorAll('#toolbar .tool-btn').forEach(btn => {
-  if (btn.id === 'btn-clear') return;
-  btn.addEventListener('click', () => playSfx('click'));
+soundToggle.addEventListener('change', () => {
+  sfxMuted = !soundToggle.checked;
+  localStorage.setItem(SFX_MUTE_KEY, sfxMuted ? '1' : '0');
 });
 
 /* ================= שינוי רוחב הסרגל הצדדי (גרירת הגבול) ================= */
@@ -1398,7 +1496,6 @@ sidebarResizer.addEventListener('pointercancel', endSidebarResize);
 function makeDraggableSource(el, item){
   el.addEventListener('pointerdown', (e) => {
     e.preventDefault();
-    playSfx('click');
     const rect = playArea.getBoundingClientRect();
     const startX = e.clientX - rect.left - 20;
     const startY = e.clientY - rect.top - 16;
