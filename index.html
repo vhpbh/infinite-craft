@@ -136,6 +136,9 @@
   #nick-modal input{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); font-family:inherit; font-size:14px; margin-bottom:12px; background:var(--bg); color:var(--text); }
   #nick-modal button{ width:100%; padding:10px; border:none; border-radius:10px; background:var(--accent-grad); color:#fff; font-weight:600; font-family:inherit; font-size:14px; cursor:pointer; transition:transform .12s, box-shadow .12s; }
   #nick-modal button:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(139,92,246,.4); }
+  #auth-mode-tabs{ display:flex; gap:6px; margin-bottom:14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:4px; }
+  .auth-tab{ flex:1; padding:8px; border:none; border-radius:8px; background:none; color:var(--text-dim); font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; box-shadow:none !important; transform:none !important; }
+  .auth-tab.active{ background:var(--accent-grad); color:#fff; }
   @keyframes modal-pop{ from{opacity:0; transform:scale(.92) translateY(6px);} to{opacity:1; transform:scale(1) translateY(0);} }
   .pkey-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--bg); border:1px solid var(--border);
     border-radius:10px; padding:7px 10px; font-size:12.5px; }
@@ -584,10 +587,27 @@
   <div id="nick-modal-backdrop" style="display:none;">
     <div id="nick-modal">
       <div class="big">🧑‍🎨</div>
-      <h2>איך קוראים לך?</h2>
-      <p>הכינוי שלך יופיע לצד כל אלמנט חדש שתגלה, בדיוק כמו ב-Infinite Craft. שימו לב: לא ניתן להחליף כינוי אחרי שמתחילים, ואם השם כבר תפוס תקבלו גרסה ייחודית שלו.</p>
-      <input id="nick-input" type="text" maxlength="24" placeholder="לדוגמה: דני">
-      <button id="nick-submit">בואו נתחיל!</button>
+      <h2>ברוכים הבאים!</h2>
+      <p>הכינוי שלך יופיע לצד כל אלמנט חדש שתגלה, בדיוק כמו ב-Infinite Craft. הרשמה דורשת גם סיסמה, כדי להגן על החשבון שלך מפני התחזות ולאפשר להיכנס אליו שוב ממכשיר אחר.</p>
+
+      <div id="auth-mode-tabs">
+        <button type="button" id="tab-register" class="auth-tab active">✍️ הרשמה</button>
+        <button type="button" id="tab-login" class="auth-tab">🔑 התחברות</button>
+      </div>
+
+      <div id="register-fields">
+        <input id="nick-input" type="text" maxlength="24" placeholder="בחרו כינוי" autocomplete="username">
+        <input id="reg-password-input" type="password" placeholder="בחרו סיסמה (לפחות 6 תווים)" autocomplete="new-password">
+        <input id="reg-password-confirm" type="password" placeholder="אימות סיסמה" autocomplete="new-password">
+        <button id="nick-submit">בואו נתחיל!</button>
+      </div>
+
+      <div id="login-fields" style="display:none;">
+        <input id="auth-login-nickname" type="text" placeholder="הכינוי שלכם" autocomplete="username">
+        <input id="auth-login-password" type="password" placeholder="סיסמה" autocomplete="current-password">
+        <button id="auth-login-submit">התחברות</button>
+      </div>
+
       <div id="nick-status" style="font-size:12.5px; margin-top:10px; display:none; color:#e53e3e;"></div>
     </div>
   </div>
@@ -991,13 +1011,35 @@ async function claimNickname(desired){
 
 async function submitNickname(){
   const val = nickInput.value.trim();
-  if (!val) return;
-  nickSubmitBtn.disabled = true; nickSubmitBtn.textContent = 'בודק זמינות...';
+  const pw = document.getElementById('reg-password-input').value;
+  const pwConfirm = document.getElementById('reg-password-confirm').value;
+
+  if (!val) { if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'יש לבחור כינוי.'; } return; }
+  if (!pw || pw.length < 6) { if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'הסיסמה חייבת להכיל לפחות 6 תווים.'; } return; }
+  if (pw !== pwConfirm) { if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'הסיסמאות לא תואמות.'; } return; }
+
+  nickSubmitBtn.disabled = true; nickSubmitBtn.textContent = 'נרשמים...';
   if (nickStatus) nickStatus.style.display = 'none';
   try{
     const { nickname: finalNickname, wasTaken } = await claimNickname(val);
     nickname = finalNickname;
     localStorage.setItem('jc_nickname', nickname);
+
+    // קביעת הסיסמה מיד עם ההרשמה - מהרגע הראשון החשבון מוגן מפני התחזות.
+    try{
+      const pwRes = await fetch(ACCOUNT_SET_PASSWORD_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, password: pw })
+      });
+      const pwResult = await pwRes.json();
+      if (!pwRes.ok || pwResult.error) {
+        showToast(`⚠️ נרשמת בהצלחה, אבל קביעת הסיסמה נכשלה (${pwResult.error || 'שגיאת שרת'}). אפשר לנסות שוב מתפריט המשתמש למעלה.`, false);
+      }
+    }catch{
+      showToast('⚠️ נרשמת בהצלחה, אבל לא הצלחנו לשמור סיסמה בגלל בעיית תקשורת. אפשר לנסות שוב מתפריט המשתמש למעלה.', false);
+    }
+
     nickBadge.textContent = nickname;
     nickModalBackdrop.style.display = 'none';
     claimReferralIfPending();
@@ -1005,13 +1047,63 @@ async function submitNickname(){
       showToast(`הכינוי "${val}" כבר תפוס, לכן קיבלת את הכינוי "${finalNickname}"`, false);
     }
     startGame();
-    maybeShowPasswordNag();
   }catch(err){
-    if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'לא הצלחנו לקבוע כינוי, נסו שוב.'; }
+    if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'לא הצלחנו להירשם, נסו שוב.'; }
   }finally{
     nickSubmitBtn.disabled = false; nickSubmitBtn.textContent = 'בואו נתחיל!';
   }
 }
+
+/* ================= מעבר בין הרשמה להתחברות במסך הפתיחה ================= */
+const tabRegister = document.getElementById('tab-register');
+const tabLogin = document.getElementById('tab-login');
+const registerFields = document.getElementById('register-fields');
+const loginFields = document.getElementById('login-fields');
+
+tabRegister.addEventListener('click', () => {
+  tabRegister.classList.add('active'); tabLogin.classList.remove('active');
+  registerFields.style.display = 'block'; loginFields.style.display = 'none';
+  if (nickStatus) nickStatus.style.display = 'none';
+});
+tabLogin.addEventListener('click', () => {
+  tabLogin.classList.add('active'); tabRegister.classList.remove('active');
+  loginFields.style.display = 'block'; registerFields.style.display = 'none';
+  if (nickStatus) nickStatus.style.display = 'none';
+});
+
+const authLoginBtn = document.getElementById('auth-login-submit');
+async function submitAuthLogin(){
+  const nick = document.getElementById('auth-login-nickname').value.trim();
+  const pw = document.getElementById('auth-login-password').value;
+  if (!nick || !pw) { if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'יש להזין כינוי וסיסמה.'; } return; }
+
+  authLoginBtn.disabled = true; authLoginBtn.textContent = 'מתחברים...';
+  if (nickStatus) nickStatus.style.display = 'none';
+  try{
+    const res = await fetch(ACCOUNT_LOGIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname: nick, password: pw })
+    });
+    const result = await res.json();
+    if (!res.ok || result.error) {
+      if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = result.error || 'שגיאת שרת'; }
+      return;
+    }
+    clientId = result.clientId;
+    localStorage.setItem(CLIENT_ID_KEY, clientId);
+    nickname = result.nickname;
+    localStorage.setItem('jc_nickname', nickname);
+    location.reload();
+  }catch{
+    if (nickStatus){ nickStatus.style.display = 'block'; nickStatus.textContent = 'שגיאת תקשורת עם השרת.'; }
+  }finally{
+    authLoginBtn.disabled = false; authLoginBtn.textContent = 'התחברות';
+  }
+}
+authLoginBtn.addEventListener('click', submitAuthLogin);
+document.getElementById('auth-login-password').addEventListener('keydown', e => { if (e.key === 'Enter') submitAuthLogin(); });
+document.getElementById('reg-password-confirm').addEventListener('keydown', e => { if (e.key === 'Enter') submitNickname(); });
 
 /* ================= תפריט חשבון: קביעת/שינוי סיסמה + התנתקות ================= */
 const nickAccountMenu = document.getElementById('nick-account-menu');
