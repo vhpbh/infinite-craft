@@ -387,6 +387,7 @@
   #trade-auto-want-box.pending{ color:var(--text-dim); font-weight:500; }
   #trade-auto-want-box.instant{ border-style:solid; border-color:#22c55e; background:rgba(34,197,94,.13); color:#16a34a; }
   html.dark #trade-auto-want-box.instant{ color:#4ade80; }
+  #trade-auto-want-box.unavailable{ border-style:solid; border-color:var(--danger); background:rgba(239,68,68,.13); color:var(--danger); font-weight:500; }
 
   #trade-offers-list{ display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto; }
   .trade-offer-row{ display:flex; align-items:center; gap:8px; border:1px solid var(--item-border); border-radius:12px; padding:9px 12px; background:var(--item-bg); font-size:13.5px; }
@@ -2340,29 +2341,35 @@ function startTradeCountdown(seconds){
 
 // חיפוש חי בתוך האלמנטים שהשחקן/ית כבר מחזיק/ה בהם, לצורך בחירת מה להעלות לסחר
 let autoWantPreviewTimer = null;
-function setupOfferSearch(){
+let tradedAwayElements = new Set(); // אלמנטים שכבר הוחלפו בהצלחה בעבר - אי אפשר להציע אותם שוב (ר' loadMyOffer)
+
+function renderOfferDatalist(q){
   const input = document.getElementById('trade-offer-input');
   const datalist = document.getElementById('trade-offer-datalist');
-  const render = (q) => {
-    const query = (q || '').trim().toLowerCase();
-    datalist.innerHTML = '';
-    unlockedItems
-      .filter(it => !query || it.name.toLowerCase().includes(query))
-      .slice(0, 50)
-      .forEach(it => {
-        const opt = document.createElement('option');
-        opt.value = it.name;
-        opt.label = `${it.emoji} ${it.name}`;
-        datalist.appendChild(opt);
-      });
-  };
+  const query = (q ?? input.value ?? '').trim().toLowerCase();
+  datalist.innerHTML = '';
+  unlockedItems
+    .filter(it => !query || it.name.toLowerCase().includes(query))
+    .slice(0, 50)
+    .forEach(it => {
+      const opt = document.createElement('option');
+      opt.value = it.name;
+      opt.label = tradedAwayElements.has(it.name)
+        ? `🚫 ${it.emoji} ${it.name} (כבר הוחלף - לא זמין)`
+        : `${it.emoji} ${it.name}`;
+      datalist.appendChild(opt);
+    });
+}
+
+function setupOfferSearch(){
+  const input = document.getElementById('trade-offer-input');
   input.value = '';
   input.oninput = () => {
-    render(input.value);
+    renderOfferDatalist(input.value);
     clearTimeout(autoWantPreviewTimer);
     autoWantPreviewTimer = setTimeout(updateAutoWantPreview, 300);
   };
-  render('');
+  renderOfferDatalist('');
   updateAutoWantPreview();
 }
 
@@ -2405,22 +2412,28 @@ async function updateAutoWantPreview(){
   const offered = document.getElementById('trade-offer-input').value.trim();
   if (!offered || !findItem(offered)) {
     autoWantChoice = null;
-    box.classList.remove('instant'); box.classList.add('pending');
+    box.classList.remove('instant', 'unavailable'); box.classList.add('pending');
     label.textContent = 'בחרו קודם מה תרצו להעלות';
     return;
   }
-  box.classList.remove('instant'); box.classList.add('pending');
+  if (tradedAwayElements.has(offered)) {
+    autoWantChoice = null;
+    box.classList.remove('instant', 'pending'); box.classList.add('unavailable');
+    label.textContent = `🚫 כבר החלפתם את "${offered}" בעבר - לא ניתן להציע אותו שוב`;
+    return;
+  }
+  box.classList.remove('instant', 'unavailable'); box.classList.add('pending');
   label.textContent = 'בודקים מה אפשר לקבל...';
   const choice = await computeAutoWant(offered);
   // ה-offered אולי כבר השתנה עד שהתשובה חזרה - נוודא שעדיין רלוונטי
   if (document.getElementById('trade-offer-input').value.trim() !== offered) return;
   autoWantChoice = choice;
   if (!choice) {
-    box.classList.remove('instant'); box.classList.add('pending');
+    box.classList.remove('instant', 'unavailable'); box.classList.add('pending');
     label.textContent = 'אין כרגע אלמנטים זמינים לקבל - נסו שוב מאוחר יותר';
     return;
   }
-  box.classList.remove('pending');
+  box.classList.remove('pending', 'unavailable');
   if (choice.instantOfferId) {
     box.classList.add('instant');
     label.textContent = `⚡ תקבלו מיד: ${choice.emoji} ${choice.name}`;
@@ -2437,6 +2450,10 @@ async function loadMyOffer(){
     const res = await fetch(`${TRADE_URL}/my-offers?clientId=${encodeURIComponent(clientId)}`);
     const data = await res.json();
     const offers = data.offers || [];
+    // כל הצעה שהושלמה בהצלחה (בכל זמן) - האלמנט שהוצע בה כבר "נשרף" ולא ניתן להציע אותו שוב.
+    tradedAwayElements = new Set(offers.filter(o => o.status === 'completed').map(o => o.offered_element));
+    renderOfferDatalist();
+    updateAutoWantPreview();
     const open = offers.find(o => o.status === 'open');
     const readyToClaim = offers.find(o => o.status === 'completed' && !o.poster_claimed);
 
@@ -2563,6 +2580,7 @@ document.getElementById('trade-create-btn').addEventListener('click', async () =
   const offered = document.getElementById('trade-offer-input').value.trim();
   if (!offered) { showToast('בחרו אלמנט מהאוסף שלכם להעלות', false); return; }
   if (!findItem(offered)) { showToast('בחרו אלמנט קיים מתוך האוסף שלכם', false); return; }
+  if (tradedAwayElements.has(offered)) { showToast(`כבר החלפתם את "${offered}" בעבר - בחרו אלמנט אחר`, false); return; }
   const btn = document.getElementById('trade-create-btn');
   btn.disabled = true;
   const choice = autoWantChoice || await computeAutoWant(offered);
