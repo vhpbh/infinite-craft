@@ -411,10 +411,10 @@
   /* ================= כוכבי-רקע + חנות רקעים ================= */
   #bg-layer{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; display:none; }
   #bg-layer canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
-  #stars-badge{ position:absolute; top:64px; right:16px; z-index:20; background:var(--toolbar-btn); border:1px solid var(--border);
+  #money-badge{ position:absolute; top:64px; right:16px; z-index:20; background:var(--toolbar-btn); border:1px solid var(--border);
     backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
     border-radius:20px; padding:7px 14px; font-size:13px; font-weight:700; box-shadow:var(--item-shadow); color:var(--gold); }
-  #stars-badge span{ color:var(--text); font-weight:700; }
+  #money-badge span{ color:var(--text); font-weight:700; }
 
   #bg-shop-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; }
   #bg-shop-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
@@ -581,7 +581,7 @@
 
   <div id="play-area">
     <div id="bg-layer"></div>
-    <div id="stars-badge" title="כוכבי-רקע - נצברים מהישגים, נפדים בחנות הרקעים">💫 <span id="stars-balance-label">0</span></div>
+    <div id="money-badge" title="יתרת כסף - נצברת מהישגים, נפדית בחנות הרקעים">💰 <span id="money-balance-label">$0.00</span></div>
     <div id="toolbar">
       <button class="tool-btn" id="btn-settings" title="הגדרות">⚙️</button>
       <button class="tool-btn" id="btn-recipe-book" title="ספר המתכונים שלי">📖</button>
@@ -759,7 +759,7 @@
         <h2>🎨 חנות רקעים</h2>
         <button id="btn-close-bg-shop">✕</button>
       </div>
-      <div id="bg-shop-modal-sub">פדו את כוכבי-הרקע 💫 שצברתם מהישגים על רקעים דינמיים ללוח - ככל שהרקע מרשים יותר, כך הוא עולה יותר</div>
+      <div id="bg-shop-modal-sub">קנו רקעים דינמיים ללוח בכסף 💰 שצברתם מהישגים - ככל שהרקע מרשים יותר, כך הוא עולה יותר</div>
       <div id="bg-shop-grid"></div>
     </div>
   </div>
@@ -1364,8 +1364,9 @@ async function startGame(){
   updateEmptyHint();
   refreshDiscoveredByMe();
   loadDailyChallenge();
-  updateStarsBadge();
   applyBackground(getActiveBackground());
+  fetchShopCatalog();
+  claimAchievementPayouts();
 }
 
 /* ================= personal progress (local to this browser only) ================= */
@@ -2276,8 +2277,6 @@ document.getElementById('btn-export-progress').addEventListener('click', () => {
     dailyCompletedCount,
     sidebarSortMode,
     dailyCompletions: collectDailyCompletions(),
-    stars: starsBalance,
-    purchasedBackgrounds: [...getPurchasedBackgrounds()],
     activeBackground: getActiveBackground(),
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -2357,8 +2356,6 @@ document.getElementById('btn-import-progress').addEventListener('click', async (
       localStorage.setItem(DAILY_KEY_PREFIX + dateKey, data.dailyCompletions[dateKey]);
     });
   }
-  localStorage.setItem(STARS_KEY, String(Number.isFinite(data.stars) ? data.stars : 0));
-  localStorage.setItem(BG_PURCHASED_KEY, JSON.stringify(Array.isArray(data.purchasedBackgrounds) ? data.purchasedBackgrounds : []));
   localStorage.setItem(BG_ACTIVE_KEY, typeof data.activeBackground === 'string' ? data.activeBackground : 'none');
 
   showBackupStatus('✅ יובא בהצלחה! טוענים מחדש...', true);
@@ -2387,8 +2384,6 @@ function syncProgressToServer(){
             tradesCompleted,
             dailyCompletedCount,
             dailyCompletions: collectDailyCompletions(),
-            stars: starsBalance,
-            purchasedBackgrounds: [...getPurchasedBackgrounds()],
             activeBackground: getActiveBackground(),
           },
         }),
@@ -2409,8 +2404,6 @@ async function restoreProgressAfterLogin(cid){
   localStorage.removeItem(TOTAL_COMBINES_KEY);
   localStorage.removeItem(TRADES_KEY);
   localStorage.removeItem(DAILY_COUNT_KEY);
-  localStorage.removeItem(STARS_KEY);
-  localStorage.removeItem(BG_PURCHASED_KEY);
   localStorage.removeItem(BG_ACTIVE_KEY);
 
   if (!ACCOUNT_PROGRESS_URL) return;
@@ -2434,8 +2427,6 @@ async function restoreProgressAfterLogin(cid){
         localStorage.setItem(DAILY_KEY_PREFIX + dateKey, progress.dailyCompletions[dateKey]);
       });
     }
-    localStorage.setItem(STARS_KEY, String(Number.isFinite(progress.stars) ? progress.stars : 0));
-    localStorage.setItem(BG_PURCHASED_KEY, JSON.stringify(Array.isArray(progress.purchasedBackgrounds) ? progress.purchasedBackgrounds : []));
     localStorage.setItem(BG_ACTIVE_KEY, typeof progress.activeBackground === 'string' ? progress.activeBackground : 'none');
   }catch{ /* אין תקשורת עם השרת - נטען עם מה שיש (בדרך כלל ריק אחרי הניקוי למעלה) */ }
 }
@@ -2924,19 +2915,22 @@ function checkBadges(){
   newlyUnlocked.forEach(b => unlocked.add(b.id));
   saveUnlockedBadges(unlocked);
   newlyUnlocked.forEach((b, i) => setTimeout(() => celebrateBadge(b), i * 900));
+  // התשלום הדולרי בפועל מתבצע ומאומת בשרת (ר' handleAchievementReport ב-worker.js) - הלקוח
+  // רק מציג בתצוגה מקדימה כמה זה עתיד להיות (ר' celebrateBadge/renderAchievements), ואז מסנכרן
+  // את היתרה האמיתית מהתשובה של השרת.
   newlyUnlocked.forEach(b => reportAchievementToServer(b.id));
-  // כל הישג חדש מזכה גם בכוכבי-רקע (מטבע נפרד מ"טוקני הסחר" של points) - ר' מערכת חנות הרקעים למטה.
-  const totalStarsEarned = newlyUnlocked.reduce((sum, b) => sum + (b.stars || 0), 0);
-  if (totalStarsEarned > 0) addStars(totalStarsEarned);
 }
 
-// מדווח לשרת על הישג חדש (לצורך אימות תנאי "חבר מביא חבר" - ר' פופאפ הסחר). כשל בשקט אם אין רשת/כינוי.
+// מדווח לשרת על הישג חדש (לצורך אימות תנאי "חבר מביא חבר" ותשלום דולרי - ר' פופאפ הסחר וחנות
+// הרקעים). כשל בשקט אם אין רשת/כינוי. מסנכרן את היתרה בעקבות התשלום שהשרת מבצע על ההישג הזה.
 function reportAchievementToServer(achievementId){
   if (!WORKER_URL || !clientId || !nickname) return;
   fetch(`${WORKER_URL}/achievement/report`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ clientId, nickname, achievementId })
+  }).then(res => res.json()).then(data => {
+    if (data && Number.isFinite(data.balanceUsd)){ balanceUsd = data.balanceUsd; updateMoneyBadge(); }
   }).catch(() => {});
 }
 
@@ -2944,7 +2938,8 @@ function celebrateBadge(b){
   playSfx('achievement');
   const t = document.createElement('div');
   t.className = 'toast badge-toast';
-  t.innerHTML = `<span>${b.icon} תג חדש נפתח: ${b.title}! ${b.stars ? `<b class="star-earn">+${b.stars} 💫</b>` : ''}</span>`;
+  const earnedUsd = ((b.stars || 0) * 0.01).toFixed(2);
+  t.innerHTML = `<span>${b.icon} תג חדש נפתח: ${b.title}! ${b.stars ? `<b class="star-earn">+$${earnedUsd}</b>` : ''}</span>`;
   toastWrap.appendChild(t);
   setTimeout(() => t.remove(), 3600);
 }
@@ -2956,7 +2951,7 @@ function renderAchievements(){
   BADGE_DEFS.forEach(b => {
     const card = document.createElement('div');
     card.className = 'badge-card' + (unlocked.has(b.id) ? ' unlocked' : '');
-    card.innerHTML = `<div class="badge-icon">${b.icon}</div><div class="badge-title">${b.title}</div><div class="badge-desc">${b.desc}</div><div class="badge-progress">🎁 ${'⭐'.repeat(b.points)} למי שהזמין/ה אתכם &nbsp;·&nbsp; 💫 ${b.stars || 0} כוכבי-רקע</div>`;
+    card.innerHTML = `<div class="badge-icon">${b.icon}</div><div class="badge-title">${b.title}</div><div class="badge-desc">${b.desc}</div><div class="badge-progress">🎁 ${'⭐'.repeat(b.points)} למי שהזמין/ה אתכם &nbsp;·&nbsp; 💰 $${((b.stars || 0) * 0.01).toFixed(2)}</div>`;
     grid.appendChild(card);
   });
 }
@@ -2968,48 +2963,58 @@ document.getElementById('btn-achievements').addEventListener('click', () => {
 document.getElementById('btn-close-achievements').addEventListener('click', () => { document.getElementById('achievements-modal-backdrop').style.display = 'none'; });
 document.getElementById('achievements-modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'achievements-modal-backdrop') e.target.style.display = 'none'; });
 
-/* ================= כוכבי-רקע + חנות רקעים ================================================
-   מטבע נפרד לגמרי מ"טוקני הסחר" (badge.points) שכבר קיימים במשחק - כל תג חדש שנפתח מזכה גם
-   בכמות מסוימת של "כוכבי-רקע" (badge.stars, ר' BADGE_DEFS למעלה). כוכבים אלה אפשר לפדות בחנות
-   על רקעים דינמיים ל-#play-area. כל רקע חי בקובץ JS נפרד תחת backgrounds/ (כדי לא להכביד את
-   האינדקס הזה) שנטען דינמית רק כשצריך, ונרשם עצמאית ל-window.GameBackgrounds[id].
-   שמירה: הכל ב-localStorage בדפדפן הזה + מסונכרן ל-DB דרך אותו מנגנון progress_json הקיים
-   (ר' syncProgressToServer / restoreProgressAfterLogin למעלה) - כך שגם התחברות מדפדפן אחר
-   משחזרת את יתרת הכוכבים והרקעים שנרכשו. */
-const STARS_KEY = 'jc_stars_balance';
-const BG_PURCHASED_KEY = 'jc_purchased_backgrounds';
+/* ================= חנות רקעים (קטלוג + בעלות מנוהלים בשרת, מחיר בדולרים) =================
+   הקטלוג (אילו רקעים קיימים, שם/תיאור/אייקון, מחיר) והבעלות (מי קנה/קיבל מה) חיים כעת ב-DB
+   בצד השרת (ר' /shop/backgrounds, /shop/buy-background ב-worker.js) - כדי שאפשר לנהל אותם
+   מפאנל הניהול (admin.html), כולל הענקת רקעים ידנית למשתמשים ספציפיים. כל רקע עדיין חי בקובץ
+   JS נפרד תחת backgrounds/<id>.js (מועלה ל-GitHub כרגיל) שנטען דינמית רק כשצריך, ונרשם
+   עצמאית ל-window.GameBackgrounds[id]. הבחירה איזה רקע "פעיל" כרגע היא העדפת תצוגה מקומית
+   בלבד ונשארת ב-localStorage. */
 const BG_ACTIVE_KEY = 'jc_active_background';
-let starsBalance = parseInt(localStorage.getItem(STARS_KEY) || '0', 10) || 0;
-
-function getPurchasedBackgrounds(){
-  try{ return new Set(JSON.parse(localStorage.getItem(BG_PURCHASED_KEY) || '[]')); }catch{ return new Set(); }
-}
-function savePurchasedBackgrounds(set){ localStorage.setItem(BG_PURCHASED_KEY, JSON.stringify([...set])); }
+const SHOP_URL = WORKER_URL ? `${WORKER_URL}/shop` : '';
 function getActiveBackground(){ return localStorage.getItem(BG_ACTIVE_KEY) || 'none'; }
 function setActiveBackground(id){ localStorage.setItem(BG_ACTIVE_KEY, id); }
 
-function addStars(amount){
-  starsBalance += amount;
-  localStorage.setItem(STARS_KEY, String(starsBalance));
-  updateStarsBadge();
-  syncProgressToServer();
+let shopCatalog = []; // [{id,name,description,icon,previewCss,priceUsd,owned}] - ממולא ע"י fetchShopCatalog
+let balanceUsd = 0;
+
+function updateMoneyBadge(){
+  const el = document.getElementById('money-balance-label');
+  if (el) el.textContent = `$${balanceUsd.toFixed(2)}`;
 }
 
-function updateStarsBadge(){
-  const el = document.getElementById('stars-balance-label');
-  if (el) el.textContent = starsBalance.toLocaleString('he-IL');
+// שולף מהשרת את קטלוג הרקעים המוגדרים + מה בבעלות הלקוח הזה + יתרת הדולרים הנוכחית.
+async function fetchShopCatalog(){
+  if (!SHOP_URL || !clientId) return;
+  try{
+    const res = await fetch(`${SHOP_URL}/backgrounds?clientId=${encodeURIComponent(clientId)}`);
+    const data = await res.json();
+    if (!res.ok || data.error) return;
+    shopCatalog = Array.isArray(data.backgrounds) ? data.backgrounds : [];
+    balanceUsd = Number.isFinite(data.balanceUsd) ? data.balanceUsd : 0;
+    updateMoneyBadge();
+  }catch{ /* לא קריטי - נמשיך עם המטמון האחרון שהיה (או ריק) */ }
 }
 
-// כל רקע = קובץ JS נפרד (backgrounds/<id>.js) שכשנטען נרשם עצמאית ל-window.GameBackgrounds[id] = { init(container) => teardownFn }.
-// preview הוא רק גרדיאנט CSS לתצוגה מקדימה בכרטיס החנות - לא קשור לקובץ עצמו.
-const BACKGROUND_DEFS = [
-  { id: 'bubbles-pink',   name: 'בועות ורודות חולמניות', desc: 'בועות רכות מרחפות בעדינות בגוונים ורודים וסגולים',        price: 60,  icon: '🫧', preview: 'linear-gradient(135deg,#ffd6ec,#c9a7ff)' },
-  { id: 'starfield-blue', name: 'שדה כוכבים כחול',        desc: 'כוכבים נוצצים וזורמים על רקע כחול עמוק, כמו חלל אינסופי', price: 60,  icon: '✨', preview: 'linear-gradient(135deg,#0b1030,#1b3a8a)' },
-  { id: 'aurora-waves',   name: 'גלי אורורה ירוקים',      desc: 'גלים זוהרים נעים בעדינות בהשראת זוהר הצפון',              price: 120, icon: '🌌', preview: 'linear-gradient(135deg,#062f2a,#0fae7a)' },
-  { id: 'confetti-drift', name: 'קונפטי צבעוני מרחף',     desc: 'פיסות קונפטי בכל צבעי הקשת נופלות ברחבי המסך',            price: 120, icon: '🎉', preview: 'linear-gradient(135deg,#ff9ad5,#ffd166,#7ee8fa)' },
-  { id: 'matrix-rain',    name: 'גשם דיגיטלי ירוק',       desc: 'תווים ירוקים זוהרים נופלים על רקע שחור, בסגנון האקרים',   price: 150, icon: '💻', preview: 'linear-gradient(135deg,#000,#003b1a)' },
-  { id: 'particle-links', name: 'רשת חלקיקים אינטראקטיבית', desc: 'רשת חלקיקים סגולה שמגיבה בזמן אמת לתנועת העכבר שלכם - הרקע היוקרתי ביותר בחנות', price: 250, icon: '🕸️', preview: 'radial-gradient(circle at 40% 40%,#2b2f45,#0a0c10)' },
-];
+// המסלול הרטרואקטיבי: מבקש מהשרת לשלם על כל הישג שכבר נפתח אבל עדיין לא שולם עליו (ר'
+// handleAchievementClaimPayouts ב-worker.js) - כדי שגם הישגים שנפתחו לפני התוספת הזו ישולמו.
+// בטוח לקרוא לזה שוב ושוב - הישג ששולם כבר לא ישולם פעם נוספת.
+async function claimAchievementPayouts(){
+  if (!WORKER_URL || !clientId) return;
+  try{
+    const res = await fetch(`${WORKER_URL}/achievement/claim-payouts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) return;
+    if (Number.isFinite(data.balanceUsd)){ balanceUsd = data.balanceUsd; updateMoneyBadge(); }
+    if (data.paidNow > 0){
+      showToast(`💰 קיבלתם $${data.paidNow.toFixed(2)} רטרואקטיבית על הישגים קודמים!`, true);
+    }
+  }catch{ /* לא קריטי */ }
+}
 
 let currentBgTeardown = null;
 const BG_SCRIPT_BASE = 'backgrounds/';
@@ -3035,8 +3040,6 @@ async function applyBackground(id){
   bgLayer.innerHTML = '';
   bgLayer.style.display = 'none';
   if (!id || id === 'none') return;
-  const def = BACKGROUND_DEFS.find(b => b.id === id);
-  if (!def) return;
   try{
     await loadBackgroundScript(id);
     const mod = window.GameBackgrounds && window.GameBackgrounds[id];
@@ -3052,34 +3055,39 @@ function equipBackground(id){
   setActiveBackground(id);
   applyBackground(id);
   renderShop();
-  syncProgressToServer();
 }
 
-function purchaseBackground(id){
-  const def = BACKGROUND_DEFS.find(b => b.id === id);
+async function purchaseBackground(id){
+  const def = shopCatalog.find(b => b.id === id);
   if (!def) return;
-  const purchased = getPurchasedBackgrounds();
-  if (purchased.has(id)){ equipBackground(id); return; }
-  if (starsBalance < def.price){
-    showToast(`❌ חסרים לכם עוד 💫 ${def.price - starsBalance} כדי לרכוש את "${def.name}"`, false);
+  if (def.owned){ equipBackground(id); return; }
+  if (balanceUsd < def.priceUsd){
+    showToast(`❌ חסרים לכם עוד $${(def.priceUsd - balanceUsd).toFixed(2)} כדי לרכוש את "${def.name}"`, false);
     return;
   }
-  if (!confirm(`לרכוש את הרקע "${def.name}" תמורת 💫 ${def.price} כוכבי-רקע?`)) return;
-  starsBalance -= def.price;
-  localStorage.setItem(STARS_KEY, String(starsBalance));
-  purchased.add(id);
-  savePurchasedBackgrounds(purchased);
-  updateStarsBadge();
-  equipBackground(id);
-  showToast(`✅ נרכש בהצלחה! הרקע "${def.name}" פעיל כעת`, true);
+  if (!confirm(`לרכוש את הרקע "${def.name}" תמורת $${def.priceUsd.toFixed(2)}?`)) return;
+  try{
+    const res = await fetch(`${SHOP_URL}/buy-background`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, backgroundId: id }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error){ showToast(`❌ ${data.error || 'הרכישה נכשלה'}`, false); return; }
+    if (Number.isFinite(data.newBalanceUsd)){ balanceUsd = data.newBalanceUsd; updateMoneyBadge(); }
+    await fetchShopCatalog();
+    equipBackground(id);
+    showToast(`✅ נרכש בהצלחה! הרקע "${def.name}" פעיל כעת`, true);
+  }catch{
+    showToast('❌ שגיאת תקשורת עם השרת - נסו שוב', false);
+  }
 }
 
 function renderShop(){
-  updateStarsBadge();
+  updateMoneyBadge();
   const grid = document.getElementById('bg-shop-grid');
   if (!grid) return;
   grid.innerHTML = '';
-  const purchased = getPurchasedBackgrounds();
   const active = getActiveBackground();
 
   const noneCard = document.createElement('div');
@@ -3091,23 +3099,31 @@ function renderShop(){
   noneCard.querySelector('.bg-card-btn').addEventListener('click', () => equipBackground('none'));
   grid.appendChild(noneCard);
 
-  BACKGROUND_DEFS.forEach(def => {
-    const owned = purchased.has(def.id);
+  if (shopCatalog.length === 0){
+    const empty = document.createElement('div');
+    empty.style.cssText = 'grid-column:1/-1;text-align:center;color:var(--text-dim);font-size:13px;padding:10px 0;';
+    empty.textContent = 'עדיין אין רקעים נוספים בחנות.';
+    grid.appendChild(empty);
+  }
+
+  shopCatalog.forEach(def => {
+    const owned = def.owned;
     const isActive = active === def.id;
     const card = document.createElement('div');
-    card.className = 'bg-card' + (isActive ? ' active' : '') + (!owned && starsBalance < def.price ? ' locked' : '');
-    let btnLabel = owned ? (isActive ? '✓ פעיל' : 'הפעלה') : `🔒 קנייה - 💫 ${def.price}`;
-    card.innerHTML = `<div class="bg-card-preview" style="background:${def.preview}"><span class="bg-card-icon">${def.icon}</span></div>
+    card.className = 'bg-card' + (isActive ? ' active' : '') + (!owned && balanceUsd < def.priceUsd ? ' locked' : '');
+    let btnLabel = owned ? (isActive ? '✓ פעיל' : 'הפעלה') : `🔒 קנייה - $${def.priceUsd.toFixed(2)}`;
+    card.innerHTML = `<div class="bg-card-preview" style="background:${def.previewCss}"><span class="bg-card-icon">${def.icon}</span></div>
       <div class="bg-card-name">${def.name}</div>
-      <div class="bg-card-desc">${def.desc}</div>
+      <div class="bg-card-desc">${def.description}</div>
       <button class="bg-card-btn${isActive ? ' active' : ''}">${btnLabel}</button>`;
     card.querySelector('.bg-card-btn').addEventListener('click', () => purchaseBackground(def.id));
     grid.appendChild(card);
   });
 }
 
-document.getElementById('btn-bg-shop').addEventListener('click', () => {
+document.getElementById('btn-bg-shop').addEventListener('click', async () => {
   document.getElementById('bg-shop-modal-backdrop').style.display = 'flex';
+  await fetchShopCatalog();
   renderShop();
 });
 document.getElementById('btn-close-bg-shop').addEventListener('click', () => { document.getElementById('bg-shop-modal-backdrop').style.display = 'none'; });
