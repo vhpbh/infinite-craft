@@ -45,6 +45,10 @@
   #empty-hint{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--text-dim); font-size:15px;
     text-align:center; pointer-events:none; display:flex; flex-direction:column; gap:6px; align-items:center; z-index:1; }
   #empty-hint .big{ font-size:34px; }
+  #sfx-credit{ position:absolute; bottom:6px; left:50%; transform:translateX(-50%); z-index:1;
+    font-size:10px; color:var(--text-dim); opacity:.45; pointer-events:none; }
+  #sfx-credit a{ color:inherit; pointer-events:auto; }
+  #sfx-credit:hover{ opacity:.8; }
 
   #toolbar{ position:absolute; top:16px; left:16px; display:flex; gap:8px; z-index:20; }
   .tool-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--toolbar-btn);
@@ -543,6 +547,7 @@
     </div>
     <div id="toast-wrap"></div>
     <div id="empty-hint"><div class="big">🧩</div><div>גררו אלמנטים מהתפריט ללוח<br>ושחררו אחד על השני כדי לשלב</div></div>
+    <div id="sfx-credit">אפקטים קוליים: <a href="https://pixabay.com" target="_blank" rel="noopener">Pixabay</a></div>
     <div id="info-panel"></div>
 
     <div id="active-players" title="שחקנים פעילים במשחק כרגע">
@@ -966,6 +971,28 @@ const nickBadge = document.getElementById('nick-label');
 const nickModalBackdrop = document.getElementById('nick-modal-backdrop');
 const nickInput = document.getElementById('nick-input');
 
+/* ================= אפקטים קוליים (SFX) =================
+   כל קובצי הסאונד יושבים באותה תיקייה כמו index.html. משתמשים ב-cloneNode בכל השמעה
+   כדי לאפשר חפיפה (למשל כמה שילובים מהירים ברצף) בלי לחתוך סאונד קודם. */
+const SFX_VOLUME = 0.55;
+const SFX = {
+  click:       new Audio('sfx-click.mp3'),        // לחיצה כללית על משהו במשחק (כפתורי סרגל כלים, לקיחת אלמנט מהרשימה)
+  combine:     new Audio('sfx-combine.mp3'),       // שילוב אלמנטים על הלוח
+  discover:    new Audio('sfx-discover.mp3'),      // אלמנט חדש התגלה (עבור השחקן/ה, גלובלית או אישית)
+  clearBoard:  new Audio('sfx-clear-board.mp3'),   // ניקוי הלוח
+  achievement: new Audio('sfx-achievement.mp3'),   // פתיחת תג/הישג בהישגים
+  error:       new Audio('sfx-error.mp3'),         // חוסר טוקנים / שגיאה כללית / שילוב לא הגיוני
+};
+function playSfx(name){
+  const base = SFX[name];
+  if (!base) return;
+  try{
+    const node = base.cloneNode();
+    node.volume = SFX_VOLUME;
+    node.play().catch(() => {}); // מתעלמים משגיאות autoplay (למשל לפני אינטראקציה ראשונה של המשתמש/ת)
+  }catch(e){ /* לא קריטי - המשחק ממשיך גם בלי סאונד */ }
+}
+
 const LOCAL_PROGRESS_KEY = 'jc_personal_progress'; // האלמנטים שהמשתמש הזה עצמו גילה (בדפדפן הזה בלבד)
 
 /* אלמנטי הפתיחה קבועים וזהים לכולם - אין צורך לשלוף אותם מהשרת */
@@ -1297,12 +1324,19 @@ document.getElementById('btn-reset').addEventListener('click', () => {
   renderSidebar();
 });
 document.getElementById('btn-clear').addEventListener('click', () => {
+  playSfx('clearBoard');
   playArea.querySelectorAll('.board-item').forEach(n => n.remove());
   updateEmptyHint();
 });
 document.getElementById('btn-dark').addEventListener('click', () => {
   document.documentElement.classList.toggle('dark');
   document.getElementById('btn-dark').textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+});
+
+// סאונד לחיצה כללי לשאר כפתורי סרגל הכלים (לניקוי הלוח יש כבר סאונד ייעודי משלו למעלה)
+document.querySelectorAll('#toolbar .tool-btn').forEach(btn => {
+  if (btn.id === 'btn-clear') return;
+  btn.addEventListener('click', () => playSfx('click'));
 });
 
 /* ================= שינוי רוחב הסרגל הצדדי (גרירת הגבול) ================= */
@@ -1364,6 +1398,7 @@ sidebarResizer.addEventListener('pointercancel', endSidebarResize);
 function makeDraggableSource(el, item){
   el.addEventListener('pointerdown', (e) => {
     e.preventDefault();
+    playSfx('click');
     const rect = playArea.getBoundingClientRect();
     const startX = e.clientX - rect.left - 20;
     const startY = e.clientY - rect.top - 16;
@@ -1526,6 +1561,7 @@ async function combineItems(div1, div2){
     // המכסה של מפתחות ה-API המשותפים נגמרה - מציעים לפתוח את חלונית המפתחות האישיים.
     if (result.quotaExceeded) {
       div1.classList.remove('loading'); div2.classList.remove('loading');
+      playSfx('error');
       showToast("⚡ אין מספיק טוקנים", false, null, "להוספת מפתח API", () => {
         openPersonalKeyModal();
       });
@@ -1546,6 +1582,7 @@ async function combineItems(div1, div2){
     console.error(err);
     div1.classList.remove('loading'); div2.classList.remove('loading');
     div1.classList.add('shake'); div2.classList.add('shake');
+    playSfx('error');
 
     // אין מספיק טוקנים - במקום לפנות לבוחן אנושי, מציעים לפתוח את חלונית מפתחות ה-API האישיים.
     if (isQuotaIssue) {
@@ -1560,12 +1597,14 @@ async function combineItems(div1, div2){
 }
 function handleCombineFailed(div1, div2, name1, name2){
   div1.classList.add('shake'); div2.classList.add('shake');
+  playSfx('error');
   showToast(`🚫 אין שילוב הגיוני בין ${name1} ל-${name2}`, false);
   setTimeout(() => { div1.classList.remove('shake'); div2.classList.remove('shake'); }, 350);
   comboStreak = 0;
 }
 
 function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
+  playSfx('combine');
   spawnSparks(x, y);
   div1.classList.add('merged-away'); div2.classList.add('merged-away');
   setTimeout(() => { div1.remove(); div2.remove(); }, 170);
@@ -1582,6 +1621,7 @@ function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
   }, 160);
 
   if (isPersonallyNew){
+    playSfx('discover');
     unlockedItems.push({ name: result.name, emoji: result.emoji, discovered_by: result.discoveredBy || null, discovered_at: Date.now() });
     savePersonalProgress();
     recentlyDiscovered.add(result.name);
@@ -2718,6 +2758,7 @@ function reportAchievementToServer(achievementId){
 }
 
 function celebrateBadge(b){
+  playSfx('achievement');
   const t = document.createElement('div');
   t.className = 'toast badge-toast';
   t.innerHTML = `<span>${b.icon} תג חדש נפתח: ${b.title}!</span>`;
