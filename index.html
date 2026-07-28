@@ -3741,6 +3741,17 @@ async function loadDailyChallenge(){
   const dateKey = todayKey();
   dailyCompleted = localStorage.getItem(DAILY_KEY_PREFIX + dateKey) === '1';
   if (!WORKER_URL) return;
+  // קודם בודקים אם המנהל/ת קבע/ה מראש ידנית איזה אלמנט יהיה האתגר בתאריך הזה (ר' admin.html) -
+  // אם כן, זה גובר על הבחירה האוטומטית מהמאגר. אם אין קביעה ידנית (או שאין חיבור), פשוט ממשיכים כרגיל.
+  try{
+    const schedRes = await fetch(`${WORKER_URL}/daily-schedule?date=${dateKey}`);
+    const schedBody = await schedRes.json();
+    if (schedBody && schedBody.data && schedBody.data.name){
+      dailyTarget = schedBody.data;
+      updateDailyChallengeUI();
+      return;
+    }
+  }catch{ /* אין קביעה ידנית לתאריך הזה - ממשיכים לבחירה האוטומטית */ }
   try{
     const res = await fetch(DAILY_POOL_URL);
     const { data } = await res.json();
