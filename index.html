@@ -361,6 +361,29 @@
   #ad-overlay-close:disabled{ cursor:default; opacity:.75; font-size:14px; }
   #ad-overlay-close:disabled:hover{ filter:none; }
 
+  /* ================= תוספת: התראת עדכון לקובץ "הרצה ישירה" ================= */
+  #direct-run-update-badge{ position:fixed; bottom:18px; left:18px; z-index:350; display:none; align-items:center; gap:10px;
+    background:var(--accent-grad); color:#fff; padding:11px 16px; border-radius:14px; font-size:13.5px; font-weight:600;
+    box-shadow:0 10px 30px rgba(80,40,150,.3); cursor:pointer; max-width:min(80vw,320px); }
+  #direct-run-update-close{ border:none; background:rgba(255,255,255,.25); color:#fff; width:22px; height:22px; border-radius:50%;
+    font-size:12px; cursor:pointer; flex:0 0 auto; }
+  #direct-run-update-close:hover{ background:rgba(255,255,255,.4); }
+
+  /* ================= תוספת: ווידג'ט תחרות אלמנטים (ספירה לאחור + לוח מובילים חי) ================= */
+  #competition-widget{ position:fixed; top:90px; left:18px; z-index:250; width:230px; display:none;
+    background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:16px; padding:14px; box-shadow:0 14px 40px rgba(80,40,150,.2); }
+  #competition-widget-header{ font-weight:700; font-size:14px; margin-bottom:4px; }
+  .competition-seed-row{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+  .competition-countdown{ font-size:22px; font-weight:700; color:var(--accent); text-align:center; margin:6px 0; direction:ltr; }
+  .competition-lb-row{ display:flex; justify-content:space-between; gap:6px; font-size:12.5px; padding:4px 0; border-bottom:1px solid var(--item-border); }
+  .competition-lb-row:last-child{ border-bottom:none; }
+  .competition-lb-rank{ color:var(--text-dim); width:22px; flex:0 0 auto; }
+  @media (max-width:760px){
+    #competition-widget{ left:8px; top:auto; bottom:80px; width:190px; }
+    #direct-run-update-badge{ left:8px; bottom:8px; font-size:12px; padding:9px 12px; }
+  }
+
   /* ================= מסך מצב תחזוקה (חוסם, בלי אפשרות סגירה) ================= */
   #maintenance-backdrop{ position:fixed; inset:0; background:var(--bg); z-index:500; display:none; align-items:center; justify-content:center;
     text-align:center; padding:24px; }
@@ -1017,6 +1040,16 @@
       <button id="ad-overlay-close" title="סגירה">✕</button>
       <img id="ad-overlay-img" src="" alt="פרסומת">
     </div>
+  </div>
+
+  <div id="direct-run-update-badge">
+    <span>📥 קובץ ההרצה הישירה התעדכנה!</span>
+    <button id="direct-run-update-close" title="סגירה">✕</button>
+  </div>
+
+  <div id="competition-widget">
+    <div id="competition-widget-header">🏆 תחרות אלמנטים</div>
+    <div id="competition-widget-body"></div>
   </div>
 
   <div id="maintenance-backdrop">
@@ -2164,6 +2197,140 @@ async function checkMaintenance(){
 }
 checkMaintenance();
 setInterval(checkMaintenance, 15000);
+
+/* ================= תוספת: התראת עדכון לקובץ "הרצה ישירה" =================
+   כשהמנהל/ת מעלה קובץ מעודכן (ר' worker.js /admin/direct-run-file), מופיע כפתור התראה קטן
+   שנשאר גלוי עד שסוגרים אותו; אז נזכר ב-localStorage (לא sessionStorage - בכוונה, כדי שהוא
+   באמת "לא יופיע יותר" גם אחרי סגירת הדפדפן) שה-version הזה כבר נסגר, ולא יופיע שוב עד גרסה חדשה. */
+const DIRECT_RUN_STATUS_URL = WORKER_URL ? `${WORKER_URL}/direct-run-file/status` : '';
+const DIRECT_RUN_DOWNLOAD_URL = WORKER_URL ? `${WORKER_URL}/direct-run-file/download` : '';
+const directRunBadge = document.getElementById('direct-run-update-badge');
+const directRunCloseBtn = document.getElementById('direct-run-update-close');
+
+async function checkDirectRunFileUpdate(){
+  if (!WORKER_URL) return;
+  try{
+    const res = await fetch(DIRECT_RUN_STATUS_URL);
+    const { data } = await res.json();
+    if (!data || !data.version){ directRunBadge.style.display = 'none'; return; }
+    const dismissed = localStorage.getItem('jc_direct_run_dismissed_version');
+    if (dismissed === data.version){ directRunBadge.style.display = 'none'; return; }
+    directRunBadge.dataset.version = data.version;
+    directRunBadge.style.display = 'flex';
+  }catch{ /* לא קריטי אם זה נכשל */ }
+}
+directRunBadge.addEventListener('click', (e) => {
+  if (e.target === directRunCloseBtn) return;
+  window.open(DIRECT_RUN_DOWNLOAD_URL, '_blank');
+});
+directRunCloseBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  localStorage.setItem('jc_direct_run_dismissed_version', directRunBadge.dataset.version || '1');
+  directRunBadge.style.display = 'none';
+});
+checkDirectRunFileUpdate();
+setInterval(checkDirectRunFileUpdate, 15000);
+
+/* ================= תוספת: תחרות אלמנטים - ספירה לאחור + לוח מובילים חי =================
+   בזמן scheduled: מציג ספירה לאחור עד להתחלה + תצוגה מקדימה של 4 האלמנטים. ברגע שהופך ל-active
+   (ר' /competition/status ב-worker.js): מוסיף את 4 האלמנטים למלאי האישי של השחקן/ית (כדי שיהיה
+   אפשר לשלב מהם, בדיוק כמו אלמנטי הפתיחה), ופותח לוח מובילים חי (פולינג נפרד ותכוף יותר). */
+const COMPETITION_STATUS_URL = WORKER_URL ? `${WORKER_URL}/competition/status` : '';
+const COMPETITION_LEADERBOARD_URL = WORKER_URL ? `${WORKER_URL}/competition/leaderboard` : '';
+const competitionWidget = document.getElementById('competition-widget');
+const competitionWidgetBody = document.getElementById('competition-widget-body');
+let competitionCountdownTimer = null;
+let competitionLbTimer = null;
+let lastCompetitionSeededId = null;
+let isCompetitionWinnerNow = false;
+
+function addCompetitionElementsToInventory(seedElements){
+  let changed = false;
+  (seedElements || []).forEach(e => {
+    if (!findItem(e.name)){
+      unlockedItems.push({ name: e.name, emoji: e.emoji, discovered_by: null, discovered_at: Date.now() });
+      changed = true;
+    }
+  });
+  if (changed){ savePersonalProgress(); renderSidebar(); }
+}
+
+function formatCompetitionCountdown(ms){
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+  return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
+}
+
+async function checkCompetitionStatus(){
+  if (!WORKER_URL) return;
+  try{
+    const qs = nickname ? `?nickname=${encodeURIComponent(nickname)}` : '';
+    const res = await fetch(`${COMPETITION_STATUS_URL}${qs}`);
+    const { data } = await res.json();
+    clearInterval(competitionCountdownTimer);
+    clearInterval(competitionLbTimer);
+
+    if (!data || data.status === 'ended'){
+      competitionWidget.style.display = 'none';
+      if (data && data.isWinner && !isCompetitionWinnerNow){ isCompetitionWinnerNow = true; checkBadges(); }
+      return;
+    }
+
+    competitionWidget.style.display = 'block';
+    if (data.status === 'active' && lastCompetitionSeededId !== data.id){
+      addCompetitionElementsToInventory(data.seedElements);
+      lastCompetitionSeededId = data.id;
+    }
+
+    const seedHtml = `<div class="competition-seed-row">${(data.seedElements || []).map(e =>
+      `<span class="sidebar-item"><span class="emoji">${escapeHtml(e.emoji)}</span><span>${escapeHtml(e.name)}</span></span>`).join('')}</div>`;
+
+    if (data.status === 'scheduled'){
+      const startAt = new Date(data.startAt).getTime();
+      competitionWidgetBody.innerHTML = `<div style="font-size:12.5px; color:var(--text-dim);">התחרות מתחילה בעוד:</div>
+        <div class="competition-countdown" id="competition-countdown-num"></div>${seedHtml}`;
+      const tick = () => {
+        const remaining = startAt - Date.now();
+        if (remaining <= 0){ checkCompetitionStatus(); return; }
+        const el = document.getElementById('competition-countdown-num');
+        if (el) el.textContent = formatCompetitionCountdown(remaining);
+      };
+      tick();
+      competitionCountdownTimer = setInterval(tick, 1000);
+    } else if (data.status === 'active'){
+      const endsAt = new Date(data.endsAt).getTime();
+      competitionWidgetBody.innerHTML = `${seedHtml}
+        <div style="font-size:12.5px; color:var(--text-dim); margin-top:6px;">נותר:</div>
+        <div class="competition-countdown" id="competition-countdown-num"></div>
+        <div id="competition-lb-list" style="margin-top:8px;">טוען לוח מובילים...</div>`;
+      const tick = () => {
+        const remaining = endsAt - Date.now();
+        if (remaining <= 0){ checkCompetitionStatus(); return; }
+        const el = document.getElementById('competition-countdown-num');
+        if (el) el.textContent = formatCompetitionCountdown(remaining);
+      };
+      tick();
+      competitionCountdownTimer = setInterval(tick, 1000);
+
+      const refreshLb = async () => {
+        try{
+          const lbRes = await fetch(`${COMPETITION_LEADERBOARD_URL}?id=${data.id}`);
+          const { data: lb } = await lbRes.json();
+          const listEl = document.getElementById('competition-lb-list');
+          if (!listEl) return;
+          if (!lb || lb.length === 0){ listEl.innerHTML = `<div style="font-size:12px; color:var(--text-dim);">אין עדיין תוצאות</div>`; return; }
+          listEl.innerHTML = lb.map((row, i) =>
+            `<div class="competition-lb-row"><span class="competition-lb-rank">#${i + 1}</span><span>${escapeHtml(row.nickname)}</span><b>${row.score}</b></div>`
+          ).join('');
+        }catch{ /* לא קריטי */ }
+      };
+      refreshLb();
+      competitionLbTimer = setInterval(refreshLb, 6000);
+    }
+  }catch{ /* לא קריטי אם זה נכשל */ }
+}
+checkCompetitionStatus();
+setInterval(checkCompetitionStatus, 10000);
 
 /* ================= גיבוי / העברת התקדמות (ייצוא + ייבוא) =================
    הקובץ המיוצא הוא בעצם "כרטיס כניסה" מלא לחשבון (כולל ה-client_id שמזהה את הכינוי מול השרת) -
