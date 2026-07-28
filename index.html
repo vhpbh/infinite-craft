@@ -369,20 +369,32 @@
     font-size:12px; cursor:pointer; flex:0 0 auto; }
   #direct-run-update-close:hover{ background:rgba(255,255,255,.4); }
 
-  /* ================= תוספת: ווידג'ט תחרות אלמנטים (ספירה לאחור + לוח מובילים חי) ================= */
-  #competition-widget{ position:fixed; top:90px; left:18px; z-index:250; width:230px; display:none;
-    background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
-    border:1px solid var(--item-border); border-radius:16px; padding:14px; box-shadow:0 14px 40px rgba(80,40,150,.2); }
-  #competition-widget-header{ font-weight:700; font-size:14px; margin-bottom:4px; }
+  /* ================= תוספת: ווידג'ט תחרות אלמנטים (ספירה לאחור + לוח מובילים חי) =================
+     כפתור/"בועה" צפה קטנה שלא חוסמת כלום; לחיצה עליה פותחת פאנל קטן מעליה עם הפרטים, ולחיצה
+     נוספת/על ה-✕ סוגרת את הפאנל בחזרה (הבועה עצמה נשארת, כדי שאפשר יהיה לפתוח שוב). */
+  #competition-widget{ position:fixed; bottom:18px; right:18px; z-index:250; display:none; }
+  #competition-pill{ display:flex; align-items:center; gap:8px; background:var(--accent-grad); color:#fff;
+    padding:11px 16px; border-radius:999px; font-size:13.5px; font-weight:700; cursor:pointer;
+    box-shadow:0 10px 30px rgba(80,40,150,.3); white-space:nowrap; }
+  #competition-pill .dot{ width:8px; height:8px; border-radius:50%; background:#4ade80; flex:0 0 auto; }
+  #competition-panel{ display:none; position:absolute; bottom:56px; right:0; width:230px; max-height:min(70vh,420px);
+    overflow-y:auto; background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:16px; padding:14px; box-shadow:0 14px 40px rgba(80,40,150,.25); }
+  #competition-widget.expanded #competition-panel{ display:block; }
+  #competition-panel-header{ display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:14px; margin-bottom:4px; }
+  #competition-panel-close{ border:none; background:var(--item-bg); color:var(--text); width:22px; height:22px; border-radius:50%;
+    font-size:12px; cursor:pointer; flex:0 0 auto; }
   .competition-seed-row{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
   .competition-countdown{ font-size:22px; font-weight:700; color:var(--accent); text-align:center; margin:6px 0; direction:ltr; }
   .competition-lb-row{ display:flex; justify-content:space-between; gap:6px; font-size:12.5px; padding:4px 0; border-bottom:1px solid var(--item-border); }
   .competition-lb-row:last-child{ border-bottom:none; }
   .competition-lb-rank{ color:var(--text-dim); width:22px; flex:0 0 auto; }
   @media (max-width:760px){
-    #competition-widget{ left:8px; top:auto; bottom:80px; width:190px; }
+    #competition-widget{ right:8px; bottom:76px; }
+    #competition-panel{ width:min(74vw,220px); bottom:50px; }
     #direct-run-update-badge{ left:8px; bottom:8px; font-size:12px; padding:9px 12px; }
   }
+
 
   /* ================= מסך מצב תחזוקה (חוסם, בלי אפשרות סגירה) ================= */
   #maintenance-backdrop{ position:fixed; inset:0; background:var(--bg); z-index:500; display:none; align-items:center; justify-content:center;
@@ -1048,8 +1060,11 @@
   </div>
 
   <div id="competition-widget">
-    <div id="competition-widget-header">🏆 תחרות אלמנטים</div>
-    <div id="competition-widget-body"></div>
+    <div id="competition-pill"><span class="dot"></span><span>🏆 תחרות אלמנטים</span></div>
+    <div id="competition-panel">
+      <div id="competition-panel-header"><span>🏆 תחרות אלמנטים</span><button id="competition-panel-close" title="סגירה">✕</button></div>
+      <div id="competition-widget-body"></div>
+    </div>
   </div>
 
   <div id="maintenance-backdrop">
@@ -2238,11 +2253,16 @@ setInterval(checkDirectRunFileUpdate, 15000);
 const COMPETITION_STATUS_URL = WORKER_URL ? `${WORKER_URL}/competition/status` : '';
 const COMPETITION_LEADERBOARD_URL = WORKER_URL ? `${WORKER_URL}/competition/leaderboard` : '';
 const competitionWidget = document.getElementById('competition-widget');
+const competitionPill = document.getElementById('competition-pill');
+const competitionPanelClose = document.getElementById('competition-panel-close');
 const competitionWidgetBody = document.getElementById('competition-widget-body');
 let competitionCountdownTimer = null;
 let competitionLbTimer = null;
 let lastCompetitionSeededId = null;
 let isCompetitionWinnerNow = false;
+
+competitionPill.addEventListener('click', () => competitionWidget.classList.toggle('expanded'));
+competitionPanelClose.addEventListener('click', () => competitionWidget.classList.remove('expanded'));
 
 function addCompetitionElementsToInventory(seedElements){
   let changed = false;
