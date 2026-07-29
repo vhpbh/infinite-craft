@@ -370,28 +370,55 @@
   #direct-run-update-close:hover{ background:rgba(255,255,255,.4); }
 
   /* ================= תוספת: ווידג'ט תחרות אלמנטים (ספירה לאחור + לוח מובילים חי) =================
-     כפתור/"בועה" צפה קטנה שלא חוסמת כלום; לחיצה עליה פותחת פאנל קטן מעליה עם הפרטים, ולחיצה
-     נוספת/על ה-✕ סוגרת את הפאנל בחזרה (הבועה עצמה נשארת, כדי שאפשר יהיה לפתוח שוב). */
-  #competition-widget{ position:fixed; bottom:18px; right:18px; z-index:250; display:none; }
-  #competition-pill{ display:flex; align-items:center; gap:8px; background:var(--accent-grad); color:#fff;
-    padding:11px 16px; border-radius:999px; font-size:13.5px; font-weight:700; cursor:pointer;
-    box-shadow:0 10px 30px rgba(80,40,150,.3); white-space:nowrap; }
-  #competition-pill .dot{ width:8px; height:8px; border-radius:50%; background:#4ade80; flex:0 0 auto; }
-  #competition-panel{ display:none; position:absolute; bottom:56px; right:0; width:230px; max-height:min(70vh,420px);
+     ווידג'ט בולט וניתן לגרירה בכל המסך: ה"בועה" עצמה גדולה ומהבהבת כדי שלא תפספס תחרות פעילה/
+     מתוזמנת, אפשר לגרור אותה (וגם את הפאנל הפתוח) לכל מקום על המסך, ולמזער אותה בחזרה לבועה
+     בלחיצה על כפתור המזעור. המיקום האחרון נשמר לפי מכשיר (localStorage). */
+  #competition-widget{ position:fixed; top:18px; left:18px; z-index:400; display:none; touch-action:none; }
+  #competition-widget.dragging{ transition:none !important; }
+  #competition-pill{ display:flex; align-items:center; gap:10px; background:var(--accent-grad); color:#fff;
+    padding:15px 22px; border-radius:999px; font-size:16px; font-weight:800; cursor:grab;
+    box-shadow:0 14px 40px rgba(80,40,150,.45), 0 0 0 4px rgba(255,255,255,.12);
+    white-space:nowrap; animation:competitionPillPulse 1.8s ease-in-out infinite; user-select:none; }
+  #competition-pill:active{ cursor:grabbing; }
+  #competition-widget.expanded #competition-pill{ animation:none; }
+  #competition-pill .dot{ width:10px; height:10px; border-radius:50%; background:#4ade80; flex:0 0 auto;
+    box-shadow:0 0 0 0 rgba(74,222,128,.6); animation:competitionDotPing 1.6s ease-in-out infinite; }
+  @keyframes competitionPillPulse{
+    0%,100%{ box-shadow:0 14px 40px rgba(80,40,150,.45), 0 0 0 4px rgba(255,255,255,.12); }
+    50%{ box-shadow:0 14px 46px rgba(80,40,150,.6), 0 0 0 9px rgba(255,255,255,.05); }
+  }
+  @keyframes competitionDotPing{
+    0%,100%{ box-shadow:0 0 0 0 rgba(74,222,128,.55); }
+    50%{ box-shadow:0 0 0 6px rgba(74,222,128,0); }
+  }
+  #competition-panel{ display:none; position:absolute; top:64px; left:0; width:270px; max-height:min(74vh,480px);
     overflow-y:auto; background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
-    border:1px solid var(--item-border); border-radius:16px; padding:14px; box-shadow:0 14px 40px rgba(80,40,150,.25); }
+    border:1px solid var(--item-border); border-radius:16px; padding:14px; box-shadow:0 16px 46px rgba(80,40,150,.3); cursor:default; }
   #competition-widget.expanded #competition-panel{ display:block; }
-  #competition-panel-header{ display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:14px; margin-bottom:4px; }
-  #competition-panel-close{ border:none; background:var(--item-bg); color:var(--text); width:22px; height:22px; border-radius:50%;
-    font-size:12px; cursor:pointer; flex:0 0 auto; }
+  #competition-panel-header{ display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:14.5px;
+    margin-bottom:4px; cursor:grab; }
+  #competition-panel-header:active{ cursor:grabbing; }
+  #competition-panel-close{ border:none; background:var(--item-bg); color:var(--text); width:24px; height:24px; border-radius:50%;
+    font-size:14px; cursor:pointer; flex:0 0 auto; line-height:1; }
+  #competition-panel-close:hover{ filter:brightness(1.15); }
   .competition-seed-row{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
-  .competition-countdown{ font-size:22px; font-weight:700; color:var(--accent); text-align:center; margin:6px 0; direction:ltr; }
+  .competition-countdown{ font-size:24px; font-weight:800; color:var(--accent); text-align:center; margin:6px 0; direction:ltr; }
   .competition-lb-row{ display:flex; justify-content:space-between; gap:6px; font-size:12.5px; padding:4px 0; border-bottom:1px solid var(--item-border); }
   .competition-lb-row:last-child{ border-bottom:none; }
   .competition-lb-rank{ color:var(--text-dim); width:22px; flex:0 0 auto; }
+  .competition-optin-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:10px 0;
+    padding:8px 10px; background:var(--item-bg); border:1px solid var(--item-border); border-radius:10px; font-size:12.5px; font-weight:700; }
+  .competition-optin-row label{ display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .competition-optin-hint{ font-size:11px; color:var(--text-dim); font-weight:400; margin-top:4px; }
+  /* באנר "מצב תחרות" - חוסם ויזואלית את שאר האלמנטים בסרגל הצדדי כשמשתתפים בפועל */
+  #competition-lock-banner{ display:none; align-items:center; gap:8px; background:linear-gradient(90deg,#f97316,#ec4899);
+    color:#fff; font-weight:800; font-size:12.5px; padding:9px 12px; border-radius:10px; margin:0 0 8px 0; text-align:center;
+    box-shadow:0 6px 18px rgba(236,72,153,.3); }
+  #sidebar.competition-locked #competition-lock-banner{ display:flex; justify-content:center; }
   @media (max-width:760px){
-    #competition-widget{ right:8px; bottom:76px; }
-    #competition-panel{ width:min(74vw,220px); bottom:50px; }
+    #competition-widget{ left:8px; top:auto; bottom:76px; }
+    #competition-pill{ padding:12px 16px; font-size:14px; }
+    #competition-panel{ width:min(78vw,250px); }
     #direct-run-update-badge{ left:8px; bottom:8px; font-size:12px; padding:9px 12px; }
   }
 
@@ -697,6 +724,7 @@
       </div>
       <div id="meta-row"><span id="count-label">0 אלמנטים</span><button id="btn-reset">איפוס התקדמות</button></div>
     </div>
+    <div id="competition-lock-banner">🏆 מצב תחרות פעיל - זמינים רק אלמנטי התחרות</div>
     <div id="items-list"></div>
   </div>
 
@@ -1062,7 +1090,7 @@
   <div id="competition-widget">
     <div id="competition-pill"><span class="dot"></span><span>🏆 תחרות אלמנטים</span></div>
     <div id="competition-panel">
-      <div id="competition-panel-header"><span>🏆 תחרות אלמנטים</span><button id="competition-panel-close" title="סגירה">✕</button></div>
+      <div id="competition-panel-header"><span>🏆 תחרות אלמנטים</span><button id="competition-panel-close" title="מזעור">‒</button></div>
       <div id="competition-widget-body"></div>
     </div>
   </div>
@@ -1125,6 +1153,11 @@ const ACCOUNT_PROGRESS_URL = WORKER_URL ? `${WORKER_URL}/account/progress` : '';
 let unlockedItems = [];         // {name, emoji, discovered_by}
 let recentlyDiscovered = new Set();
 let nickname = localStorage.getItem('jc_nickname') || '';
+
+// ===== תוספת: מצב "נעילת תחרות" - כשמשתתפים בפועל בתחרות פעילה, מסננים את הסרגל הצדדי כך
+// שיוצגו רק אלמנטי משפחת התחרות (הזרעים + כל מה שהתגלה מהם). ר' בלוק "תחרות אלמנטים" בהמשך.
+let competitionLockActive = false;
+let competitionFamilyNames = new Set();
 
 // מזהה קבוע לדפדפן הזה - נוצר פעם אחת בלבד ולא משתנה לעולם, כדי לקשור את הכינוי
 // לזהות אחת ויציבה (בסיס למניעת החלפת כינוי ולמניעת התנגשות עם כינוי שכבר תפוס - ראו claimNickname).
@@ -1498,8 +1531,13 @@ updateSortPillsUI();
 function renderSidebar(){
   const q = searchInput.value.trim().toLowerCase();
   itemsList.innerHTML = '';
-  countLabel.textContent = unlockedItems.length + ' אלמנטים';
-  const filtered = sortedUnlockedItems().filter(i => i.name.toLowerCase().includes(q));
+  document.getElementById('sidebar').classList.toggle('competition-locked', competitionLockActive);
+  const sorted = sortedUnlockedItems();
+  const visibleItems = competitionLockActive
+    ? sorted.filter(i => competitionFamilyNames.has(i.name))
+    : sorted;
+  countLabel.textContent = visibleItems.length + ' אלמנטים' + (competitionLockActive ? ' (מצב תחרות)' : '');
+  const filtered = visibleItems.filter(i => i.name.toLowerCase().includes(q));
   if (filtered.length === 0){
     const div = document.createElement('div');
     div.id = 'no-results'; div.textContent = 'לא נמצאו אלמנטים תואמים';
@@ -1860,6 +1898,11 @@ function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
   const isPersonallyNew = !findItem(result.name);
   const isGloballyNew = !!result.isNew;
 
+  // ===== תוספת: תחרות אלמנטים - אם התוצאה שייכת למשפחת התחרות הפעילה, מוסיפים אותה לרשימת
+  // האלמנטים ה"מותרים" במצב נעילה (ר' בלוק "תחרות אלמנטים" בהמשך), כדי שיהיה אפשר להמשיך
+  // לשלב איתה גם כשהתחרות פעילה ורק אלמנטי המשפחה מוצגים.
+  if (result.competitionFamily) competitionFamilyNames.add(result.name);
+
   setTimeout(() => {
     const newDiv = spawnOnBoard(result, x, y);
     newDiv.classList.add('combining');
@@ -1871,15 +1914,18 @@ function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
     savePersonalProgress();
     recentlyDiscovered.add(result.name);
     renderSidebar();
+    const competitionSuffix = result.competitionFamily ? ' 🏆 +1 לתחרות' : '';
     if (isGloballyNew) {
-      showToast(`${result.emoji} גילוי חדש: ${result.name}`, true, nickname);
+      showToast(`${result.emoji} גילוי חדש: ${result.name}${competitionSuffix}`, true, nickname);
       setTimeout(refreshDiscoveredByMe, 600);
     } else {
-      showToast(`${result.emoji} פתחת אלמנט חדש: ${result.name}`, true, result.discoveredBy);
+      showToast(`${result.emoji} פתחת אלמנט חדש: ${result.name}${competitionSuffix}`, true, result.discoveredBy);
     }
     setTimeout(() => recentlyDiscovered.delete(result.name), 3400);
   } else {
-    showToast(`${result.emoji} ${name1} + ${name2} = ${result.name}`, false);
+    const competitionSuffix = result.competitionFamily ? ' 🏆 +1 לתחרות' : '';
+    showToast(`${result.emoji} ${name1} + ${name2} = ${result.name}${competitionSuffix}`, false);
+    if (result.competitionFamily && competitionLockActive) renderSidebar();
   }
 
   const isNewComboForStreak = recordMyRecipe(name1, name2, result.name, result.emoji);
@@ -2247,11 +2293,14 @@ checkDirectRunFileUpdate();
 setInterval(checkDirectRunFileUpdate, 15000);
 
 /* ================= תוספת: תחרות אלמנטים - ספירה לאחור + לוח מובילים חי =================
-   בזמן scheduled: מציג ספירה לאחור עד להתחלה + תצוגה מקדימה של 4 האלמנטים. ברגע שהופך ל-active
-   (ר' /competition/status ב-worker.js): מוסיף את 4 האלמנטים למלאי האישי של השחקן/ית (כדי שיהיה
-   אפשר לשלב מהם, בדיוק כמו אלמנטי הפתיחה), ופותח לוח מובילים חי (פולינג נפרד ותכוף יותר). */
+   בזמן scheduled: מציג ספירה לאחור עד להתחלה + תצוגה מקדימה של 4 האלמנטים, ומאפשר לסמן "רוצה/ה
+   להשתתף". ברגע שהופך ל-active (ר' /competition/status ב-worker.js): מוסיף את 4 האלמנטים למלאי
+   האישי (כדי שיהיה אפשר לשלב מהם, בדיוק כמו אלמנטי הפתיחה), ופותח לוח מובילים חי. אם השחקן/ית
+   סימן/ה השתתפות - נכנסים ל"מצב תחרות" (competitionLockActive) שבו הסרגל הצדדי מציג רק את
+   אלמנטי המשפחה (ר' renderSidebar). הווידג'ט עצמו בולט וניתן לגרירה+מזעור בכל מקום במסך. */
 const COMPETITION_STATUS_URL = WORKER_URL ? `${WORKER_URL}/competition/status` : '';
 const COMPETITION_LEADERBOARD_URL = WORKER_URL ? `${WORKER_URL}/competition/leaderboard` : '';
+const COMPETITION_OPTIN_URL = WORKER_URL ? `${WORKER_URL}/competition/opt-in` : '';
 const competitionWidget = document.getElementById('competition-widget');
 const competitionPill = document.getElementById('competition-pill');
 const competitionPanelClose = document.getElementById('competition-panel-close');
@@ -2260,25 +2309,137 @@ let competitionCountdownTimer = null;
 let competitionLbTimer = null;
 let lastCompetitionSeededId = null;
 let isCompetitionWinnerNow = false;
+let currentCompetitionData = null;
+let myCompetitionOptIn = false;
 
-competitionPill.addEventListener('click', () => competitionWidget.classList.toggle('expanded'));
+competitionPill.addEventListener('click', () => { if (!competitionWidget.classList.contains('justDragged')) competitionWidget.classList.toggle('expanded'); });
 competitionPanelClose.addEventListener('click', () => competitionWidget.classList.remove('expanded'));
+
+/* ---- גרירה חופשית של הווידג'ט (בועה + פאנל) לכל מקום במסך, עם שמירת מיקום לפי מכשיר ---- */
+const COMPETITION_POS_KEY = 'jc_competition_widget_pos';
+function clampCompetitionPos(left, top){
+  const w = competitionWidget.offsetWidth || 60, h = competitionWidget.offsetHeight || 60;
+  return {
+    left: Math.min(Math.max(8, left), window.innerWidth - w - 8),
+    top: Math.min(Math.max(8, top), window.innerHeight - h - 8),
+  };
+}
+function applySavedCompetitionPos(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(COMPETITION_POS_KEY) || 'null');
+    if (!saved) return;
+    const pos = clampCompetitionPos(saved.left, saved.top);
+    competitionWidget.style.left = pos.left + 'px';
+    competitionWidget.style.top = pos.top + 'px';
+  }catch{ /* ignore */ }
+}
+applySavedCompetitionPos();
+
+(function setupCompetitionDrag(){
+  let dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0, moved = false;
+  const dragHandles = [competitionPill, document.getElementById('competition-panel-header')];
+
+  function onPointerDown(e){
+    dragging = true; moved = false;
+    const rect = competitionWidget.getBoundingClientRect();
+    startX = e.clientX; startY = e.clientY;
+    startLeft = rect.left; startTop = rect.top;
+    competitionWidget.classList.add('dragging');
+    e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId);
+  }
+  function onPointerMove(e){
+    if (!dragging) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+    if (!moved) return;
+    const pos = clampCompetitionPos(startLeft + dx, startTop + dy);
+    competitionWidget.style.left = pos.left + 'px';
+    competitionWidget.style.top = pos.top + 'px';
+  }
+  function onPointerUp(){
+    if (!dragging) return;
+    dragging = false;
+    competitionWidget.classList.remove('dragging');
+    if (moved){
+      const rect = competitionWidget.getBoundingClientRect();
+      localStorage.setItem(COMPETITION_POS_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+      competitionWidget.classList.add('justDragged');
+      setTimeout(() => competitionWidget.classList.remove('justDragged'), 50);
+    }
+  }
+  dragHandles.forEach(handle => handle && handle.addEventListener('pointerdown', onPointerDown));
+  document.addEventListener('pointermove', onPointerMove);
+  document.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('resize', () => {
+    const rect = competitionWidget.getBoundingClientRect();
+    const pos = clampCompetitionPos(rect.left, rect.top);
+    competitionWidget.style.left = pos.left + 'px';
+    competitionWidget.style.top = pos.top + 'px';
+  });
+})();
 
 function addCompetitionElementsToInventory(seedElements){
   let changed = false;
   (seedElements || []).forEach(e => {
+    competitionFamilyNames.add(e.name);
     if (!findItem(e.name)){
       unlockedItems.push({ name: e.name, emoji: e.emoji, discovered_by: null, discovered_at: Date.now() });
       changed = true;
     }
   });
-  if (changed){ savePersonalProgress(); renderSidebar(); }
+  if (changed){ savePersonalProgress(); }
+  renderSidebar();
 }
 
 function formatCompetitionCountdown(ms){
   const total = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
   return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
+}
+
+async function setCompetitionOptIn(competitionId, optIn){
+  if (!nickname || !COMPETITION_OPTIN_URL) return;
+  myCompetitionOptIn = optIn;
+  updateCompetitionLockState();
+  try{
+    await fetch(COMPETITION_OPTIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname, competitionId, optIn }),
+    });
+  }catch{ /* לא קריטי - ננסה שוב בבדיקת הסטטוס הבאה */ }
+}
+
+// מעדכן את מצב הנעילה בפועל בהתאם לסטטוס התחרות + סימון ההשתתפות, ומרענן את הסרגל הצדדי.
+// כשנכנסים למצב נעילה, מנקים גם מהלוח את כל האלמנטים שאינם שייכים למשפחת התחרות - כדי
+// שבאמת אי אפשר יהיה להמשיך לשלב איתם עד לסיום התחרות.
+function updateCompetitionLockState(){
+  const shouldLock = !!(currentCompetitionData && currentCompetitionData.status === 'active' && myCompetitionOptIn);
+  if (shouldLock !== competitionLockActive){
+    competitionLockActive = shouldLock;
+    if (competitionLockActive){
+      playArea.querySelectorAll('.board-item').forEach(div => {
+        if (!competitionFamilyNames.has(div.dataset.name)) div.remove();
+      });
+      updateEmptyHint();
+    }
+    renderSidebar();
+  }
+}
+
+function competitionOptInRowHtml(competitionId){
+  const checked = myCompetitionOptIn ? 'checked' : '';
+  return `<div class="competition-optin-row">
+    <label><input type="checkbox" id="competition-optin-checkbox" ${checked}> משתתף/ת בתחרות</label>
+  </div>
+  <div class="competition-optin-hint">${myCompetitionOptIn
+    ? 'האלמנטים הקודמים שלכם ננעלים בזמן התחרות - זמינים רק אלמנטי התחרות.'
+    : 'סמנו כדי להשתתף - האלמנטים הקודמים ייעלמו זמנית ותוכלו להשתמש רק באלמנטי התחרות.'}</div>`;
+}
+function wireCompetitionOptInCheckbox(competitionId){
+  const cb = document.getElementById('competition-optin-checkbox');
+  if (!cb) return;
+  cb.addEventListener('change', () => setCompetitionOptIn(competitionId, cb.checked));
 }
 
 async function checkCompetitionStatus(){
@@ -2289,18 +2450,23 @@ async function checkCompetitionStatus(){
     const { data } = await res.json();
     clearInterval(competitionCountdownTimer);
     clearInterval(competitionLbTimer);
+    currentCompetitionData = data || null;
 
     if (!data || data.status === 'ended'){
       competitionWidget.style.display = 'none';
+      myCompetitionOptIn = false;
+      updateCompetitionLockState();
       if (data && data.isWinner && !isCompetitionWinnerNow){ isCompetitionWinnerNow = true; checkBadges(); }
       return;
     }
 
     competitionWidget.style.display = 'block';
+    myCompetitionOptIn = !!data.myOptedIn;
     if (data.status === 'active' && lastCompetitionSeededId !== data.id){
       addCompetitionElementsToInventory(data.seedElements);
       lastCompetitionSeededId = data.id;
     }
+    updateCompetitionLockState();
 
     const seedHtml = `<div class="competition-seed-row">${(data.seedElements || []).map(e =>
       `<span class="sidebar-item"><span class="emoji">${escapeHtml(e.emoji)}</span><span>${escapeHtml(e.name)}</span></span>`).join('')}</div>`;
@@ -2308,7 +2474,9 @@ async function checkCompetitionStatus(){
     if (data.status === 'scheduled'){
       const startAt = new Date(data.startAt).getTime();
       competitionWidgetBody.innerHTML = `<div style="font-size:12.5px; color:var(--text-dim);">התחרות מתחילה בעוד:</div>
-        <div class="competition-countdown" id="competition-countdown-num"></div>${seedHtml}`;
+        <div class="competition-countdown" id="competition-countdown-num"></div>${seedHtml}
+        ${nickname ? competitionOptInRowHtml(data.id) : ''}`;
+      wireCompetitionOptInCheckbox(data.id);
       const tick = () => {
         const remaining = startAt - Date.now();
         if (remaining <= 0){ checkCompetitionStatus(); return; }
@@ -2320,9 +2488,11 @@ async function checkCompetitionStatus(){
     } else if (data.status === 'active'){
       const endsAt = new Date(data.endsAt).getTime();
       competitionWidgetBody.innerHTML = `${seedHtml}
+        ${nickname ? competitionOptInRowHtml(data.id) : ''}
         <div style="font-size:12.5px; color:var(--text-dim); margin-top:6px;">נותר:</div>
         <div class="competition-countdown" id="competition-countdown-num"></div>
         <div id="competition-lb-list" style="margin-top:8px;">טוען לוח מובילים...</div>`;
+      wireCompetitionOptInCheckbox(data.id);
       const tick = () => {
         const remaining = endsAt - Date.now();
         if (remaining <= 0){ checkCompetitionStatus(); return; }
