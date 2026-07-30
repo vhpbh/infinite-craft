@@ -1045,17 +1045,17 @@
         <h2>💾 גיבוי והעברת התקדמות</h2>
         <button id="btn-close-backup">✕</button>
       </div>
-      <div id="backup-modal-sub">שומר/מטעין את הכינוי, כל האלמנטים שגיליתם, ספר המתכונים וההישגים שלכם.</div>
+      <div id="backup-modal-sub">שומר/מטעין את הכינוי, כל האלמנטים שגיליתם, ספר המתכונים, ההישגים, היתרה הכספית והמנוי שלכם.</div>
 
       <div class="backup-section">
         <h3>⬇️ ייצוא לקובץ</h3>
-        <p>מוריד קובץ JSON עם כל ההתקדמות שלכם בדפדפן הזה. שמרו אותו במקום בטוח - מי שמחזיק בקובץ יכול להמשיך בתור החשבון שלכם.</p>
+        <p>מוריד קובץ מוצפן (אי אפשר לערוך אותו ידנית - כל שינוי בקובץ פוסל אותו לגמרי) עם כל ההתקדמות שלכם: אלמנטים, הישגים, יתרה כספית, מנוי ועוד. שמרו אותו במקום בטוח - מי שמחזיק בקובץ יכול להמשיך בתור החשבון שלכם.</p>
         <button class="backup-btn" id="btn-export-progress">⬇️ הורדת קובץ גיבוי</button>
       </div>
 
       <div class="backup-section">
         <h3>⬆️ ייבוא מקובץ</h3>
-        <p>העלו קובץ שיוצא בעבר כדי להמשיך בדיוק מהמקום שבו עצרתם - כולל הכינוי, האלמנטים וההישגים - גם ממחשב או דפדפן אחר. שימו לב: זה יחליף לגמרי את ההתקדמות הנוכחית בדפדפן הזה. אם לחשבון שבקובץ מוגדרת סיסמה, תתבקשו להזין אותה כדי לאמת שהוא באמת שלכם.</p>
+        <p>העלו קובץ שיוצא בעבר כדי להמשיך בדיוק מהמקום שבו עצרתם - כולל הכינוי, האלמנטים, ההישגים, היתרה הכספית והמנוי - גם ממחשב או דפדפן אחר. שימו לב: זה יחליף לגמרי את ההתקדמות הנוכחית בדפדפן הזה. אם לחשבון שבקובץ מוגדרת סיסמה, תתבקשו להזין אותה כדי לאמת שהוא באמת שלכם.</p>
         <input type="file" id="import-file-input" accept="application/json">
         <button class="backup-btn-outline" id="btn-import-progress">⬆️ ייבוא והמשך משם</button>
         <div id="backup-status"></div>
@@ -1200,6 +1200,8 @@ const ACCOUNT_SET_PASSWORD_URL = WORKER_URL ? `${WORKER_URL}/account/set-passwor
 const ACCOUNT_LOGIN_URL = WORKER_URL ? `${WORKER_URL}/account/login` : '';
 const ACCOUNT_SAVE_PROGRESS_URL = WORKER_URL ? `${WORKER_URL}/account/save-progress` : '';
 const ACCOUNT_PROGRESS_URL = WORKER_URL ? `${WORKER_URL}/account/progress` : '';
+const BACKUP_EXPORT_URL = WORKER_URL ? `${WORKER_URL}/backup/export` : '';
+const BACKUP_IMPORT_URL = WORKER_URL ? `${WORKER_URL}/backup/import` : '';
 
 /* ================= STATE ================= */
 let unlockedItems = [];         // {name, emoji, discovered_by}
@@ -2713,58 +2715,78 @@ function collectDailyCompletions(){
   return out;
 }
 
-document.getElementById('btn-export-progress').addEventListener('click', () => {
+document.getElementById('btn-export-progress').addEventListener('click', async () => {
   if (!nickname || !clientId){ showBackupStatus('❌ עדיין אין לך כינוי פעיל - שחקו קצת קודם.', false); return; }
-  const payload = {
-    formatVersion: 1,
-    exportedAt: new Date().toISOString(),
-    clientId,
-    nickname,
-    unlockedItems,
-    myRecipes: getMyRecipes(),
-    unlockedBadges: [...getUnlockedBadges()],
-    bestStreak,
-    totalCombines,
-    tradesCompleted,
-    dailyCompletedCount,
-    sidebarSortMode,
-    dailyCompletions: collectDailyCompletions(),
-    activeBackground: getActiveBackground(),
+  if (!BACKUP_EXPORT_URL){ showBackupStatus('❌ אין חיבור לשרת כרגע.', false); return; }
+  showBackupStatus('⏳ מכינים קובץ גיבוי מוצפן...', true);
+  // localFallback נשלח רק ליתר ביטחון (חשבון שמעולם לא סונכרן לשרת) - השרת משתמש בו רק אם
+  // אין לו בכלל progress_json שמור; הוא לא משפיע על מה שנטען חזרה בייבוא (ר' handleBackupExport).
+  const localFallback = {
+    unlockedItems, myRecipes: getMyRecipes(), unlockedBadges: [...getUnlockedBadges()],
+    bestStreak, totalCombines, tradesCompleted, dailyCompletedCount, sidebarSortMode,
+    dailyCompletions: collectDailyCompletions(), activeBackground: getActiveBackground(),
   };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `יצירה-אינסופית-גיבוי-${nickname}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  showBackupStatus('✅ הקובץ ירד בהצלחה. שמרו אותו במקום בטוח.', true);
+  try{
+    const res = await fetch(BACKUP_EXPORT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, localFallback }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error || !data.file){
+      showBackupStatus(`❌ ${data.error || 'שגיאה ביצירת קובץ הגיבוי.'}`, false); return;
+    }
+    // הקובץ המורד הוא עדיין JSON תקני, אבל השדה data הוא ציפרטקסט (AES-GCM) - עריכה ידנית שלו,
+    // ולו בביט אחד, תגרום לפענוח בשרת להיכשל לגמרי בייבוא הבא (ר' handleBackupImport ב-worker.js).
+    const blob = new Blob([JSON.stringify(data.file, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `יצירה-אינסופית-גיבוי-${nickname}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showBackupStatus('✅ הקובץ ירד בהצלחה (מוצפן). שמרו אותו במקום בטוח.', true);
+  }catch{
+    showBackupStatus('❌ שגיאת תקשורת בזמן יצירת קובץ הגיבוי.', false);
+  }
 });
 
 document.getElementById('btn-import-progress').addEventListener('click', async () => {
   const fileInput = document.getElementById('import-file-input');
   const file = fileInput.files && fileInput.files[0];
   if (!file){ showBackupStatus('❌ בחרו קודם קובץ גיבוי (.json).', false); return; }
+  if (!BACKUP_IMPORT_URL){ showBackupStatus('❌ אין חיבור לשרת כרגע.', false); return; }
 
-  let data;
+  let encrypted;
   try{
     const text = await file.text();
-    data = JSON.parse(text);
+    encrypted = JSON.parse(text);
   }catch{
     showBackupStatus('❌ הקובץ לא תקין (לא JSON תקני).', false); return;
   }
 
-  if (!data || typeof data !== 'object' || !data.clientId || !data.nickname || !Array.isArray(data.unlockedItems)){
-    showBackupStatus('❌ הקובץ לא נראה כמו קובץ גיבוי של המשחק הזה.', false); return;
+  showBackupStatus('⏳ מאמתים את קובץ הגיבוי מול השרת...', true);
+  let data;
+  try{
+    const res = await fetch(BACKUP_IMPORT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ encrypted }),
+    });
+    data = await res.json();
+    if (!res.ok || data.error || !data.success){
+      showBackupStatus(`❌ ${data.error || 'קובץ הגיבוי לא תקין, פגום, או נערך ידנית.'}`, false); return;
+    }
+  }catch{
+    showBackupStatus('❌ שגיאת תקשורת בזמן אימות קובץ הגיבוי.', false); return;
   }
 
-  // הגנת אבטחה: אם לחשבון שבקובץ כבר יש סיסמה מוגדרת בשרת, חובה לאמת אותה כאן לפני שמאמצים
-  // את ה-client_id שבקובץ. כך קובץ גיבוי שדלף/הועתק (או client_id שנוחש) לא מספיק בעצמו כדי
-  // להשתלט על חשבון מוגן - צריך גם את הסיסמה.
-  const targetStatus = await fetchAccountStatusByClientId(data.clientId);
-  if (targetStatus.hasPassword) {
+  // חשוב: מכאן והלאה לא משתמשים בשום נתון "כמותי" מהקובץ שהועלה (אין לו כזה בכלל - ר' למעלה) -
+  // רק בזהות (clientId + nickname) שהשרת אישר. ההתקדמות/הכסף/ההישגים האמיתיים נמשכים מהשרת
+  // ממש כמו בהתחברות רגילה (ר' restoreProgressAfterLogin), כך שאין שום ערך בעריכת הקובץ.
+  if (data.hasPassword) {
     const pw = prompt(`החשבון "${data.nickname}" מוגן בסיסמה. הזינו אותה כדי לאמת שהוא שלכם:`);
     if (!pw) { showBackupStatus('❌ ייבוא בוטל - נדרשת סיסמה לחשבון מוגן.', false); return; }
     try {
@@ -2789,27 +2811,11 @@ document.getElementById('btn-import-progress').addEventListener('click', async (
   // מזהה הדפדפן הזה משתנה למזהה שבקובץ - מרגע זה הדפדפן הזה "הוא" אותו חשבון מול השרת.
   clientId = data.clientId;
   localStorage.setItem(CLIENT_ID_KEY, clientId);
-
   nickname = data.nickname;
   localStorage.setItem('jc_nickname', nickname);
 
-  const personal = data.unlockedItems.filter(i => !STARTING_ITEMS.some(s => s.name === i.name));
-  localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify(personal));
-
-  localStorage.setItem(MY_RECIPES_KEY, JSON.stringify(Array.isArray(data.myRecipes) ? data.myRecipes : []));
-  localStorage.setItem(BADGES_KEY, JSON.stringify(Array.isArray(data.unlockedBadges) ? data.unlockedBadges : []));
-  localStorage.setItem(STREAK_KEY, String(Number.isFinite(data.bestStreak) ? data.bestStreak : 0));
-  localStorage.setItem(TOTAL_COMBINES_KEY, String(Number.isFinite(data.totalCombines) ? data.totalCombines : 0));
-  localStorage.setItem(TRADES_KEY, String(Number.isFinite(data.tradesCompleted) ? data.tradesCompleted : 0));
-  localStorage.setItem(DAILY_COUNT_KEY, String(Number.isFinite(data.dailyCompletedCount) ? data.dailyCompletedCount : 0));
-  if (data.sidebarSortMode) localStorage.setItem(SIDEBAR_SORT_KEY, data.sidebarSortMode);
-  if (data.dailyCompletions && typeof data.dailyCompletions === 'object'){
-    Object.keys(data.dailyCompletions).forEach(dateKey => {
-      localStorage.setItem(DAILY_KEY_PREFIX + dateKey, data.dailyCompletions[dateKey]);
-    });
-  }
-  localStorage.setItem(BG_ACTIVE_KEY, typeof data.activeBackground === 'string' ? data.activeBackground : 'none');
-
+  showBackupStatus('⏳ מושכים את ההתקדמות האמיתית מהשרת...', true);
+  await restoreProgressAfterLogin(clientId);
   showBackupStatus('✅ יובא בהצלחה! טוענים מחדש...', true);
   setTimeout(() => location.reload(), 900);
 });
