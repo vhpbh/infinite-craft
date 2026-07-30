@@ -562,6 +562,7 @@
   .bg-card.locked{ opacity:.72; }
   .bg-card-preview{ height:72px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:8px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.06); }
   .bg-card-name{ font-size:13.5px; font-weight:700; margin-bottom:3px; }
+  .bg-card-badge{ display:inline-block; font-size:10.5px; font-weight:700; margin-inline-start:6px; padding:1px 6px; border-radius:8px; background:linear-gradient(135deg,#8a5cff,#5c8aff); color:#fff; vertical-align:middle; }
   .bg-card-desc{ font-size:11px; color:var(--text-dim); line-height:1.4; min-height:30px; }
   .bg-card-btn{ width:100%; margin-top:8px; padding:8px; border:none; border-radius:10px; background:var(--accent-grad); color:#fff;
     font-weight:700; font-size:12.5px; cursor:pointer; font-family:inherit; transition:filter .12s; }
@@ -3563,8 +3564,9 @@ function renderShop(){
     const card = document.createElement('div');
     card.className = 'bg-card' + (isActive ? ' active' : '') + (!owned && balanceUsd < def.priceUsd ? ' locked' : '');
     let btnLabel = owned ? (isActive ? '✓ פעיל' : 'הפעלה') : `🔒 קנייה - $${def.priceUsd.toFixed(2)}`;
+    const subBadge = def.subscriberOnly ? '<span class="bg-card-badge" title="בלעדי לחברי מועדון">👑 בלעדי למנויים</span>' : '';
     card.innerHTML = `<div class="bg-card-preview" style="background:${def.previewCss}"><span class="bg-card-icon">${def.icon}</span></div>
-      <div class="bg-card-name">${def.name}</div>
+      <div class="bg-card-name">${def.name}${subBadge}</div>
       <div class="bg-card-desc">${def.description}</div>
       <button class="bg-card-btn${isActive ? ' active' : ''}">${btnLabel}</button>`;
     card.querySelector('.bg-card-btn').addEventListener('click', () => purchaseBackground(def.id));
