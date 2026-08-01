@@ -125,6 +125,16 @@
     color:var(--text); min-height:58px; text-align:center; width:100%; font-family:inherit; line-height:1.2; }
   .tool-btn:hover{ background:var(--accent-soft); }
   .tool-btn i{ font-size:18px; }
+  /* הלהבה גדלה/מתעצמת ככל שהרצף עולה (ר' streakTier/updateStreakUI ב-JS) - טיירים 0 (כבויה,
+     אין רצף) עד 5 (רצף של 60+ ימים, עם זוהר ופעימה קלה). */
+  .streak-flame-icon{ transition:font-size .3s ease, color .3s ease, text-shadow .3s ease; }
+  .streak-flame-icon.tier-0{ color:#94a3b8; font-size:18px; }
+  .streak-flame-icon.tier-1{ color:#fb923c; font-size:20px; }
+  .streak-flame-icon.tier-2{ color:#f97316; font-size:22px; text-shadow:0 0 6px rgba(249,115,22,.5); }
+  .streak-flame-icon.tier-3{ color:#ea580c; font-size:25px; text-shadow:0 0 10px rgba(234,88,12,.6); }
+  .streak-flame-icon.tier-4{ color:#dc2626; font-size:28px; text-shadow:0 0 14px rgba(220,38,38,.7); }
+  .streak-flame-icon.tier-5{ color:#dc2626; font-size:31px; text-shadow:0 0 20px rgba(220,38,38,.85); animation:streak-flame-pulse 1.6s ease-in-out infinite; }
+  @keyframes streak-flame-pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.12); } }
 
   #nick-badge{ position:absolute; top:16px; right:16px; z-index:20; background:var(--toolbar-btn); border:1px solid var(--border);
     backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
@@ -775,6 +785,7 @@
           <button class="tool-btn" id="btn-personal-keys" title="מפתחות API אישיים שלי"><i class="fa-solid fa-key" style="color:#475569;"></i><span>מפתחות API</span></button>
           <button class="tool-btn" id="btn-backup" title="ייצוא/ייבוא התקדמות"><i class="fa-solid fa-floppy-disk" style="color:#0d9488;"></i><span>גיבוי</span></button>
           <button class="tool-btn" id="btn-chat" title="צ'אט עם המנהל"><i class="fa-solid fa-comment-dots" style="color:#0ea5e9;"></i><span>צ'אט</span><span id="chat-unread-dot" style="display:none;"></span></button>
+          <button class="tool-btn" id="btn-streak" title="הרצף היומי שלכם"><i id="streak-flame" class="fa-solid fa-fire streak-flame-icon tier-0"></i><span>רצף: <b id="streak-count">0</b></span></button>
         </div>
       </div>
     </div>
@@ -898,6 +909,7 @@
       <div id="leaderboard-tabs">
         <button class="sort-pill active" data-lb-tab="discoverers"><i class="fa-solid fa-magnifying-glass"></i> הכי הרבה גילויים</button>
         <button class="sort-pill" data-lb-tab="collectors"><i class="fa-solid fa-puzzle-piece"></i> הכי הרבה אלמנטים</button>
+        <button class="sort-pill" data-lb-tab="streaks"><i class="fa-solid fa-fire"></i> רצף יומי</button>
       </div>
       <div id="leaderboard-list"></div>
     </div>
@@ -1266,6 +1278,9 @@ const MY_ELEMENTS_URL = WORKER_URL ? `${WORKER_URL}/my-elements` : '';
 const HEARTBEAT_URL = WORKER_URL ? `${WORKER_URL}/heartbeat` : '';
 const ACTIVE_PLAYERS_URL = WORKER_URL ? `${WORKER_URL}/active-players` : '';
 const TOP_COLLECTORS_URL = WORKER_URL ? `${WORKER_URL}/top-collectors` : '';
+const TOP_STREAKS_URL = WORKER_URL ? `${WORKER_URL}/top-streaks` : '';
+const DAILY_STREAK_URL = WORKER_URL ? `${WORKER_URL}/daily/streak` : '';
+const DAILY_CHECKIN_URL = WORKER_URL ? `${WORKER_URL}/daily/checkin` : '';
 const BROADCAST_AD_URL = WORKER_URL ? `${WORKER_URL}/broadcast-ad` : '';
 const SITE_STATUS_URL = WORKER_URL ? `${WORKER_URL}/site-status` : '';
 const DAILY_POOL_URL = WORKER_URL ? `${WORKER_URL}/daily-pool` : '';
@@ -1607,6 +1622,7 @@ async function startGame(){
   applyBackground(getActiveBackground());
   fetchShopCatalog();
   claimAchievementPayouts();
+  refreshDailyStreak();
   maybeShowTutorialOnFirstVisit();
 }
 
@@ -3285,6 +3301,11 @@ const LEADERBOARD_TAB_CFG = {
     empty: 'עדיין אין נתונים מספיקים - המשיכו לשחק!',
     unit: '📦',
   },
+  streaks: {
+    sub: 'השחקנים עם רצף האתגרים היומיים הכי ארוך שעדיין פעיל',
+    empty: 'עדיין אין רצפים פעילים - השלימו את האתגר היומי כדי להתחיל!',
+    unit: '🔥',
+  },
 };
 
 function renderLeaderboardRows(ranked, unit){
@@ -3313,6 +3334,14 @@ async function loadLeaderboard(){
       ranked = (data || [])
         .filter(row => row.nickname && row.elements_count > 0)
         .map(row => [row.nickname, row.elements_count])
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+    } else if (leaderboardTab === 'streaks'){
+      const res = await fetch(TOP_STREAKS_URL);
+      const { data } = await res.json();
+      ranked = (data || [])
+        .filter(row => row.nickname && row.streak > 0)
+        .map(row => [row.nickname, row.streak])
         .sort((a, b) => b[1] - a[1])
         .slice(0, 20);
     } else {
@@ -3363,6 +3392,13 @@ document.getElementById('btn-leaderboard').addEventListener('click', () => {
 document.getElementById('btn-close-leaderboard').addEventListener('click', () => { leaderboardBackdrop.style.display = 'none'; });
 leaderboardBackdrop.addEventListener('click', (e) => { if (e.target === leaderboardBackdrop) leaderboardBackdrop.style.display = 'none'; });
 
+document.getElementById('btn-streak').addEventListener('click', () => {
+  leaderboardTab = 'streaks';
+  document.querySelectorAll('#leaderboard-tabs .sort-pill').forEach(b => b.classList.toggle('active', b.dataset.lbTab === 'streaks'));
+  leaderboardBackdrop.style.display = 'flex';
+  loadLeaderboard();
+});
+
 /* ================= הישגים אישיים (localStorage בלבד, בלי צורך בטבלה חדשה) ================= */
 const BADGES_KEY = 'jc_unlocked_badges';
 const STREAK_KEY = 'jc_best_streak';
@@ -3376,6 +3412,8 @@ let tradesCompleted = parseInt(localStorage.getItem(TRADES_KEY) || '0', 10);
 let dailyCompletedCount = parseInt(localStorage.getItem(DAILY_COUNT_KEY) || '0', 10);
 let myQualifiedReferrals = 0; // מתעדכן מ-loadTradeStatus (ר' פופאפ הסחר)
 let myWorldFirstCount = 0;
+let myDailyStreak = 0; // מתעדכן מ-refreshDailyStreak (ר' /daily/streak, /daily/checkin ב-worker.js)
+let myLongestStreak = 0;
 
 // כל תג כולל עכשיו גם points (1-5): כמה טוקני סחר בונוס מקבל/ת מי שהפנה אתכם למשחק בכל פעם
 // שאתם משיגים את התג הזה (אחרי שכבר עברתם את סף ההסמכה כ"חבר מוסמך" - ר' פופאפ הסחר).
@@ -3436,6 +3474,14 @@ const BADGE_DEFS = [
   { id: 'daily-365', icon: '🕰️', title: 'שנה שלמה', desc: 'השלמתם 365 אתגרים יומיים - שנה שלמה של התמדה', points: 5, stars: 300, check: s => s.dailyCompleted >= 365 },
   { id: 'recruiter-20', icon: '🏙️', title: 'בונה אימפריה', desc: '20 חברים שהזמנתם הפכו לחברים מוסמכים - הישג חברתי נדיר ביותר', points: 5, stars: 250, check: s => s.qualifiedReferrals >= 20 },
   { id: 'completionist', icon: '💠', title: 'שלמות מוחלטת', desc: 'פתחתם 2,000 אלמנטים - כמעט אף אחד לא ראה את המסך הזה', points: 5, stars: 400, check: s => s.elements >= 2000 },
+  { id: 'tutorial-complete', icon: '🎓', title: 'בוגר המדריך', desc: 'עברתם על מדריך ההסברה של המשחק', points: 1, stars: 5, check: s => s.tutorialCompleted },
+  { id: 'daily-streak-3',   icon: '🔥', title: 'מתחילים רצף',  desc: 'השלמתם את האתגר היומי 3 ימים ברצף',   points: 1, stars: 5,   check: s => s.dailyStreak >= 3 },
+  { id: 'daily-streak-7',   icon: '🔥', title: 'שבוע רצוף',    desc: 'השלמתם את האתגר היומי 7 ימים ברצף',   points: 2, stars: 15,  check: s => s.dailyStreak >= 7 },
+  { id: 'daily-streak-14',  icon: '🔥', title: 'שבועיים רצופים', desc: 'השלמתם את האתגר היומי 14 ימים ברצף', points: 3, stars: 35,  check: s => s.dailyStreak >= 14 },
+  { id: 'daily-streak-30',  icon: '🔥', title: 'חודש בלהבות',  desc: 'השלמתם את האתגר היומי 30 ימים ברצף',  points: 4, stars: 75,  check: s => s.dailyStreak >= 30 },
+  { id: 'daily-streak-60',  icon: '🔥', title: 'רצף בלתי כבה', desc: 'השלמתם את האתגר היומי 60 ימים ברצף - הישג נדיר', points: 4, stars: 150, check: s => s.dailyStreak >= 60 },
+  { id: 'daily-streak-100', icon: '🔥', title: '100 ימים רצופים', desc: 'השלמתם את האתגר היומי 100 ימים ברצף - כמעט בלתי אפשרי', points: 5, stars: 220, check: s => s.dailyStreak >= 100 },
+  { id: 'daily-streak-365', icon: '🔥', title: 'שנה שלמה בלהבות', desc: 'השלמתם את האתגר היומי 365 ימים ברצף - ההישג הקשה ביותר במשחק', points: 5, stars: 400, check: s => s.dailyStreak >= 365 },
 ];
 
 function getUnlockedBadges(){
@@ -3454,6 +3500,8 @@ function currentStats(){
     dailyCompleted: dailyCompletedCount,
     qualifiedReferrals: myQualifiedReferrals,
     isSubscriber: isSubscriberNow,
+    tutorialCompleted: localStorage.getItem(TUTORIAL_SEEN_KEY) === '1',
+    dailyStreak: myDailyStreak,
   };
 }
 
@@ -4479,6 +4527,7 @@ function closeTutorial(){
   document.getElementById('tutorial-overlay').classList.remove('active');
   gridMenuDropdown.classList.remove('open');
   localStorage.setItem(TUTORIAL_SEEN_KEY, '1');
+  checkBadges();
 }
 function maybeShowTutorialOnFirstVisit(){
   if (!localStorage.getItem(TUTORIAL_SEEN_KEY)) openTutorial();
@@ -4524,7 +4573,62 @@ function markDailyComplete(resultName){
   localStorage.setItem(DAILY_COUNT_KEY, String(dailyCompletedCount));
   updateDailyChallengeUI();
   checkBadges();
+  dailyStreakCheckin();
   return true;
+}
+
+// נקרא פעם ביום, ברגע שהאתגר היומי הושלם בפועל (ר' markDailyComplete) - מדווח לשרת על
+// הצ'ק-אין (ר' handleDailyCheckin ב-worker.js) ומעדכן את תצוגת הלהבה בתפריט הכלים.
+async function dailyStreakCheckin(){
+  if (!DAILY_CHECKIN_URL || !clientId) return;
+  try{
+    const res = await fetch(DAILY_CHECKIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, dateKey: todayKey() }),
+    });
+    const data = await res.json();
+    if (Number.isFinite(data.currentStreak)){
+      myDailyStreak = data.currentStreak;
+      myLongestStreak = data.longestStreak ?? myLongestStreak;
+      updateStreakUI();
+      checkBadges();
+    }
+  }catch{ /* לא קריטי - הרצף פשוט יתעדכן בפעם הבאה */ }
+}
+
+// נקרא בעליית המשחק (ר' startGame) כדי להציג את הרצף הנוכחי עוד לפני שמשלימים משהו היום.
+async function refreshDailyStreak(){
+  if (!DAILY_STREAK_URL || !clientId) return;
+  try{
+    const res = await fetch(`${DAILY_STREAK_URL}?clientId=${encodeURIComponent(clientId)}`);
+    const data = await res.json();
+    myDailyStreak = Number.isFinite(data.currentStreak) ? data.currentStreak : 0;
+    myLongestStreak = Number.isFinite(data.longestStreak) ? data.longestStreak : 0;
+    updateStreakUI();
+    checkBadges();
+  }catch{ /* אין חיבור - נשאר על הערך האחרון הידוע (או 0) */ }
+}
+
+// טיירים ויזואליים - ככל שהרצף עולה, הלהבה גדלה/מתעצמת (ר' .streak-badge ב-CSS).
+function streakTier(streak){
+  if (streak >= 60) return 5;
+  if (streak >= 30) return 4;
+  if (streak >= 14) return 3;
+  if (streak >= 7) return 2;
+  if (streak >= 3) return 1;
+  return 0;
+}
+function updateStreakUI(){
+  const flameEl = document.getElementById('streak-flame');
+  const countEl = document.getElementById('streak-count');
+  if (!flameEl || !countEl) return;
+  countEl.textContent = String(myDailyStreak);
+  flameEl.className = 'streak-flame-icon tier-' + streakTier(myDailyStreak);
+  const wrap = document.getElementById('btn-streak');
+  if (wrap) wrap.title = myDailyStreak > 0
+    ? `רצף של ${myDailyStreak} ימים רצופים! השיא שלכם: ${myLongestStreak} ימים.`
+    : 'השלימו את האתגר היומי כדי להתחיל רצף!';
 }
 
 /* ================= כרטיס שיתוף (canvas, בלי שום שרת) ================= */
