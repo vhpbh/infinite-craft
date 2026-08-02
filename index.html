@@ -2044,6 +2044,7 @@ function handleCombineFailed(div1, div2, name1, name2){
 
 function handleCombineSuccess(result, div1, div2, name1, name2, x, y){
   tutorialNotifyCombineAttempt();
+  maybeStreakCheckin();
   playSfx('combine');
   spawnSparks(x, y);
   div1.classList.add('merged-away'); div2.classList.add('merged-away');
@@ -3302,8 +3303,8 @@ const LEADERBOARD_TAB_CFG = {
     unit: '📦',
   },
   streaks: {
-    sub: 'השחקנים עם רצף האתגרים היומיים הכי ארוך שעדיין פעיל',
-    empty: 'עדיין אין רצפים פעילים - השלימו את האתגר היומי כדי להתחיל!',
+    sub: 'השחקנים עם רצף הימים הרצוף הארוך ביותר של כניסה למשחק ושילוב אלמנטים',
+    empty: 'עדיין אין רצפים פעילים - היכנסו ובצעו שילוב אחד כדי להתחיל!',
     unit: '🔥',
   },
 };
@@ -3475,13 +3476,13 @@ const BADGE_DEFS = [
   { id: 'recruiter-20', icon: '🏙️', title: 'בונה אימפריה', desc: '20 חברים שהזמנתם הפכו לחברים מוסמכים - הישג חברתי נדיר ביותר', points: 5, stars: 250, check: s => s.qualifiedReferrals >= 20 },
   { id: 'completionist', icon: '💠', title: 'שלמות מוחלטת', desc: 'פתחתם 2,000 אלמנטים - כמעט אף אחד לא ראה את המסך הזה', points: 5, stars: 400, check: s => s.elements >= 2000 },
   { id: 'tutorial-complete', icon: '🎓', title: 'בוגר המדריך', desc: 'עברתם על מדריך ההסברה של המשחק', points: 1, stars: 5, check: s => s.tutorialCompleted },
-  { id: 'daily-streak-3',   icon: '🔥', title: 'מתחילים רצף',  desc: 'השלמתם את האתגר היומי 3 ימים ברצף',   points: 1, stars: 5,   check: s => s.dailyStreak >= 3 },
-  { id: 'daily-streak-7',   icon: '🔥', title: 'שבוע רצוף',    desc: 'השלמתם את האתגר היומי 7 ימים ברצף',   points: 2, stars: 15,  check: s => s.dailyStreak >= 7 },
-  { id: 'daily-streak-14',  icon: '🔥', title: 'שבועיים רצופים', desc: 'השלמתם את האתגר היומי 14 ימים ברצף', points: 3, stars: 35,  check: s => s.dailyStreak >= 14 },
-  { id: 'daily-streak-30',  icon: '🔥', title: 'חודש בלהבות',  desc: 'השלמתם את האתגר היומי 30 ימים ברצף',  points: 4, stars: 75,  check: s => s.dailyStreak >= 30 },
-  { id: 'daily-streak-60',  icon: '🔥', title: 'רצף בלתי כבה', desc: 'השלמתם את האתגר היומי 60 ימים ברצף - הישג נדיר', points: 4, stars: 150, check: s => s.dailyStreak >= 60 },
-  { id: 'daily-streak-100', icon: '🔥', title: '100 ימים רצופים', desc: 'השלמתם את האתגר היומי 100 ימים ברצף - כמעט בלתי אפשרי', points: 5, stars: 220, check: s => s.dailyStreak >= 100 },
-  { id: 'daily-streak-365', icon: '🔥', title: 'שנה שלמה בלהבות', desc: 'השלמתם את האתגר היומי 365 ימים ברצף - ההישג הקשה ביותר במשחק', points: 5, stars: 400, check: s => s.dailyStreak >= 365 },
+  { id: 'daily-streak-3',   icon: '🔥', title: 'מתחילים רצף',  desc: 'נכנסתם ושיחקתם 3 ימים ברצף',   points: 1, stars: 5,   check: s => s.dailyStreak >= 3 },
+  { id: 'daily-streak-7',   icon: '🔥', title: 'שבוע רצוף',    desc: 'נכנסתם ושיחקתם 7 ימים ברצף',   points: 2, stars: 15,  check: s => s.dailyStreak >= 7 },
+  { id: 'daily-streak-14',  icon: '🔥', title: 'שבועיים רצופים', desc: 'נכנסתם ושיחקתם 14 ימים ברצף', points: 3, stars: 35,  check: s => s.dailyStreak >= 14 },
+  { id: 'daily-streak-30',  icon: '🔥', title: 'חודש בלהבות',  desc: 'נכנסתם ושיחקתם 30 ימים ברצף',  points: 4, stars: 75,  check: s => s.dailyStreak >= 30 },
+  { id: 'daily-streak-60',  icon: '🔥', title: 'רצף בלתי כבה', desc: 'נכנסתם ושיחקתם 60 ימים ברצף - הישג נדיר', points: 4, stars: 150, check: s => s.dailyStreak >= 60 },
+  { id: 'daily-streak-100', icon: '🔥', title: '100 ימים רצופים', desc: 'נכנסתם ושיחקתם 100 ימים ברצף - כמעט בלתי אפשרי', points: 5, stars: 220, check: s => s.dailyStreak >= 100 },
+  { id: 'daily-streak-365', icon: '🔥', title: 'שנה שלמה בלהבות', desc: 'נכנסתם ושיחקתם 365 ימים ברצף - ההישג הקשה ביותר במשחק', points: 5, stars: 400, check: s => s.dailyStreak >= 365 },
 ];
 
 function getUnlockedBadges(){
@@ -4573,12 +4574,23 @@ function markDailyComplete(resultName){
   localStorage.setItem(DAILY_COUNT_KEY, String(dailyCompletedCount));
   updateDailyChallengeUI();
   checkBadges();
-  dailyStreakCheckin();
   return true;
 }
 
-// נקרא פעם ביום, ברגע שהאתגר היומי הושלם בפועל (ר' markDailyComplete) - מדווח לשרת על
-// הצ'ק-אין (ר' handleDailyCheckin ב-worker.js) ומעדכן את תצוגת הלהבה בתפריט הכלים.
+// חשוב: הרצף היומי (🔥) לא תלוי בהשלמת האתגר היומי הספציפי - מספיק להיכנס למשחק ולבצע שילוב
+// אחד כלשהו, אפילו שילוב שכבר בוצע בעבר (ר' הקריאה ל-maybeStreakCheckin בתוך
+// handleCombineSuccess, שרצה על כל שילוב מוצלח, חדש או חוזר). ה-KEY הזה (נפרד מ-DAILY_KEY_PREFIX
+// של האתגר היומי) מוודא שלא שולחים את הבקשה לשרת שוב ושוב על כל שילוב באותו היום - השרת עצמו
+// גם ככה "לא עושה כלום" בצ'ק-אין שני באותו תאריך (ר' handleDailyCheckin), זו רק אופטימיזציה.
+const STREAK_CHECKIN_DONE_KEY = 'jc_streak_checkin_date';
+function maybeStreakCheckin(){
+  const today = todayKey();
+  if (localStorage.getItem(STREAK_CHECKIN_DONE_KEY) === today) return;
+  localStorage.setItem(STREAK_CHECKIN_DONE_KEY, today);
+  dailyStreakCheckin();
+}
+
+// מדווח לשרת על הצ'ק-אין (ר' handleDailyCheckin ב-worker.js) ומעדכן את תצוגת הלהבה בתפריט הכלים.
 async function dailyStreakCheckin(){
   if (!DAILY_CHECKIN_URL || !clientId) return;
   try{
@@ -4628,7 +4640,7 @@ function updateStreakUI(){
   const wrap = document.getElementById('btn-streak');
   if (wrap) wrap.title = myDailyStreak > 0
     ? `רצף של ${myDailyStreak} ימים רצופים! השיא שלכם: ${myLongestStreak} ימים.`
-    : 'השלימו את האתגר היומי כדי להתחיל רצף!';
+    : 'היכנסו ובצעו שילוב אחד היום כדי להתחיל רצף!';
 }
 
 /* ================= כרטיס שיתוף (canvas, בלי שום שרת) ================= */
