@@ -550,6 +550,40 @@
   @media (max-width:480px){ #achievements-grid{ grid-template-columns:1fr; } }
   .toast .star-earn{ color:var(--gold); font-weight:800; }
 
+  /* ================= תוספת: מודאל "תחרות אלמנטים" (מתפריט 9 הנקודות) - תחרות הבאה + היסטוריית זוכים ================= */
+  #competition-info-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.5); backdrop-filter:blur(4px); z-index:300; display:flex; align-items:center; justify-content:center; padding:16px; }
+  #competition-info-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:18px; padding:22px; width:460px; max-height:80vh; display:flex; flex-direction:column;
+    box-shadow:0 20px 60px rgba(80,40,150,.25); animation:modal-pop .25s cubic-bezier(.34,1.56,.64,1); }
+  #competition-info-modal-header{ display:flex; justify-content:space-between; align-items:center; }
+  #competition-info-modal-header h2{ margin:0; font-size:18px; }
+  #competition-info-modal-header button{ border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-dim); }
+  #competition-info-modal-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 14px; }
+  #competition-info-body{ overflow-y:auto; }
+  .comp-info-section{ margin-bottom:16px; }
+  .comp-info-section h3{ font-size:14px; margin:0 0 8px; color:var(--text); }
+  .comp-info-seeds{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+  .comp-info-seeds span{ background:var(--item-bg); border:1px solid var(--item-border); border-radius:20px; padding:4px 10px; font-size:12.5px; }
+  .comp-history-row{ background:var(--item-bg); border:1px solid var(--item-border); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+  .comp-history-row .comp-history-date{ font-size:11.5px; color:var(--text-dim); margin-bottom:4px; }
+  .comp-history-row .comp-history-winners{ font-size:13px; font-weight:700; }
+  .comp-history-row .comp-history-winners .crown{ color:var(--gold); }
+  #competition-info-empty{ font-size:13px; color:var(--text-dim); }
+
+  /* ================= תוספת: פופ-אפ אוטומטי שקופץ שעה לפני תחילת תחרות מתוזמנת ================= */
+  #competition-soon-modal-backdrop{ position:fixed; inset:0; background:rgba(20,15,35,.55); backdrop-filter:blur(4px); z-index:500; display:flex; align-items:center; justify-content:center; padding:16px; }
+  #competition-soon-modal{ background:var(--sidebar-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+    border:1px solid var(--item-border); border-radius:18px; padding:24px; width:420px; max-width:100%; text-align:center;
+    box-shadow:0 20px 60px rgba(80,40,150,.35); animation:modal-pop .25s cubic-bezier(.34,1.56,.64,1); }
+  #competition-soon-modal h2{ margin:0 0 6px; font-size:19px; }
+  #competition-soon-modal .comp-soon-sub{ font-size:13px; color:var(--text-dim); margin-bottom:14px; }
+  #competition-soon-modal .comp-info-seeds{ justify-content:center; margin-bottom:16px; }
+  #competition-soon-modal .comp-soon-countdown{ font-size:22px; font-weight:800; color:var(--accent); direction:ltr; margin-bottom:16px; }
+  #competition-soon-modal .comp-soon-actions{ display:flex; gap:10px; justify-content:center; }
+  #competition-soon-modal button{ border:none; border-radius:12px; padding:10px 18px; font-size:14px; font-weight:700; cursor:pointer; }
+  #competition-soon-join-btn{ background:var(--accent-grad); color:#fff; }
+  #competition-soon-dismiss-btn{ background:var(--item-bg); color:var(--text); border:1px solid var(--item-border) !important; }
+
   /* ================= כוכבי-רקע + חנות רקעים ================= */
   #bg-layer{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; display:none; }
   #bg-layer canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
@@ -779,6 +813,7 @@
           <button class="tool-btn" id="btn-players" title="כל השחקנים והאלמנטים שגילו"><i class="fa-solid fa-users" style="color:#3b82f6;"></i><span>שחקנים</span></button>
           <button class="tool-btn" id="btn-leaderboard" title="לוח מובילים גלובלי"><i class="fa-solid fa-medal" style="color:#f59e0b;"></i><span>מובילים</span></button>
           <button class="tool-btn" id="btn-achievements" title="ההישגים שלי"><i class="fa-solid fa-trophy" style="color:#d97706;"></i><span>הישגים</span></button>
+          <button class="tool-btn" id="btn-competition-info" title="תחרות אלמנטים - הבאה + זוכים קודמים"><i class="fa-solid fa-crown" style="color:#f59e0b;"></i><span>תחרות אלמנטים</span></button>
           <button class="tool-btn" id="btn-bg-shop" title="חנות רקעים"><i class="fa-solid fa-palette" style="color:#10b981;"></i><span>חנות רקעים</span></button>
           <button class="tool-btn" id="btn-trade" title="סחר חליפין"><i class="fa-solid fa-right-left" style="color:#8b5cf6;"></i><span>סחר חליפין</span></button>
           <button class="tool-btn" id="btn-subscribe" title="מנוי VIP"><i class="fa-solid fa-star" style="color:#f59e0b;"></i><span>מנוי VIP</span></button>
@@ -946,6 +981,32 @@
       </div>
       <div id="achievements-modal-sub">תגים שנפתחים ככל שמתקדמים במשחק, בדפדפן הזה</div>
       <div id="achievements-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===== תוספת: מודאל "תחרות אלמנטים" - התחרות הבאה + היסטוריית זוכים (מתפריט 9 הנקודות) ===== -->
+  <div id="competition-info-modal-backdrop" style="display:none;">
+    <div id="competition-info-modal">
+      <div id="competition-info-modal-header">
+        <h2>🏆 תחרות אלמנטים</h2>
+        <button id="btn-close-competition-info">✕</button>
+      </div>
+      <div id="competition-info-modal-sub">מתי התחרות הבאה, ומי ניצח/ה בתחרויות הקודמות</div>
+      <div id="competition-info-body">טוען...</div>
+    </div>
+  </div>
+
+  <!-- ===== תוספת: פופ-אפ אוטומטי שקופץ שעה לפני שתחרות מתוזמנת מתחילה ===== -->
+  <div id="competition-soon-modal-backdrop" style="display:none;">
+    <div id="competition-soon-modal">
+      <h2>🏆 תחרות אלמנטים מתחילה בקרוב!</h2>
+      <div class="comp-soon-sub">בעוד פחות משעה תתחיל תחרות אלמנטים חדשה - הנה 4 האלמנטים שיהיו בה:</div>
+      <div class="comp-info-seeds" id="competition-soon-seeds"></div>
+      <div class="comp-soon-countdown" id="competition-soon-countdown"></div>
+      <div class="comp-soon-actions">
+        <button id="competition-soon-join-btn">✅ אני רוצה/ה להשתתף</button>
+        <button id="competition-soon-dismiss-btn">סגירה</button>
+      </div>
     </div>
   </div>
 
@@ -2612,6 +2673,7 @@ async function checkCompetitionStatus(){
 
     if (!data || data.status === 'ended'){
       competitionWidget.style.display = 'none';
+      document.getElementById('competition-soon-modal-backdrop').style.display = 'none';
       myCompetitionOptIn = false;
       updateCompetitionLockState();
       if (data && data.isWinner && !isCompetitionWinnerNow){ isCompetitionWinnerNow = true; checkBadges(); }
@@ -2631,6 +2693,7 @@ async function checkCompetitionStatus(){
 
     if (data.status === 'scheduled'){
       const startAt = new Date(data.startAt).getTime();
+      maybeShowCompetitionSoonPopup(data, startAt);
       competitionWidgetBody.innerHTML = `<div style="font-size:12.5px; color:var(--text-dim);">התחרות מתחילה בעוד:</div>
         <div class="competition-countdown" id="competition-countdown-num"></div>${seedHtml}
         ${nickname ? competitionOptInRowHtml(data.id) : ''}`;
@@ -2644,6 +2707,7 @@ async function checkCompetitionStatus(){
       tick();
       competitionCountdownTimer = setInterval(tick, 1000);
     } else if (data.status === 'active'){
+      document.getElementById('competition-soon-modal-backdrop').style.display = 'none';
       const endsAt = new Date(data.endsAt).getTime();
       competitionWidgetBody.innerHTML = `${seedHtml}
         ${nickname ? competitionOptInRowHtml(data.id) : ''}
@@ -2679,6 +2743,122 @@ async function checkCompetitionStatus(){
 }
 checkCompetitionStatus();
 setInterval(checkCompetitionStatus, 10000);
+
+/* ================= תוספת: פופ-אפ אוטומטי שעה לפני תחילת תחרות מתוזמנת =================
+   מוצג פעם אחת בלבד לכל תחרות (נשמר ב-localStorage לפי competitionId) כדי לא להטריד עם קפיצות
+   חוזרות בכל פולינג - השחקן/ית יכול/ה לסגור אותו וימשיך להופיע לו/ה הווידג'ט הקבוע בפינה. */
+const COMPETITION_SOON_POPUP_KEY = 'jc_competition_soon_popup_shown';
+const competitionSoonBackdrop = document.getElementById('competition-soon-modal-backdrop');
+let competitionSoonTimer = null;
+
+function wasCompetitionSoonPopupShown(competitionId){
+  try{ return localStorage.getItem(COMPETITION_SOON_POPUP_KEY) === String(competitionId); }catch{ return false; }
+}
+function markCompetitionSoonPopupShown(competitionId){
+  try{ localStorage.setItem(COMPETITION_SOON_POPUP_KEY, String(competitionId)); }catch{ /* ignore */ }
+}
+
+function maybeShowCompetitionSoonPopup(data, startAt){
+  const remaining = startAt - Date.now();
+  if (remaining > 0 && remaining <= 3600 * 1000 && !wasCompetitionSoonPopupShown(data.id)){
+    showCompetitionSoonPopup(data, startAt);
+  }
+}
+
+function showCompetitionSoonPopup(data, startAt){
+  markCompetitionSoonPopupShown(data.id);
+  document.getElementById('competition-soon-seeds').innerHTML = (data.seedElements || []).map(e =>
+    `<span>${escapeHtml(e.emoji)} ${escapeHtml(e.name)}</span>`).join('');
+  competitionSoonBackdrop.style.display = 'flex';
+
+  clearInterval(competitionSoonTimer);
+  const tick = () => {
+    const remaining = startAt - Date.now();
+    const el = document.getElementById('competition-soon-countdown');
+    if (remaining <= 0){
+      clearInterval(competitionSoonTimer);
+      competitionSoonBackdrop.style.display = 'none';
+      return;
+    }
+    if (el) el.textContent = 'מתחילה בעוד: ' + formatCompetitionCountdown(remaining);
+  };
+  tick();
+  competitionSoonTimer = setInterval(tick, 1000);
+
+  const joinBtn = document.getElementById('competition-soon-join-btn');
+  const dismissBtn = document.getElementById('competition-soon-dismiss-btn');
+  joinBtn.onclick = () => {
+    if (nickname) setCompetitionOptIn(data.id, true);
+    competitionSoonBackdrop.style.display = 'none';
+    clearInterval(competitionSoonTimer);
+  };
+  dismissBtn.onclick = () => {
+    competitionSoonBackdrop.style.display = 'none';
+    clearInterval(competitionSoonTimer);
+  };
+}
+competitionSoonBackdrop.addEventListener('click', (e) => {
+  if (e.target === competitionSoonBackdrop){
+    competitionSoonBackdrop.style.display = 'none';
+    clearInterval(competitionSoonTimer);
+  }
+});
+
+/* ================= תוספת: מודאל "תחרות אלמנטים" מתפריט 9 הנקודות - התחרות הבאה + היסטוריית זוכים ================= */
+const COMPETITION_HISTORY_URL = WORKER_URL ? `${WORKER_URL}/competition/history` : '';
+const competitionInfoModalBackdrop = document.getElementById('competition-info-modal-backdrop');
+const competitionInfoBody = document.getElementById('competition-info-body');
+
+function competitionNextSectionHtml(data){
+  if (!data){
+    return `<div class="comp-info-section"><h3>🕒 התחרות הבאה</h3><div id="competition-info-empty">אין כרגע תחרות מתוזמנת/פעילה.</div></div>`;
+  }
+  const seedsHtml = `<div class="comp-info-seeds">${(data.seedElements || []).map(e =>
+    `<span>${escapeHtml(e.emoji)} ${escapeHtml(e.name)}</span>`).join('')}</div>`;
+  if (data.status === 'scheduled'){
+    return `<div class="comp-info-section"><h3>🕒 התחרות הבאה</h3>
+      <div style="font-size:12.5px; color:var(--text-dim); margin-bottom:6px;">מתחילה ב-${new Date(data.startAt).toLocaleString('he-IL')}</div>
+      ${seedsHtml}</div>`;
+  }
+  return `<div class="comp-info-section"><h3>🟢 תחרות פעילה כרגע</h3>
+    <div style="font-size:12.5px; color:var(--text-dim); margin-bottom:6px;">מסתיימת ב-${new Date(data.endsAt).toLocaleString('he-IL')}</div>
+    ${seedsHtml}</div>`;
+}
+
+function competitionHistoryRowHtml(row){
+  const seedsHtml = `<div class="comp-info-seeds">${(row.seedElements || []).map(e =>
+    `<span>${escapeHtml(e.emoji)} ${escapeHtml(e.name)}</span>`).join('')}</div>`;
+  const winnersHtml = row.winners && row.winners.length
+    ? `<span class="crown">👑</span> ${row.winners.map(escapeHtml).join(', ')} (${row.topScore} נק')`
+    : 'לא היו משתתפים/ות עם ניקוד';
+  return `<div class="comp-history-row">
+    <div class="comp-history-date">הסתיימה ב-${new Date(row.endedAt).toLocaleString('he-IL')}</div>
+    ${seedsHtml}
+    <div class="comp-history-winners">${winnersHtml}</div>
+  </div>`;
+}
+
+async function openCompetitionInfoModal(){
+  competitionInfoModalBackdrop.style.display = 'flex';
+  competitionInfoBody.innerHTML = 'טוען...';
+  try{
+    const nextHtml = competitionNextSectionHtml(currentCompetitionData);
+    let historyHtml = '';
+    if (COMPETITION_HISTORY_URL){
+      const res = await fetch(`${COMPETITION_HISTORY_URL}?limit=10`);
+      const { data } = await res.json();
+      historyHtml = `<div class="comp-info-section"><h3>🏁 זוכי תחרויות קודמות</h3>${
+        (data && data.length) ? data.map(competitionHistoryRowHtml).join('') : '<div id="competition-info-empty">עוד לא הסתיימה אף תחרות.</div>'
+      }</div>`;
+    }
+    competitionInfoBody.innerHTML = nextHtml + historyHtml;
+  }catch{
+    competitionInfoBody.innerHTML = '<div id="competition-info-empty">שגיאה בטעינת נתוני התחרות.</div>';
+  }
+}
+document.getElementById('btn-competition-info').addEventListener('click', openCompetitionInfoModal);
+document.getElementById('btn-close-competition-info').addEventListener('click', () => { competitionInfoModalBackdrop.style.display = 'none'; });
+competitionInfoModalBackdrop.addEventListener('click', (e) => { if (e.target === competitionInfoModalBackdrop) competitionInfoModalBackdrop.style.display = 'none'; });
 
 /* ================= גיבוי / העברת התקדמות (ייצוא + ייבוא) =================
    הקובץ המיוצא הוא בעצם "כרטיס כניסה" מלא לחשבון (כולל ה-client_id שמזהה את הכינוי מול השרת) -
