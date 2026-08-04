@@ -873,6 +873,7 @@
         <button id="btn-close-recipe-book">✕</button>
       </div>
       <div id="recipe-book-sub">כל השילובים שאני גיליתי בעצמי</div>
+      <button id="btn-export-recipes" style="align-self:flex-start; margin-bottom:10px; border:1px solid var(--item-border); background:var(--item-bg); color:var(--text); border-radius:10px; padding:7px 12px; font-size:12.5px; cursor:pointer;">⬇️ ייצוא 30 שילובים אקראיים ל-TXT</button>
       <input id="recipe-book-search" type="text" placeholder="חיפוש בספר המתכונים...">
       <div id="recipe-book-list"></div>
     </div>
@@ -3337,6 +3338,60 @@ document.getElementById('btn-recipe-book').addEventListener('click', () => {
 document.getElementById('btn-close-recipe-book').addEventListener('click', () => { recipeBookBackdrop.style.display = 'none'; });
 recipeBookBackdrop.addEventListener('click', (e) => { if (e.target === recipeBookBackdrop) recipeBookBackdrop.style.display = 'none'; });
 recipeBookSearch.addEventListener('input', renderRecipeBook);
+
+/* ================= תוספת: ייצוא קובץ TXT של 30 שילובים אקראיים מספר המתכונים, פעם ביום =================
+   מוגבל לפעם אחת בכל יום קלנדרי (לפי השעון המקומי של הדפדפן) - נשמר localStorage עם תאריך הייצוא
+   האחרון (YYYY-MM-DD) ומשווים לתאריך של היום; אם זהה, לא מאפשרים ייצוא נוסף עד יום המחרת. */
+const EXPORT_RECIPES_LAST_DATE_KEY = 'jc_export_recipes_last_date';
+
+function todayDateStr(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function shuffleCopy(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+document.getElementById('btn-export-recipes').addEventListener('click', () => {
+  const lastDate = localStorage.getItem(EXPORT_RECIPES_LAST_DATE_KEY);
+  const today = todayDateStr();
+  if (lastDate === today){
+    showToast('⏳ אפשר לייצא קובץ פעם ביום בלבד - נסו שוב מחר', false);
+    return;
+  }
+
+  const mine = getMyRecipes();
+  if (mine.length === 0){
+    showToast('עדיין לא גיליתם שילובים לייצוא - התחילו לגרור אלמנטים!', false);
+    return;
+  }
+
+  const chosen = shuffleCopy(mine).slice(0, 30);
+  const lines = [
+    `יצירה אינסופית - ייצוא שילובים (${chosen.length} מתוך ${mine.length} שגיליתי בסך הכל)`,
+    `תאריך ייצוא: ${new Date().toLocaleString('he-IL')}`,
+    '',
+    ...chosen.map(r => `${r.itemA} + ${r.itemB} ← ${r.resultEmoji} ${r.resultName}`),
+  ];
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `יצירה-אינסופית-שילובים-${today}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+
+  localStorage.setItem(EXPORT_RECIPES_LAST_DATE_KEY, today);
+  showToast(`✅ יוצאו ${chosen.length} שילובים אקראיים ל-TXT`, true);
+});
 
 /* ================= מפתחות API אישיים (כמה שרוצים, נשמרים רק בדפדפן הזה, רוטציה בין הבקשות) ================= */
 const PERSONAL_KEYS_STORAGE = 'jc_personal_keys';
